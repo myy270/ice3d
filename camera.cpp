@@ -18,7 +18,7 @@
 #define	VALUE_MOVE_CAMERA	(2.0f)					// カメラの移動量
 #define	VALUE_ROTATE_CAMERA	(D3DX_PI * 0.01f)		// カメラの回転量
 
-#define	INTERVAL_CAMERA_R	(12.5f)					// モデルの視線の先までの距離(プレイヤーと注視点の距離)
+#define	INTERVAL_CAMERA_R	(0.0f)					// モデルの視線の先までの距離(プレイヤーと注視点の距離) カメラブレの原因の一つ
 #define	RATE_CHASE_CAMERA_P	(0.35f)					// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
@@ -63,7 +63,7 @@ HRESULT InitCamera(void)
 	float vx,vz;
 	vx = g_posCameraP.x - g_posCameraR.x;
 	vz = g_posCameraP.z - g_posCameraR.z;
-	g_fLengthIntervalCamera = sqrtf(vx * vx + vz * vz);
+	g_fLengthIntervalCamera = sqrtf(vx * vx + vz * vz);//= g_posCameraP.z
 	g_fLengthIntervalPlayer = INTERVAL_CAMERA_R;
 
 	return S_OK;
@@ -142,6 +142,35 @@ void UpdateCamera(void)
 		fov -= 0.01f;
 	}*/
 
+	if (GetKeyboardPress(DIK_G))
+	{
+		g_chaseHightP -= VALUE_MOVE_CAMERA;
+	}
+
+	if (GetKeyboardPress(DIK_H))
+	{
+		g_chaseHightP += VALUE_MOVE_CAMERA;
+	}
+
+	if (GetKeyboardPress(DIK_J))
+	{
+		g_fLengthIntervalCamera -= VALUE_MOVE_CAMERA;
+	}
+
+	if (GetKeyboardPress(DIK_K))
+	{
+		g_fLengthIntervalCamera += VALUE_MOVE_CAMERA;
+	}
+
+	//if (GetKeyboardPress(DIK_L))
+	//{
+	//	g_fLengthIntervalPlayer -= VALUE_MOVE_CAMERA;
+	//}
+
+	//if (GetKeyboardPress(DIK_SEMICOLON))
+	//{
+	//	g_fLengthIntervalPlayer += VALUE_MOVE_CAMERA;
+	//}
 #endif
 
 
@@ -178,15 +207,29 @@ void UpdateCamera(void)
 	PrintDebugProc("\n");
 	PrintDebugProc("\n");
 	PrintDebugProc("\n");
-	PrintDebugProc("fov:%f\n", VIEW_ANGLE + fov);
+	/*PrintDebugProc("fov:%f\n", VIEW_ANGLE + fov);*/
 
 	PrintDebugProc("[camera pos：(%f : %f : %f)]\n", g_posCameraP.x,
 											g_posCameraP.y, 
 											g_posCameraP.z);
 	
-	PrintDebugProc("[camera rock：(%f : %f : %f)]\n", g_posCameraR.x,
+	PrintDebugProc("[camera at：(%f : %f : %f)]\n", g_posCameraR.x,
 											g_posCameraR.y, 
 											g_posCameraR.z);
+
+	PrintDebugProc("\n");
+
+	PrintDebugProc("chaseHightP:%f\n", g_chaseHightP);
+
+	PrintDebugProc("\n");
+
+	PrintDebugProc("LengthIntervalCamera:%f\n", g_fLengthIntervalCamera);
+
+	PrintDebugProc("\n");
+
+	PrintDebugProc("LengthIntervalPlayer:%f\n", g_fLengthIntervalPlayer);
+
+	PrintDebugProc("\n");
 }
 
 //=============================================================================

@@ -43,7 +43,7 @@ int					g_nCountFPS;			// FPSカウンタ
 #endif
 MODE				g_mode = MODE_TITLE;	// モード
 
-
+int rest;
 
 extern PLAYER g_player;
 extern DWORD g_aNumMatItem[];
@@ -149,11 +149,25 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 				dwExecLastTime = dwCurrentTime;
 
-				// 更新処理
-				Update();
+				// 入力更新
+				UpdateInput();
 
-				// 描画処理
-				Draw();
+				if (GetKeyboardTrigger(DIK_NUMPADENTER))
+				{
+#ifdef _DEBUG
+					rest = !rest;
+#endif
+				}
+
+				if (rest == 0)
+				{
+					// 更新処理
+					Update();
+
+					// 描画処理
+					Draw();
+				}
+				
 
 				dwFrameCount++;
 			}
@@ -348,8 +362,7 @@ void Uninit(void)
 //=============================================================================
 void Update(void)
 {
-	// 入力更新
-	UpdateInput();
+	
 
 	UpdateDebugProc();
 

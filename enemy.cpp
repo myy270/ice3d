@@ -27,9 +27,9 @@
 
 
 
-#define	ENEMY_RADIUS		(10.0f)						// 半径
+#define	ENEMY_RADIUS		(15.0f)						// 半径
 
-#define	VALUE_MOVE_ENEMY	(0.155f)					// 移動速度
+#define	VALUE_MOVE_ENEMY	(0.205f)					// 移動速度
 #define	RATE_MOVE_ENEMY	(0.025f)						// 移動慣性係数
 
 #define	VALUE_ROTATE_ENEMY	(D3DX_PI * 0.025f)			// 回転速度 4.5度
@@ -70,9 +70,9 @@ static KEY g_anime[] =
 		15,
 		{
 			{// part 0
-				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
 				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
-				D3DXVECTOR3(0.0000f,15.0000f,0.0000f),//T
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
 			},
 
 			{// part 1
@@ -112,9 +112,9 @@ static KEY g_anime[] =
 		30,
 		{
 			{// part 0
-				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
 				D3DXVECTOR3(-0.0385f,0.0000f,0.0000f),//R
-				D3DXVECTOR3(0.0000f,15.0000f,0.0000f),//T
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
 			},
 
 			{// part 1
@@ -154,9 +154,9 @@ static KEY g_anime[] =
 		30,
 		{
 			{// part 0
-				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
 				D3DXVECTOR3(-0.0385f,0.0000f,0.0000f),//R
-				D3DXVECTOR3(0.0000f,15.0000f,0.0000f),//T
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
 			},
 
 			{// part 1
@@ -196,9 +196,9 @@ static KEY g_anime[] =
 		30,
 		{
 			{// part 0
-				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
 				D3DXVECTOR3(-0.0385f,0.0000f,0.0000f),//R
-				D3DXVECTOR3(0.0000f,15.0000f,0.0000f),//T
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
 			},
 
 			{// part 1
@@ -276,7 +276,7 @@ HRESULT InitEnemy(void)
 		{//体
 			g_enemy.part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);//xyz必ず同じように
 			g_enemy.part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			g_enemy.part[i].srt.pos = D3DXVECTOR3(90.0f, 15.0f, 0.0f);//足が地面に触れるよう、15.0
+			g_enemy.part[i].srt.pos = D3DXVECTOR3(90.0f, 22.4000f, 0.0f);//足が地面に触れるよう、15.0
 
 			g_enemy.part[i].parent = NULL;//体の親はNULLにする
 			break;
@@ -404,18 +404,18 @@ void UpdateEnemy(void)
 
 		if (GetTimeOut() == 0)
 		{//移動
-			if (/*GetKeyboardPress(DIK_LEFT) || */g_left)
+			if (GetKeyboardPress(DIK_LEFT) || g_left)
 			{
 				g_animeState = 1;//動く状態にする
 
-				if (/*GetKeyboardPress(DIK_UP) || */g_up)
+				if (GetKeyboardPress(DIK_UP) || g_up)
 				{// 左前移動
 					g_enemy.move.x -= sinf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 
 					g_enemy.rotDest.y = rotCamera.y + D3DX_PI * 0.75f;
 				}
-				else if (/*GetKeyboardPress(DIK_DOWN) || */g_down)
+				else if (GetKeyboardPress(DIK_DOWN) || g_down)
 				{// 左後移動
 					g_enemy.move.x -= sinf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
@@ -430,18 +430,18 @@ void UpdateEnemy(void)
 					g_enemy.rotDest.y = rotCamera.y + D3DX_PI * 0.50f;
 				}
 			}
-			else if (/*GetKeyboardPress(DIK_RIGHT) || */g_right)
+			else if (GetKeyboardPress(DIK_RIGHT) || g_right)
 			{
 				g_animeState = 1;//動く状態にする
 
-				if (/*GetKeyboardPress(DIK_UP) || */g_up)
+				if (GetKeyboardPress(DIK_UP) || g_up)
 				{// 右前移動
 					g_enemy.move.x -= sinf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 
 					g_enemy.rotDest.y = rotCamera.y - D3DX_PI * 0.75f;
 				}
-				else if (/*GetKeyboardPress(DIK_DOWN) || */g_down)
+				else if (GetKeyboardPress(DIK_DOWN) || g_down)
 				{// 右後移動
 					g_enemy.move.x -= sinf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
@@ -456,7 +456,7 @@ void UpdateEnemy(void)
 					g_enemy.rotDest.y = rotCamera.y - D3DX_PI * 0.50f;
 				}
 			}
-			else if (/*GetKeyboardPress(DIK_UP) || */g_up)
+			else if (GetKeyboardPress(DIK_UP) || g_up)
 			{
 				g_animeState = 1;//動く状態にする
 
@@ -466,7 +466,7 @@ void UpdateEnemy(void)
 
 				g_enemy.rotDest.y = D3DX_PI + rotCamera.y;
 			}
-			else if (/*GetKeyboardPress(DIK_DOWN) || */g_down)
+			else if (GetKeyboardPress(DIK_DOWN) || g_down)
 			{
 				g_animeState = 1;//動く状態にする
 

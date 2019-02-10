@@ -1,26 +1,2 @@
-﻿  bullet.cpp
-  camera.cpp
-  debugproc.cpp
-  effect.cpp
-  enemy.cpp
-  explosion.cpp
-  fade.cpp
-  game.cpp
-  input.cpp
-  item.cpp
-  life.cpp
-  light.cpp
-  main.cpp
-  meshfield.cpp
-  meshwall.cpp
-  player.cpp
-  result.cpp
-  score.cpp
-  shadow.cpp
-  sound.cpp
-  コードを生成中...
-  コンパイル中...
-  timer.cpp
-  title.cpp
-  コードを生成中...
+﻿  enemy.cpp
   ice3d.vcxproj -> C:\Users\USER_MAI\source\repos\ice3d\Debug\ice3d.exe
