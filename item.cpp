@@ -32,10 +32,16 @@ D3DXMATRIX			g_mtxWorldItem;				// ワールドマトリックス
 
 ITEM				g_aItem[MAX_ITEM];			// アイテムワーク
 
+bool g_dropItem;//落下するか
+
+bool g_dropReady;//落下するアイテムはもう設置したか
+
+int g_itemIndex;//落下するアイテムのインデクス
+
 const char *c_aFileNameItem[ITEMTYPE_MAX] =
 {
-	"data/MODEL/coin.x",		// コイン
-	//"data/MODEL/item001.x",		// ライフ
+	"data/MODEL/coin.x",			// コイン
+	"data/MODEL/iceBlock.x",		// アイスブロック
 	//"data/MODEL/item002.x"		// タイマー
 };
 
@@ -118,6 +124,15 @@ void UninitItem(void)
 //=============================================================================
 void UpdateItem(void)
 {
+	if (GetKeyboardTrigger(DIK_3))
+	{
+		g_dropItem = true;
+	}
+
+	DropItem();
+	
+
+
 	for(int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{
 		if(g_aItem[nCntItem].bUse)
@@ -214,8 +229,9 @@ void DrawItem(void)
 //=============================================================================
 // アイテムの設定
 //=============================================================================
-void SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType)
+int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType)
 {
+	int itemIndex = -1;
 	for(int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{
 		if(!g_aItem[nCntItem].bUse)
@@ -229,9 +245,11 @@ void SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType)
 			// 影の設定
 			g_aItem[nCntItem].nIdxShadow = SetShadow(g_aItem[nCntItem].pos, g_aItem[nCntItem].fRadius * 2.0f, g_aItem[nCntItem].fRadius * 2.0f);
 
+			itemIndex = nCntItem;
 			break;
 		}
 	}
+	return itemIndex;
 }
 
 //=============================================================================
@@ -264,13 +282,43 @@ void Freeze(void)
 			GetEnemy()->state = FROZEN;
 			GetEnemy()->stateTime = 180;//3秒
 		}
-		//else
-		//{
-		//	GetEnemy()->state = NORMAL;
-		//	GetEnemy()->stateTime = 0;
-		//} 
-
 	}
 
 }
+
+void DropItem()
+{
+
+	if (g_dropItem)
+	{
+		if (!g_dropReady)
+		{
+			float fPosX, fPosY, fPosZ;
+
+			fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
+			fPosY = 950.0f;
+			fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
+			g_itemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_ICEBLOCK);
+			g_dropReady = true;
+		}
+		else
+		{
+			if (g_itemIndex != -1)
+			{
+				(GetItem() + g_itemIndex)->pos.y -= 15.0f;
+
+				if ((GetItem() + g_itemIndex)->pos.y <= 15.0f)
+				{
+					(GetItem() + g_itemIndex)->pos.y = 15.0f;
+
+					g_dropItem = false;
+					g_dropReady = false;
+				}
+			}
+		}
+	}
+
+}
+
+
 

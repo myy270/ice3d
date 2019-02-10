@@ -402,7 +402,7 @@ void UninitEnemy(void)
 void UpdateEnemy(void)
 {
 
-	AI2();
+	//AI2();
 
 	if (g_enemy.state == FROZEN)
 	{	

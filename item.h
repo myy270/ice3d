@@ -20,6 +20,8 @@
 enum
 {
 	ITEMTYPE_COIN = 0,		// コイン
+	ITEMTYPE_ICEBLOCK = 1,		// アイスブロック
+
 	//ITEMTYPE_LIFE,			// ライフ
 	//ITEMTYPE_TIMER,			// タイマー
 	ITEMTYPE_MAX
@@ -45,9 +47,11 @@ HRESULT InitItem(void);
 void UninitItem(void);
 void UpdateItem(void);
 void DrawItem(void);
-void SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType = ITEMTYPE_COIN);
+int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType = ITEMTYPE_COIN);
 void DeleteItem(int nIdxItem);
 ITEM *GetItem(void);
 
 void Freeze(void);
+
+void DropItem();
 #endif
