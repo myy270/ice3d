@@ -49,4 +49,5 @@ void SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType = ITEMTYPE_COIN);
 void DeleteItem(int nIdxItem);
 ITEM *GetItem(void);
 
+void Freeze(void);
 #endif

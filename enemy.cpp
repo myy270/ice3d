@@ -23,13 +23,13 @@
 #define	HEAD_ENEMY		"data/MODEL/bearHeadPink.x"	// 読み込むモデル名
 #define	HAND_ENEMY		"data/MODEL/bearHandPink.x"	// 読み込むモデル名
 #define	LEG_ENEMY		"data/MODEL/bearLegPink.x"	// 読み込むモデル名
-
+#define	ICE_BLOCK		"data/MODEL/iceBlock.x"		// 読み込むモデル名
 
 
 
 #define	ENEMY_RADIUS		(15.0f)						// 半径
 
-#define	VALUE_MOVE_ENEMY	(0.205f)					// 移動速度
+#define	VALUE_MOVE_ENEMY	(0.155f)					// 移動速度
 #define	RATE_MOVE_ENEMY	(0.025f)						// 移動慣性係数
 
 #define	VALUE_ROTATE_ENEMY	(D3DX_PI * 0.025f)			// 回転速度 4.5度
@@ -63,6 +63,8 @@ bool g_up;
 bool g_down;
 bool g_left;
 bool g_right;
+
+
 
 static KEY g_anime[] =
 {
@@ -254,6 +256,7 @@ HRESULT InitEnemy(void)
 	g_enemy.part[4].partFile = (char *)LEG_ENEMY;//左足
 	g_enemy.part[5].partFile = (char *)LEG_ENEMY;//右足
 
+	g_enemy.part[6].partFile = (char *)ICE_BLOCK;//氷
 
 	for (int i = 0; i < PART_MAX_ENEMY; i++)//パーツ番号
 	{
@@ -339,6 +342,14 @@ HRESULT InitEnemy(void)
 
 		}
 
+		if (i != 6)
+		{
+			g_enemy.part[i].use = true;
+		}
+		else
+		{
+			g_enemy.part[i].use = false;
+		}
 	}
 
 	g_enemy.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -347,7 +358,7 @@ HRESULT InitEnemy(void)
 	// 影を設定 //体を基準に
 	g_enemy.nIdxShadow = SetShadow(g_enemy.part[0].srt.pos, g_enemy.fRadius * 2.0f, g_enemy.fRadius * 2.0f);
 
-
+	g_enemy.state = NORMAL;
 #if 0
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
@@ -390,8 +401,24 @@ void UninitEnemy(void)
 //=============================================================================
 void UpdateEnemy(void)
 {
-	
+
 	AI2();
+
+	if (g_enemy.state == FROZEN)
+	{	
+		if (g_enemy.stateTime == 0)
+		{
+			g_enemy.state = NORMAL;
+			g_enemy.part[6].use = false;
+		}
+		else
+		{
+			g_enemy.stateTime--;
+			g_enemy.part[6].use = true;
+
+		}
+	}
+
 
 	{
 		D3DXVECTOR3 rotCamera;
@@ -402,7 +429,8 @@ void UpdateEnemy(void)
 
 		g_animeState = 0;//運動状態をリセット
 
-		if (GetTimeOut() == 0)
+
+		if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
 		{//移動
 			if (GetKeyboardPress(DIK_LEFT) || g_left)
 			{
@@ -682,51 +710,54 @@ void DrawEnemy(void)
 
 	for (int i = 0; i < PART_MAX_ENEMY; i++)//パーツ番号
 	{
-		// ワールドマトリックスの初期化
-		D3DXMatrixIdentity(&mtxWorld);
-
-		// スケールを反映
-		D3DXMatrixScaling(&mtxScl, g_enemy.part[i].srt.scl.x,
-								   g_enemy.part[i].srt.scl.y,
-								   g_enemy.part[i].srt.scl.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
-
-		// 回転を反映
-		D3DXMatrixRotationYawPitchRoll(&mtxRot, g_enemy.part[i].srt.rot.y, 
-												g_enemy.part[i].srt.rot.x,
-												g_enemy.part[i].srt.rot.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
-
-		// 移動を反映
-		D3DXMatrixTranslation(&mtxTranslate, g_enemy.part[i].srt.pos.x,
-											 g_enemy.part[i].srt.pos.y, 
-											 g_enemy.part[i].srt.pos.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
-
-		//親が存在する場合は親のワールドマトリクスを合成
-		if (g_enemy.part[i].parent)
+		if (g_enemy.part[i].use)
 		{
-			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &g_enemy.part[i].parent->mtxWorld);
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&mtxWorld);
+
+			// スケールを反映
+			D3DXMatrixScaling(&mtxScl, g_enemy.part[i].srt.scl.x,
+				g_enemy.part[i].srt.scl.y,
+				g_enemy.part[i].srt.scl.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
+
+			// 回転を反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_enemy.part[i].srt.rot.y,
+				g_enemy.part[i].srt.rot.x,
+				g_enemy.part[i].srt.rot.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+
+			// 移動を反映
+			D3DXMatrixTranslation(&mtxTranslate, g_enemy.part[i].srt.pos.x,
+				g_enemy.part[i].srt.pos.y,
+				g_enemy.part[i].srt.pos.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
+
+			//親が存在する場合は親のワールドマトリクスを合成
+			if (g_enemy.part[i].parent)
+			{
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &g_enemy.part[i].parent->mtxWorld);
+			}
+
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
+
+			// マテリアル情報に対するポインタを取得
+			pD3DXMat = (D3DXMATERIAL*)g_enemy.part[i].pMatBuff->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_enemy.part[i].nNumMat; nCntMat++)
+			{
+				// マテリアルの設定
+				pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_pD3DTextureEnemy);
+
+				// 描画
+				g_enemy.part[i].pMesh->DrawSubset(nCntMat);
+			}
+			g_enemy.part[i].mtxWorld = mtxWorld;//ワールドマトリクスを保存
 		}
-
-		// ワールドマトリックスの設定
-		pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
-
-		// マテリアル情報に対するポインタを取得
-		pD3DXMat = (D3DXMATERIAL*)g_enemy.part[i].pMatBuff->GetBufferPointer();
-
-		for (int nCntMat = 0; nCntMat < (int)g_enemy.part[i].nNumMat; nCntMat++)
-		{
-			// マテリアルの設定
-			pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
-
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_pD3DTextureEnemy);
-
-			// 描画
-			g_enemy.part[i].pMesh->DrawSubset(nCntMat);
-		}
-		g_enemy.part[i].mtxWorld = mtxWorld;//ワールドマトリクスを保存
 	}
 
 	pDevice->SetMaterial(&matDef);// マテリアルをデフォルトに戻す
@@ -805,7 +836,10 @@ void AnimeWalk()
 		g_motionTime = 0.0f;	//リセット
 		i = (int)g_motionTime;	//重要
 
-		g_cancelTime += dt;//0番キーフレームのtimeを使う
+		if (g_enemy.state != FROZEN)
+		{
+			g_cancelTime += dt;//0番キーフレームのtimeを使う
+		}
 
 		if (g_cancelTime > 1.0f)//最大時間を超えたら
 		{
@@ -813,46 +847,46 @@ void AnimeWalk()
 		}
 
 		//接続の補間は　[i] * 1.0です、[i + 1] * 0.0ではない
-		for (int j = 0; j < PART_MAX_ENEMY; j++)//パーツ番号
+		for (int j = 0; j < 6; j++)//パーツ番号
 		{//最初状態に戻る
 			// Scale
-			g_enemy.part[j].srt.scl.x = g_enemy.part[j].srt.scl.x +				// 前のキーフレーム位置
-				(g_anime[0].key[j].scl.x - g_enemy.part[j].srt.scl.x)			// 前のキーフレームと次のキーフレームの差分
-				* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			g_enemy.part[j].srt.scl.x = g_enemy.part[j].srt.scl.x +		
+				(g_anime[0].key[j].scl.x - g_enemy.part[j].srt.scl.x)	
+				* g_cancelTime;											
 
-			g_enemy.part[j].srt.scl.y =g_enemy.part[j].srt.scl.y +				// 前のキーフレーム位置
-				(g_anime[0].key[j].scl.y -g_enemy.part[j].srt.scl.y)			// 前のキーフレームと次のキーフレームの差分
-				* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			g_enemy.part[j].srt.scl.y =g_enemy.part[j].srt.scl.y +		
+				(g_anime[0].key[j].scl.y -g_enemy.part[j].srt.scl.y)	
+				* g_cancelTime;											
 
-			g_enemy.part[j].srt.scl.z =g_enemy.part[j].srt.scl.z +				// 前のキーフレーム位置
-				(g_anime[0].key[j].scl.z -g_enemy.part[j].srt.scl.z)			// 前のキーフレームと次のキーフレームの差分
-				* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			g_enemy.part[j].srt.scl.z =g_enemy.part[j].srt.scl.z +		
+				(g_anime[0].key[j].scl.z -g_enemy.part[j].srt.scl.z)	
+				* g_cancelTime;											
 
 			// Rotation
-			g_enemy.part[j].srt.rot.x =g_enemy.part[j].srt.rot.x +				// 前のキーフレーム位置
-				(g_anime[0].key[j].rot.x -g_enemy.part[j].srt.rot.x)			// 前のキーフレームと次のキーフレームの差分
-				* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			g_enemy.part[j].srt.rot.x =g_enemy.part[j].srt.rot.x +		
+				(g_anime[0].key[j].rot.x -g_enemy.part[j].srt.rot.x)	
+				* g_cancelTime;											
 
-			//g_enemy.part[j].srt.rot.y =g_enemy.part[j].srt.rot.y +				// 前のキーフレーム位置
-			//	(g_anime[0].key[j].rot.y -g_enemy.part[j].srt.rot.y)			// 前のキーフレームと次のキーフレームの差分
-			//	* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			//g_enemy.part[j].srt.rot.y =g_enemy.part[j].srt.rot.y +	
+			//	(g_anime[0].key[j].rot.y -g_enemy.part[j].srt.rot.y)	
+			//	* g_cancelTime;											
 
-			g_enemy.part[j].srt.rot.z =g_enemy.part[j].srt.rot.z +				// 前のキーフレーム位置
-				(g_anime[0].key[j].rot.z -g_enemy.part[j].srt.rot.z)			// 前のキーフレームと次のキーフレームの差分
-				* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			g_enemy.part[j].srt.rot.z =g_enemy.part[j].srt.rot.z +		
+				(g_anime[0].key[j].rot.z -g_enemy.part[j].srt.rot.z)	
+				* g_cancelTime;											
 
 			// Position
-			//g_enemy.part[j].srt.pos.x =g_enemy.part[j].srt.pos.x +				// 前のキーフレーム位置
-			//	(g_anime[0].key[j].pos.x -g_enemy.part[j].srt.pos.x)			// 前のキーフレームと次のキーフレームの差分
-			//	* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			//g_enemy.part[j].srt.pos.x =g_enemy.part[j].srt.pos.x +	
+			//	(g_anime[0].key[j].pos.x -g_enemy.part[j].srt.pos.x)	
+			//	* g_cancelTime;											
 
-			//g_enemy.part[j].srt.pos.y =g_enemy.part[j].srt.pos.y +				// 前のキーフレーム位置
-			//	(g_anime[0].key[j].pos.y -g_enemy.part[j].srt.pos.y)			// 前のキーフレームと次のキーフレームの差分
-			//	* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			//g_enemy.part[j].srt.pos.y =g_enemy.part[j].srt.pos.y +	
+			//	(g_anime[0].key[j].pos.y -g_enemy.part[j].srt.pos.y)	
+			//	* g_cancelTime;											
 
-			//g_enemy.part[j].srt.pos.z =g_enemy.part[j].srt.pos.z +				// 前のキーフレーム位置
-			//	(g_anime[0].key[j].pos.z -g_enemy.part[j].srt.pos.z)			// 前のキーフレームと次のキーフレームの差分
-			//	* g_cancelTime;											// に　全体アニメ時間の小数点以下の割合をかける
+			//g_enemy.part[j].srt.pos.z =g_enemy.part[j].srt.pos.z +	
+			//	(g_anime[0].key[j].pos.z -g_enemy.part[j].srt.pos.z)	
+			//	* g_cancelTime;											
 		}
 
 	}
@@ -861,7 +895,7 @@ void AnimeWalk()
 		g_cancelTime = 0.0f;	//リセット
 
 		//接続の補間は　[i] * 1.0です、[i + 1] * 0.0ではない
-		for (int j = 0; j < PART_MAX_ENEMY; j++)//パーツ番号
+		for (int j = 0; j < 6; j++)//パーツ番号
 		{
 			// Scale
 			g_enemy.part[j].srt.scl.x = g_anime[i].key[j].scl.x +				// 前のキーフレーム位置

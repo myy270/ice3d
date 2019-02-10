@@ -10,7 +10,7 @@
 #include "main.h"
 
 
-#define PART_MAX_ENEMY	(6)		// パーツの数
+#define PART_MAX_ENEMY	(7)		// パーツの数
 
 //*****************************************************************************
 // 構造体定義
@@ -24,6 +24,8 @@ struct ENEMY
 	int nIdxShadow;			// 影ID
 	PART part[PART_MAX_ENEMY];
 
+	STATE state;
+	int stateTime;
 };
 
 

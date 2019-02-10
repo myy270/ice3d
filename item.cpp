@@ -6,7 +6,9 @@
 //=============================================================================
 #include "item.h"
 #include "shadow.h"
-
+#include "input.h"
+#include "player.h"
+#include "enemy.h"
 //*****************************************************************************
 // ƒ}ƒNƒ’è‹`
 //*****************************************************************************
@@ -251,3 +253,24 @@ ITEM *GetItem(void)
 {
 	return &g_aItem[0];
 }
+
+
+void Freeze(void)
+{
+	if (GetKeyboardTrigger(DIK_SPACE))
+	{
+		if (GetEnemy()->state == NORMAL)
+		{
+			GetEnemy()->state = FROZEN;
+			GetEnemy()->stateTime = 180;//3•b
+		}
+		//else
+		//{
+		//	GetEnemy()->state = NORMAL;
+		//	GetEnemy()->stateTime = 0;
+		//} 
+
+	}
+
+}
+

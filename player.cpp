@@ -28,7 +28,7 @@
 
 #define	PLAYER_RADIUS		(15.0f)						// 半径
 
-#define	VALUE_MOVE_PLAYER	(0.205f)					// 移動速度
+#define	VALUE_MOVE_PLAYER	(0.155f)					// 移動速度
 #define	RATE_MOVE_PLAYER	(0.025f)					// 移動慣性係数
 
 #define	VALUE_ROTATE_PLAYER	(D3DX_PI * 0.025f)			// 回転速度 4.5度
@@ -856,6 +856,12 @@ void UpdatePlayer(void)
 			}
 		}
 	}
+
+	Freeze();
+
+
+
+
 
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_F2))

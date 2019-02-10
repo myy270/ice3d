@@ -40,6 +40,14 @@ struct PART
 	SRT			srt;		//Scaling Rotation Translation
 	D3DXMATRIX	mtxWorld;
 	PART		*parent;
+	bool		use;
+};
+
+enum STATE
+{
+	NORMAL,
+	FROZEN,
+	STATE_MAX
 };
 
 struct PLAYER
@@ -50,6 +58,7 @@ struct PLAYER
 	int nIdxShadow;			// 影ID
 	PART part[PART_MAX];
 
+	STATE state;
 };
 
 enum PART_ID
@@ -64,8 +73,12 @@ enum PART_ID
 enum APPLIMODE
 {
 	MODE_PLAY,
-	MODE_EDIT
+	MODE_EDIT,
+	APPLIMODE_MAX
 };
+
+
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
