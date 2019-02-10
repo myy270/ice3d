@@ -13,14 +13,13 @@
   main.cpp
   meshfield.cpp
   meshwall.cpp
-  motion.cpp
   player.cpp
   result.cpp
   score.cpp
   shadow.cpp
+  sound.cpp
   コードを生成中...
   コンパイル中...
-  sound.cpp
   timer.cpp
   title.cpp
   コードを生成中...

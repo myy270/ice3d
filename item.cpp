@@ -33,8 +33,8 @@ ITEM				g_aItem[MAX_ITEM];			// アイテムワーク
 const char *c_aFileNameItem[ITEMTYPE_MAX] =
 {
 	"data/MODEL/coin.x",		// コイン
-	"data/MODEL/item001.x",		// ライフ
-	"data/MODEL/item002.x"		// タイマー
+	//"data/MODEL/item001.x",		// ライフ
+	//"data/MODEL/item002.x"		// タイマー
 };
 
 //=============================================================================
@@ -60,7 +60,7 @@ HRESULT InitItem(void)
 									&g_aNumMatItem[nCntItemType],
 									&g_pMeshItem[nCntItemType])))
 		{
-			return E_FAIL;
+			//return E_FAIL;//コインが次のステージに残すbug
 		}
 
 #if 0

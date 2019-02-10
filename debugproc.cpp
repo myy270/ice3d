@@ -23,7 +23,7 @@
 LPD3DXFONT	g_pD3DXFont = NULL;			// フォントへのポインタ
 char		g_aStrDebug[1024] = {"\0"};	// デバッグ情報
 
-bool		g_bDispDebug = false;	// デバッグ表示ON/OFF
+bool		g_bDispDebug = true;	// デバッグ表示ON/OFF
 
 //=============================================================================
 // デバッグ表示処理の初期化
@@ -78,7 +78,7 @@ void DrawDebugProc(void)
 	if (g_bDispDebug)
 	{
 		// 情報表示
-		g_pD3DXFont->DrawText(NULL, g_aStrDebug, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0xff, 0xff, 0xff));
+		g_pD3DXFont->DrawText(NULL, g_aStrDebug, -1, &rect, DT_LEFT, D3DCOLOR_ARGB(0xff, 0, 0, 0xff));
 	}
 
 	// 情報クリア

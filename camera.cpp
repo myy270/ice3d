@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "player.h"
 #include "input.h"
+#include "debugproc.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -44,6 +45,8 @@ D3DXMATRIX		g_mtxView;					// ビューマトリックス
 D3DXMATRIX		g_mtxProjection;			// プロジェクションマトリックス
 
 float g_chaseHightP;// 追跡時の視点の高さ
+
+float fov;
 //=============================================================================
 // カメラの初期化
 //=============================================================================
@@ -128,6 +131,17 @@ void UpdateCamera(void)
 	{//zoom
 		g_fLengthIntervalCamera += VALUE_MOVE_CAMERA;
 	}
+
+	/*if (GetKeyboardTrigger(DIK_P))
+	{
+		fov += 0.01f;
+	}
+
+	if (GetKeyboardTrigger(DIK_O))
+	{
+		fov -= 0.01f;
+	}*/
+
 #endif
 
 
@@ -157,6 +171,22 @@ void UpdateCamera(void)
 	g_posCameraR.x += (g_posCameraRDest.x - g_posCameraR.x) * RATE_CHASE_CAMERA_R;
 	g_posCameraR.y += (g_posCameraRDest.y - g_posCameraR.y) * RATE_CHASE_CAMERA_R;
 	g_posCameraR.z += (g_posCameraRDest.z - g_posCameraR.z) * RATE_CHASE_CAMERA_R;
+
+
+
+
+	PrintDebugProc("\n");
+	PrintDebugProc("\n");
+	PrintDebugProc("\n");
+	PrintDebugProc("fov:%f\n", VIEW_ANGLE + fov);
+
+	PrintDebugProc("[camera pos：(%f : %f : %f)]\n", g_posCameraP.x,
+											g_posCameraP.y, 
+											g_posCameraP.z);
+	
+	PrintDebugProc("[camera rock：(%f : %f : %f)]\n", g_posCameraR.x,
+											g_posCameraR.y, 
+											g_posCameraR.z);
 }
 
 //=============================================================================

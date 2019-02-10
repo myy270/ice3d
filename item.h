@@ -20,8 +20,8 @@
 enum
 {
 	ITEMTYPE_COIN = 0,		// コイン
-	ITEMTYPE_LIFE,			// ライフ
-	ITEMTYPE_TIMER,			// タイマー
+	//ITEMTYPE_LIFE,			// ライフ
+	//ITEMTYPE_TIMER,			// タイマー
 	ITEMTYPE_MAX
 };
 
