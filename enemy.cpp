@@ -44,6 +44,7 @@
 static void AnimeWalk();
 void AI();
 int AI2();
+int AI3();
 
 //*****************************************************************************
 // グローバル変数
@@ -59,12 +60,12 @@ static bool g_animeState = 0;
  
 static float g_cancelTime = 0.0f;// 最初状態に戻る時間
 
-bool g_up;
-bool g_down;
-bool g_left;
-bool g_right;
+bool g_up;//AI行動
+bool g_down;//AI行動
+bool g_left;//AI行動
+bool g_right;//AI行動
 
-
+bool g_ai = true;//AIモード
 
 static KEY g_anime[] =
 {
@@ -406,33 +407,19 @@ void UninitEnemy(void)
 void UpdateEnemy(void)
 {
 
-	//AI2();
+#ifdef _DEBUG
+	if (GetKeyboardTrigger(DIK_ADD))
+	{//AIモードの切替
+		g_ai = !g_ai;
+		g_left = g_right = g_up = g_down = 0;
+	}
+#endif
 
-	if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
+	if (g_ai)
 	{
-		if (GetKeyboardTrigger(DIK_NUMPAD1))
-		{//凍結アイテムを使う
-			Freeze(OBJECT_PLAYER);
-		}
+		AI3();
 	}
-
-
-	//凍結状態
-	if (g_enemy.state == FROZEN)
-	{	
-		if (g_enemy.stateTime == 0)
-		{
-			g_enemy.state = NORMAL;
-			g_enemy.part[6].use = false;
-		}
-		else
-		{
-			g_enemy.stateTime--;
-			g_enemy.part[6].use = true;
-
-		}
-	}
-
+	
 
 	{
 		D3DXVECTOR3 rotCamera;
@@ -446,18 +433,18 @@ void UpdateEnemy(void)
 
 		if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
 		{//移動
-			if (GetKeyboardPress(DIK_LEFT) || g_left)
+			if (g_ai ? g_left : GetKeyboardPress(DIK_LEFT))
 			{
 				g_animeState = 1;//動く状態にする
 
-				if (GetKeyboardPress(DIK_UP) || g_up)
+				if (g_ai ? g_up : GetKeyboardPress(DIK_UP))
 				{// 左前移動
 					g_enemy.move.x -= sinf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 
 					g_enemy.rotDest.y = rotCamera.y + D3DX_PI * 0.75f;
 				}
-				else if (GetKeyboardPress(DIK_DOWN) || g_down)
+				else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN))
 				{// 左後移動
 					g_enemy.move.x -= sinf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
@@ -472,18 +459,18 @@ void UpdateEnemy(void)
 					g_enemy.rotDest.y = rotCamera.y + D3DX_PI * 0.50f;
 				}
 			}
-			else if (GetKeyboardPress(DIK_RIGHT) || g_right)
+			else if (g_ai ? g_right : GetKeyboardPress(DIK_RIGHT))
 			{
 				g_animeState = 1;//動く状態にする
 
-				if (GetKeyboardPress(DIK_UP) || g_up)
+				if (g_ai ? g_up : GetKeyboardPress(DIK_UP))
 				{// 右前移動
 					g_enemy.move.x -= sinf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 
 					g_enemy.rotDest.y = rotCamera.y - D3DX_PI * 0.75f;
 				}
-				else if (GetKeyboardPress(DIK_DOWN) || g_down)
+				else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN))
 				{// 右後移動
 					g_enemy.move.x -= sinf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
@@ -498,7 +485,7 @@ void UpdateEnemy(void)
 					g_enemy.rotDest.y = rotCamera.y - D3DX_PI * 0.50f;
 				}
 			}
-			else if (GetKeyboardPress(DIK_UP) || g_up)
+			else if (g_ai ? g_up : GetKeyboardPress(DIK_UP))
 			{
 				g_animeState = 1;//動く状態にする
 
@@ -508,7 +495,7 @@ void UpdateEnemy(void)
 
 				g_enemy.rotDest.y = D3DX_PI + rotCamera.y;
 			}
-			else if (GetKeyboardPress(DIK_DOWN) || g_down)
+			else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN))
 			{
 				g_animeState = 1;//動く状態にする
 
@@ -678,7 +665,7 @@ void UpdateEnemy(void)
 				if(fLength < (g_enemy.fRadius + pItem->fRadius) * (g_enemy.fRadius + pItem->fRadius))
 				{
 					if (g_enemy.holdItem && (pItem->nType != ITEMTYPE_COIN))
-					{//アイテム持っている場合、ほかのアイテムを拾えない
+					{//功能アイテム持っている場合、ほかの功能アイテムには行かない
 
 					}
 					else
@@ -687,18 +674,56 @@ void UpdateEnemy(void)
 						{
 							g_enemy.holdItem = ITEMTYPE_ICEBLOCK;
 						}
+						else if (pItem->nType == ITEMTYPE_COIN)
+						{
+							// スコア加算
+							ChangeScore(100);
+
+							// SE再生
+							PlaySound(SOUND_LABEL_SE_COIN);
+						}
 
 						// アイテム消去
 						DeleteItem(nCntItem);
-
-						// スコア加算
-						ChangeScore(100);
-
-						// SE再生
-						PlaySound(SOUND_LABEL_SE_COIN);
 					}
 				}
 			}
+		}
+	}
+
+
+	if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
+	{//凍結アイテムを使う
+		if (g_ai)
+		{
+			if ((g_enemy.holdItem == ITEMTYPE_ICEBLOCK))
+			{//AIは凍結アイテムを拾ったら、直ぐ使う				
+				Freeze(OBJECT_PLAYER);
+
+			}
+		}
+		else 
+		{
+			if (GetKeyboardTrigger(DIK_NUMPAD1))
+			{
+				Freeze(OBJECT_PLAYER);
+			}
+		}	
+	}
+
+	//凍結状態
+	if (g_enemy.state == FROZEN)
+	{
+		if (g_enemy.stateTime == 0)
+		{
+			g_enemy.state = NORMAL;
+			g_enemy.part[6].use = false;
+		}
+		else
+		{
+			g_enemy.stateTime--;
+			g_enemy.part[6].use = true;
+
 		}
 	}
 
@@ -1023,11 +1048,11 @@ int AI2()
 	ITEM *item = GetItem();
 
 	D3DXVECTOR3 vec;//作業用
-	float disBuff = 0;
-	float dis = 9999999;
-	int result = -1;//距離一番小さいコインの番号
+	float disBuff = 0;//アイテムとの距離
+	float dis = 9999999;//一番近い距離
+	int result = -1;//距離一番近いコインの番号
 
-	//距離一番小さいコインの番号を取得
+	//距離一番近いコインの番号を取得
 	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, item++)
 	{
 		if ((item->bUse)&&(item->nType == ITEMTYPE_COIN))
@@ -1086,8 +1111,92 @@ int AI2()
 		g_left = g_right = g_up = g_down = 0;//止まる
 	}
 
-	PrintDebugProc("距離一番小さいコインの番号 ：%d \n\n", result);
+	PrintDebugProc("距離一番近いコインの番号 ：%d \n\n", result);
 
 	return result;
 	
+}
+
+
+//一番近いコインに向かう上、アイテムを拾いに行ける
+int AI3()
+{
+	ITEM *item = GetItem();
+
+	D3DXVECTOR3 vec;//作業用
+	float disBuff = 0;//アイテムとの距離
+	float dis = 9999999;//一番近い距離
+	int result = -1;//距離一番近いコインの番号
+
+	//距離一番近いコインの番号を取得
+	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, item++)
+	{
+		if ((item->bUse))
+		{
+			vec = item->pos - g_enemy.part[0].srt.pos;
+			disBuff = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+
+			if (disBuff < dis)
+			{
+				if ((item->nType == ITEMTYPE_ICEBLOCK)&&(g_enemy.holdItem == ITEMTYPE_ICEBLOCK))
+				{
+
+				}
+				else
+				{
+					dis = disBuff;
+					result = nCntItem;
+				}
+			}
+		}
+	}
+
+	if (result != -1)
+	{
+		item = GetItem();//リセット
+		vec = (item + result)->pos - g_enemy.part[0].srt.pos;
+
+		if (vec.x < 0)
+		{
+			g_left = 1;
+			g_right = 0;
+		}
+		else if (vec.x == 0)
+		{
+			g_left = 0;
+			g_right = 0;
+		}
+		else if (vec.x > 0)
+		{
+			g_left = 0;
+			g_right = 1;
+		}
+
+		if (vec.z < 0)
+		{
+			g_up = 0;
+			g_down = 1;
+		}
+		else if (vec.z == 0)
+		{
+			g_up = 0;
+			g_down = 0;
+		}
+		else if (vec.z > 0)
+		{
+			g_up = 1;
+			g_down = 0;
+		}
+
+	}
+	else
+	{
+		g_left = g_right = g_up = g_down = 0;//止まる
+	}
+
+
+	PrintDebugProc("距離一番近いコインの番号 ：%d \n\n", result);
+
+	return result;
+
 }

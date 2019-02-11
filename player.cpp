@@ -849,6 +849,7 @@ void UpdatePlayer(void)
 
 		// アイテムを取得
 		pItem = GetItem();
+
 		for(int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, pItem++)
 		{
 			if(pItem->bUse == true)
@@ -871,16 +872,18 @@ void UpdatePlayer(void)
 						{
 							g_player.holdItem = ITEMTYPE_ICEBLOCK;
 						}
+						else if(pItem->nType == ITEMTYPE_COIN)
+						{
+							// スコア加算
+							ChangeScore2(100);
+
+							// SE再生
+							PlaySound(SOUND_LABEL_SE_COIN);
+						}
 
 						// アイテム消去
 						DeleteItem(nCntItem);
-
-						// スコア加算
-						ChangeScore2(100);
-
-						// SE再生
-						PlaySound(SOUND_LABEL_SE_COIN);
-
+				
 					}
 				}
 			}
@@ -912,8 +915,7 @@ void UpdatePlayer(void)
 		}
 	}
 
-
-
+//運動情報を書き出す
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_F2))
 	{

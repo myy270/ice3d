@@ -101,6 +101,14 @@ void UninitTimer(void)
 //=============================================================================
 void UpdateTimer(void)
 {
+
+#ifdef _DEBUG
+	if (GetKeyboardTrigger(DIK_SUBTRACT))
+	{
+		g_nTimer = 300;
+	}
+#endif
+
 	if(g_bEnableTimer)
 	{
 		g_nTimer--;

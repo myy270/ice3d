@@ -152,12 +152,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				// ì¸óÕçXêV
 				UpdateInput();
 
+#ifdef _DEBUG
 				if (GetKeyboardTrigger(DIK_NUMPADENTER))
 				{
-#ifdef _DEBUG
 					rest = !rest;
-#endif
 				}
+#endif
 
 				if (rest == 0)
 				{
