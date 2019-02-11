@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // アイテム処理 [item.cpp]
-// Author : AKIRA TANAKA
+// Author : 麦英泳
 //
 //=============================================================================
 #include "item.h"
@@ -46,16 +46,15 @@ bool g_dropReady;//落下するアイテムはもう設置したか
 
 int g_itemIndex;//落下するアイテムのインデクス
 
-bool g_pickItem;
-
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemLogo = NULL;		// 頂点バッファインターフェースへのポインタ
+
 
 
 const char *c_aFileNameItem[ITEMTYPE_MAX] =
 {
 	"data/MODEL/coin.x",			// コイン
 	"data/MODEL/iceBlock.x",		// アイスブロック
-	//"data/MODEL/item002.x"		// タイマー
+
 };
 
 //=============================================================================
@@ -65,7 +64,6 @@ HRESULT InitItem(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	g_pickItem = false;
 
 	MakeVertexItemLogo(pDevice);
 
@@ -250,24 +248,77 @@ void DrawItem(void)
 	
 	pDevice->SetMaterial(&matDef);
 
-
-	if (g_pickItem)
+	//プレイヤーの方
+	if (GetPlayer()->holdItem != ITEMTYPE_COIN)
 	{
-		//ItemLogoの描画
-		// 頂点バッファをデバイスのデータストリームにバインド
-		pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
+		if (GetPlayer()->holdItem == ITEMTYPE_ICEBLOCK)
+		{
+			//頂点バッファの中身を埋める
+			VERTEX_2D *pVtx;
 
-		// 頂点フォーマットの設定
-		pDevice->SetFVF(FVF_VERTEX_2D);
+			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+			g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
 
-		// テクスチャの設定
-		pDevice->SetTexture(0, NULL);
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
 
-		// ポリゴンの描画
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+			// 頂点データをアンロックする
+			g_pD3DVtxBuffItemLogo->Unlock();
+
+
+			//ItemLogoの描画
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, NULL);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+		}
 	}
 
+	//エネミーの方
+	if (GetEnemy()->holdItem != ITEMTYPE_COIN)
+	{
+		if (GetEnemy()->holdItem == ITEMTYPE_ICEBLOCK)
+		{
+			//頂点バッファの中身を埋める
+			VERTEX_2D *pVtx;
 
+			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+			g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
+
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X - ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X - ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+
+			// 頂点データをアンロックする
+			g_pD3DVtxBuffItemLogo->Unlock();
+
+
+			//ItemLogoの描画
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, NULL);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+		}
+	}
 }
 
 //=============================================================================
@@ -373,22 +424,35 @@ HRESULT MakeVertexItemLogo(LPDIRECT3DDEVICE9 pDevice)
 }
 
 
-void Freeze(void)
+void Freeze(OBJECT target)
 {
-	if (GetKeyboardTrigger(DIK_SPACE))
+	if (target == OBJECT_ENEMY)
 	{
-		if (g_pickItem)
+		if (GetPlayer()->holdItem == ITEMTYPE_ICEBLOCK)
 		{
 			if (GetEnemy()->state == NORMAL)
 			{
 				GetEnemy()->state = FROZEN;
 				GetEnemy()->stateTime = 180;//3秒
 
-				SetPickItem(false);//使用したアイテムのロゴを消す
+				GetPlayer()->holdItem = ITEMTYPE_COIN;
 			}
 
 		}
+	}
+	else if (target == OBJECT_PLAYER)
+	{
+		if (GetEnemy()->holdItem == ITEMTYPE_ICEBLOCK)
+		{
+			if (GetPlayer()->state == NORMAL)
+			{
+				GetPlayer()->state = FROZEN;
+				GetPlayer()->stateTime = 180;//3秒
 
+				GetEnemy()->holdItem = ITEMTYPE_COIN;
+			}
+
+		}
 	}
 	
 }
@@ -427,14 +491,3 @@ void DropItem()
 
 }
 
-
-
-void SetPickItem(bool val)
-{
-	g_pickItem = val;
-}
-
-bool GetPickItem(void)
-{
-	return g_pickItem;
-}

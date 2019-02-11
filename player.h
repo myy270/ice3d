@@ -1,16 +1,16 @@
 //=============================================================================
 //
 // プレイヤー処理 [player.h]
-// Author : AKIRA TANAKA
+// Author : 麦英泳
 //
 //=============================================================================
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
 #include "main.h"
+#include "item.h"
 
-
-#define PART_MAX	(6)		// パーツの数
+#define PART_MAX	(7)		// パーツの数
 
 //*****************************************************************************
 // 構造体定義
@@ -50,6 +50,7 @@ enum STATE
 	STATE_MAX
 };
 
+
 struct PLAYER
 {
 	D3DXVECTOR3 move;		// 移動量
@@ -58,7 +59,10 @@ struct PLAYER
 	int nIdxShadow;			// 影ID
 	PART part[PART_MAX];
 
+	ITEMTYPE holdItem;
+
 	STATE state;
+	int stateTime;
 };
 
 enum PART_ID

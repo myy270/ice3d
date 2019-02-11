@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // プレイヤー処理 [player.cpp]
-// Author : AKIRA TANAKA
+// Author : 麦英泳
 //
 //=============================================================================
 #include "player.h"
@@ -22,7 +22,7 @@
 #define	HEAD_PLAYER		"data/MODEL/bearHead.x"	// 読み込むモデル名
 #define	HAND_PLAYER		"data/MODEL/bearHand.x"	// 読み込むモデル名
 #define	LEG_PLAYER		"data/MODEL/bearLeg.x"	// 読み込むモデル名
-
+#define	ICE_BLOCK		"data/MODEL/iceBlock.x"		// 読み込むモデル名
 
 
 
@@ -249,6 +249,7 @@ HRESULT InitPlayer(void)
 	g_player.part[4].partFile = (char *)LEG_PLAYER;//左足
 	g_player.part[5].partFile = (char *)LEG_PLAYER;//右足
 
+	g_player.part[6].partFile = (char *)ICE_BLOCK;//氷
 
 	for (int i = 0; i < PART_MAX; i++)//パーツ番号
 	{
@@ -334,6 +335,14 @@ HRESULT InitPlayer(void)
 
 		}
 
+		if (i != 6)
+		{
+			g_player.part[i].use = true;
+		}
+		else
+		{
+			g_player.part[i].use = false;
+		}
 	}
 
 	g_player.move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -342,6 +351,10 @@ HRESULT InitPlayer(void)
 	// 影を設定 //体を基準に
 	g_player.nIdxShadow = SetShadow(g_player.part[0].srt.pos, g_player.fRadius * 2.0f, g_player.fRadius * 2.0f);
 
+
+	g_player.holdItem = ITEMTYPE_COIN;
+	g_player.state = NORMAL;
+	g_player.stateTime = 0;
 
 #if 0
 	// テクスチャの読み込み
@@ -525,7 +538,7 @@ void UpdatePlayer(void)
 
 		g_animeState = 0;//運動状態をリセット
 
-		if(GetTimeOut() == 0)
+		if((GetTimeOut() == 0) && (g_player.state != FROZEN))
 		{//移動
 			if (GetKeyboardPress(DIK_A))
 			{
@@ -625,11 +638,6 @@ void UpdatePlayer(void)
 					g_player.rotDest.y -= D3DX_PI * 2.0f;
 				}
 			}
-
-
-
-
-
 
 		}
 
@@ -762,9 +770,9 @@ void UpdatePlayer(void)
 
 	}//switch end
 
+// 弾発射
 #ifdef _DEBUG
-	// 弾発射
-	if (GetTimeOut() == 0)
+	if ((GetTimeOut() == 0) && (g_player.state != FROZEN))
 	{
 		if (GetKeyboardTrigger(DIK_SPACE))
 		{
@@ -853,7 +861,7 @@ void UpdatePlayer(void)
 							+ (g_player.part[0].srt.pos.z - pItem->pos.z) * (g_player.part[0].srt.pos.z - pItem->pos.z);
 				if(fLength < (g_player.fRadius + pItem->fRadius) * (g_player.fRadius + pItem->fRadius))
 				{
-					if (GetPickItem() && (pItem->nType == ITEMTYPE_ICEBLOCK))
+					if (g_player.holdItem && (pItem->nType != ITEMTYPE_COIN))
 					{//アイテム持っている場合、ほかのアイテムを拾えない
 
 					}
@@ -861,8 +869,7 @@ void UpdatePlayer(void)
 					{
 						if (pItem->nType == ITEMTYPE_ICEBLOCK)
 						{
-							SetPickItem(true);
-
+							g_player.holdItem = ITEMTYPE_ICEBLOCK;
 						}
 
 						// アイテム消去
@@ -880,11 +887,30 @@ void UpdatePlayer(void)
 		}
 	}
 
-	if (GetTimeOut() == 0)
+
+	if ((GetTimeOut() == 0) && (g_player.state != FROZEN))
 	{
-		Freeze();
+		if (GetKeyboardTrigger(DIK_SPACE))
+		{//凍結アイテムを使う
+			Freeze(OBJECT_ENEMY);
+		}
 	}
 
+	//凍結状態
+	if (g_player.state == FROZEN)
+	{
+		if (g_player.stateTime == 0)
+		{
+			g_player.state = NORMAL;
+			g_player.part[6].use = false;
+		}
+		else
+		{
+			g_player.stateTime--;
+			g_player.part[6].use = true;
+
+		}
+	}
 
 
 
@@ -927,53 +953,55 @@ void DrawPlayer(void)
 
 	for (int i = 0; i < PART_MAX; i++)//パーツ番号
 	{
-		// ワールドマトリックスの初期化
-		D3DXMatrixIdentity(&mtxWorld);
-
-		// スケールを反映
-		D3DXMatrixScaling(&mtxScl, g_player.part[i].srt.scl.x,
-								   g_player.part[i].srt.scl.y,
-								   g_player.part[i].srt.scl.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
-
-		// 回転を反映
-		D3DXMatrixRotationYawPitchRoll(&mtxRot, g_player.part[i].srt.rot.y, 
-												g_player.part[i].srt.rot.x,
-												g_player.part[i].srt.rot.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
-
-		// 移動を反映
-		D3DXMatrixTranslation(&mtxTranslate, g_player.part[i].srt.pos.x,
-											 g_player.part[i].srt.pos.y, 
-											 g_player.part[i].srt.pos.z);
-		D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
-
-		//親が存在する場合は親のワールドマトリクスを合成
-		if (g_player.part[i].parent)
+		if (g_player.part[i].use)
 		{
-			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &g_player.part[i].parent->mtxWorld);
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&mtxWorld);
+
+			// スケールを反映
+			D3DXMatrixScaling(&mtxScl, g_player.part[i].srt.scl.x,
+				g_player.part[i].srt.scl.y,
+				g_player.part[i].srt.scl.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
+
+			// 回転を反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, g_player.part[i].srt.rot.y,
+				g_player.part[i].srt.rot.x,
+				g_player.part[i].srt.rot.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+
+			// 移動を反映
+			D3DXMatrixTranslation(&mtxTranslate, g_player.part[i].srt.pos.x,
+				g_player.part[i].srt.pos.y,
+				g_player.part[i].srt.pos.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
+
+			//親が存在する場合は親のワールドマトリクスを合成
+			if (g_player.part[i].parent)
+			{
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &g_player.part[i].parent->mtxWorld);
+			}
+
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
+
+			// マテリアル情報に対するポインタを取得
+			pD3DXMat = (D3DXMATERIAL*)g_player.part[i].pMatBuff->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)g_player.part[i].nNumMat; nCntMat++)
+			{
+				// マテリアルの設定
+				pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, g_pD3DTexturePlayer);
+
+				// 描画
+				g_player.part[i].pMesh->DrawSubset(nCntMat);
+			}
+			g_player.part[i].mtxWorld = mtxWorld;//ワールドマトリクスを保存
 		}
-
-		// ワールドマトリックスの設定
-		pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
-
-		// マテリアル情報に対するポインタを取得
-		pD3DXMat = (D3DXMATERIAL*)g_player.part[i].pMatBuff->GetBufferPointer();
-
-		for (int nCntMat = 0; nCntMat < (int)g_player.part[i].nNumMat; nCntMat++)
-		{
-			// マテリアルの設定
-			pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
-
-			// テクスチャの設定
-			pDevice->SetTexture(0, g_pD3DTexturePlayer);
-
-			// 描画
-			g_player.part[i].pMesh->DrawSubset(nCntMat);
-		}
-		g_player.part[i].mtxWorld = mtxWorld;//ワールドマトリクスを保存
 	}
-
 	pDevice->SetMaterial(&matDef);// マテリアルをデフォルトに戻す
 }
 
@@ -1090,7 +1118,10 @@ void AnimeWalk()
 		g_motionTime = 0.0f;	//リセット
 		i = (int)g_motionTime;	//重要
 
-		g_cancelTime += dt;//0番キーフレームのtimeを使う
+		if (g_player.state != FROZEN)
+		{
+			g_cancelTime += dt;//0番キーフレームのtimeを使う
+		}
 
 		if (g_cancelTime > 1.0f)//最大時間を超えたら
 		{
@@ -1098,7 +1129,7 @@ void AnimeWalk()
 		}
 
 		//接続の補間は　[i] * 1.0です、[i + 1] * 0.0ではない
-		for (int j = 0; j < PART_MAX; j++)//パーツ番号
+		for (int j = 0; j < 6; j++)//パーツ番号
 		{//最初のキーの状態に戻る
 			// Scale
 			g_player.part[j].srt.scl.x = g_player.part[j].srt.scl.x +	
@@ -1146,7 +1177,7 @@ void AnimeWalk()
 		g_cancelTime = 0.0f;	//リセット
 
 		//接続の補間は　[i] * 1.0です、[i + 1] * 0.0ではない
-		for (int j = 0; j < PART_MAX; j++)//パーツ番号
+		for (int j = 0; j < 6; j++)//パーツ番号
 		{
 			// Scale
 			g_player.part[j].srt.scl.x = g_anime[i].key[j].scl.x +				// 前のキーフレーム位置

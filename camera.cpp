@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // カメラ処理 [camera.cpp]
-// Author : AKIRA TANAKA
+// Author : 麦英泳
 //
 //=============================================================================
 #include "camera.h"
@@ -22,7 +22,7 @@
 #define	RATE_CHASE_CAMERA_P	(0.35f)					// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
-#define	CHASE_HEIGHT_P		(1000.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P		(1900.0f)				// 追跡時の視点の高さ
 #define	CHASE_HEIGHT_R		(10.0f)					// 追跡時の注視点の高さ
 
 //*****************************************************************************
@@ -53,7 +53,7 @@ float fov;
 HRESULT InitCamera(void)
 {
 	g_chaseHightP = CHASE_HEIGHT_P;
-	g_posCameraP = D3DXVECTOR3(0.0f, 100.0f, -400.0f);
+	g_posCameraP = D3DXVECTOR3(0.0f, 100.0f, -300.0f);
 	g_posCameraR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_posCameraU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	g_posCameraPDest = D3DXVECTOR3(0.0f, 100.0f, -200.0f);
@@ -132,12 +132,12 @@ void UpdateCamera(void)
 		g_fLengthIntervalCamera += VALUE_MOVE_CAMERA;
 	}
 
-	/*if (GetKeyboardTrigger(DIK_P))
+	/*if (GetKeyboardTrigger(DIK_O))
 	{
 		fov += 0.01f;
 	}
 
-	if (GetKeyboardTrigger(DIK_O))
+	if (GetKeyboardTrigger(DIK_P))
 	{
 		fov -= 0.01f;
 	}*/
@@ -162,15 +162,15 @@ void UpdateCamera(void)
 		g_fLengthIntervalCamera += VALUE_MOVE_CAMERA;
 	}
 
-	//if (GetKeyboardPress(DIK_L))
-	//{
-	//	g_fLengthIntervalPlayer -= VALUE_MOVE_CAMERA;
-	//}
+	if (GetKeyboardPress(DIK_L))
+	{
+		g_fLengthIntervalPlayer -= VALUE_MOVE_CAMERA;
+	}
 
-	//if (GetKeyboardPress(DIK_SEMICOLON))
-	//{
-	//	g_fLengthIntervalPlayer += VALUE_MOVE_CAMERA;
-	//}
+	if (GetKeyboardPress(DIK_SEMICOLON))
+	{
+		g_fLengthIntervalPlayer += VALUE_MOVE_CAMERA;
+	}
 #endif
 
 

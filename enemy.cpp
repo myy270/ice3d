@@ -43,7 +43,7 @@
 
 static void AnimeWalk();
 void AI();
-void AI2();
+int AI2();
 
 //*****************************************************************************
 // グローバル変数
@@ -358,7 +358,11 @@ HRESULT InitEnemy(void)
 	// 影を設定 //体を基準に
 	g_enemy.nIdxShadow = SetShadow(g_enemy.part[0].srt.pos, g_enemy.fRadius * 2.0f, g_enemy.fRadius * 2.0f);
 
+
+	g_enemy.holdItem = ITEMTYPE_COIN;
 	g_enemy.state = NORMAL;
+	g_enemy.stateTime = 0;
+
 #if 0
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
@@ -402,8 +406,18 @@ void UninitEnemy(void)
 void UpdateEnemy(void)
 {
 
-	AI2();
+	//AI2();
 
+	if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
+	{
+		if (GetKeyboardTrigger(DIK_NUMPAD1))
+		{//凍結アイテムを使う
+			Freeze(OBJECT_PLAYER);
+		}
+	}
+
+
+	//凍結状態
 	if (g_enemy.state == FROZEN)
 	{	
 		if (g_enemy.stateTime == 0)
@@ -572,28 +586,31 @@ void UpdateEnemy(void)
 
 	}
 
+// 弾発射
 #ifdef _DEBUG
-	// 弾発射
-	if (GetKeyboardTrigger(DIK_NUMPAD1))
+	if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
 	{
-		D3DXVECTOR3 pos;
-		D3DXVECTOR3 move;
+		if (GetKeyboardTrigger(DIK_NUMPAD1))
+		{
+			D3DXVECTOR3 pos;
+			D3DXVECTOR3 move;
 
-		//体を基準に
-		pos.x = g_enemy.part[0].srt.pos.x - sinf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;//飛行機頭部の辺りに設定
-		pos.y = g_enemy.part[0].srt.pos.y;
-		pos.z = g_enemy.part[0].srt.pos.z - cosf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;
+			//体を基準に
+			pos.x = g_enemy.part[0].srt.pos.x - sinf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;//飛行機頭部の辺りに設定
+			pos.y = g_enemy.part[0].srt.pos.y;
+			pos.z = g_enemy.part[0].srt.pos.z - cosf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;
 
-		//回転角度がプラスの時、時計回り
-		//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
-		move.x = -sinf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;//体を基準に
-		move.y = 0.0f;
-		move.z = -cosf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;
+			//回転角度がプラスの時、時計回り
+			//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
+			move.x = -sinf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;//体を基準に
+			move.y = 0.0f;
+			move.z = -cosf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;
 
-		SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
+			SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
 
-		// SE再生
-		PlaySound(SOUND_LABEL_SE_SHOT);
+			// SE再生
+			PlaySound(SOUND_LABEL_SE_SHOT);
+		}
 	}
 #endif
 
@@ -660,15 +677,26 @@ void UpdateEnemy(void)
 							+ (g_enemy.part[0].srt.pos.z - pItem->pos.z) * (g_enemy.part[0].srt.pos.z - pItem->pos.z);
 				if(fLength < (g_enemy.fRadius + pItem->fRadius) * (g_enemy.fRadius + pItem->fRadius))
 				{
+					if (g_enemy.holdItem && (pItem->nType != ITEMTYPE_COIN))
+					{//アイテム持っている場合、ほかのアイテムを拾えない
 
-					// アイテム消去
-					DeleteItem(nCntItem);
+					}
+					else
+					{
+						if (pItem->nType == ITEMTYPE_ICEBLOCK)
+						{
+							g_enemy.holdItem = ITEMTYPE_ICEBLOCK;
+						}
 
-					// スコア加算
-					ChangeScore(100);
+						// アイテム消去
+						DeleteItem(nCntItem);
 
-					// SE再生
-					PlaySound(SOUND_LABEL_SE_COIN);
+						// スコア加算
+						ChangeScore(100);
+
+						// SE再生
+						PlaySound(SOUND_LABEL_SE_COIN);
+					}
 				}
 			}
 		}
@@ -690,6 +718,8 @@ void UpdateEnemy(void)
 	//										g_enemy.part[g_conId].srt.pos.z);
 
 	//PrintDebugProc("目的向き：%f \n", g_enemy.rotDest.y);
+
+	
 
 	PrintDebugProc("up ：%d \n", g_up);
 	PrintDebugProc("down ：%d \n", g_down);
@@ -988,7 +1018,7 @@ void AI()
 }
 
 //一番近いコインに向かう
-void AI2()
+int AI2()
 {
 	ITEM *item = GetItem();
 
@@ -1056,6 +1086,8 @@ void AI2()
 		g_left = g_right = g_up = g_down = 0;//止まる
 	}
 
-
 	PrintDebugProc("距離一番小さいコインの番号 ：%d \n\n", result);
+
+	return result;
+	
 }

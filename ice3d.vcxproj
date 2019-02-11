@@ -131,7 +131,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="meshfield.cpp" />
     <ClCompile Include="meshwall.cpp" />
-    <ClCompile Include="motion.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="score.cpp" />
@@ -156,7 +155,6 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="meshfield.h" />
     <ClInclude Include="meshwall.h" />
-    <ClInclude Include="motion.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="score.h" />

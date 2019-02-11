@@ -1,7 +1,7 @@
 //=============================================================================
 //
 // アイテム処理 [item.h]
-// Author : AKIRA TANAKA
+// Author : 麦英泳
 //
 //=============================================================================
 #ifndef _ITEM_H_
@@ -17,13 +17,11 @@
 //**************************************
 // 種類
 //**************************************
-enum
+enum ITEMTYPE
 {
-	ITEMTYPE_COIN = 0,		// コイン
-	ITEMTYPE_ICEBLOCK = 1,		// アイスブロック
+	ITEMTYPE_COIN,		// コイン
+	ITEMTYPE_ICEBLOCK,		// アイスブロック
 
-	//ITEMTYPE_LIFE,			// ライフ
-	//ITEMTYPE_TIMER,			// タイマー
 	ITEMTYPE_MAX
 };
 
@@ -51,10 +49,8 @@ int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType = ITEMTYPE_COIN);
 void DeleteItem(int nIdxItem);
 ITEM *GetItem(void);
 
-void Freeze(void);
+void Freeze(OBJECT target);
 
 void DropItem();
 
-void SetPickItem(bool val);
-bool GetPickItem(void);
 #endif

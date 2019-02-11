@@ -8,7 +8,7 @@
 #define _ENEMY_H_
 
 #include "main.h"
-
+#include "item.h"
 
 #define PART_MAX_ENEMY	(7)		// ÉpÅ[ÉcÇÃêî
 
@@ -23,6 +23,8 @@ struct ENEMY
 	float fRadius;			// îºåa
 	int nIdxShadow;			// âeID
 	PART part[PART_MAX_ENEMY];
+
+	ITEMTYPE holdItem;
 
 	STATE state;
 	int stateTime;
