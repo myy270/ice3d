@@ -174,29 +174,22 @@ void UpdateCamera(void)
 #endif
 
 
-	// 視点の目的位置
-	//前回、プレイヤー移動の距離
-	fLength = sqrtf(movePlayer.x * movePlayer.x + movePlayer.z * movePlayer.z) * 6.0f;//
-	
-	//posPlayerの導入はずっとプレイヤーに追いかける
-    //- sinf(g_rotCamera.y)の-が回転の方向を決める； - sin(rotPlayer.y) * fLengthは運動する時、あらかじめ位置を開ける（不器用なやり方）
-	g_posCameraPDest.x = posPlayer.x - sinf(g_rotCamera.y) * g_fLengthIntervalCamera - sinf(rotPlayer.y) * fLength;//実は、sin(rotPlayer.y) * fLength = movePlayer.x  * 6.0f
-	g_posCameraPDest.y = posPlayer.y + g_chaseHightP;
-	//- cosf(g_rotCamera.y)の-が最初のカメラ視点を決める
-	g_posCameraPDest.z = posPlayer.z - cosf(g_rotCamera.y) * g_fLengthIntervalCamera - cosf(rotPlayer.y) * fLength;
+	// 視点の目的位置 
+	g_posCameraPDest.x = - sinf(g_rotCamera.y) * g_fLengthIntervalCamera; //- sinf(g_rotCamera.y)の-が回転の方向を決める；
+	g_posCameraPDest.y = g_chaseHightP;	
+	g_posCameraPDest.z = - cosf(g_rotCamera.y) * g_fLengthIntervalCamera;//- cosf(g_rotCamera.y)の-が最初カメラの向きを決める
 
-	// 注視点の目的位置　g_fLengthIntervalPlayerの意味は、飛行機向きの一定距離に注視点を設置する
-	fLength = g_fLengthIntervalPlayer + sqrtf(movePlayer.x * movePlayer.x + movePlayer.z * movePlayer.z) * 6.0f;
-	g_posCameraRDest.x = posPlayer.x - sinf(rotPlayer.y) * fLength;
-	g_posCameraRDest.y = posPlayer.y - CHASE_HEIGHT_R;
-	g_posCameraRDest.z = posPlayer.z - cosf(rotPlayer.y) * fLength;
+	// 注視点の目的位置
+	g_posCameraRDest.x = 0.0f ;
+	g_posCameraRDest.y = 0.0f ;
+	g_posCameraRDest.z = 0.0f ;
 
-	// 視点の補正　あらかじめ開ける位置を補正する
+	// 視点の補間変化（グラデーション変化）
 	g_posCameraP.x += (g_posCameraPDest.x - g_posCameraP.x) * RATE_CHASE_CAMERA_P;
 	g_posCameraP.y = g_posCameraPDest.y;
 	g_posCameraP.z += (g_posCameraPDest.z - g_posCameraP.z) * RATE_CHASE_CAMERA_P;
 
-	// 注視点の補正
+	// 注視点の補間変化（グラデーション変化）
 	g_posCameraR.x += (g_posCameraRDest.x - g_posCameraR.x) * RATE_CHASE_CAMERA_R;
 	g_posCameraR.y += (g_posCameraRDest.y - g_posCameraR.y) * RATE_CHASE_CAMERA_R;
 	g_posCameraR.z += (g_posCameraRDest.z - g_posCameraR.z) * RATE_CHASE_CAMERA_R;
@@ -212,10 +205,20 @@ void UpdateCamera(void)
 	PrintDebugProc("[camera pos：(%f : %f : %f)]\n", g_posCameraP.x,
 											g_posCameraP.y, 
 											g_posCameraP.z);
-	
+		
 	PrintDebugProc("[camera at：(%f : %f : %f)]\n", g_posCameraR.x,
 											g_posCameraR.y, 
 											g_posCameraR.z);
+
+	PrintDebugProc("\n");
+
+	PrintDebugProc("[camera posDest：(%f : %f : %f)]\n", g_posCameraPDest.x,
+											g_posCameraPDest.y,
+											g_posCameraPDest.z);
+
+	PrintDebugProc("[camera atDest：(%f : %f : %f)]\n", g_posCameraRDest.x,
+											g_posCameraRDest.y, 
+											g_posCameraRDest.z);
 
 	PrintDebugProc("\n");
 
