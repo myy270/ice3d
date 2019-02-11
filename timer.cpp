@@ -282,6 +282,11 @@ void ResetTimer(int nTime)
 	g_nTimer = nTime * 60;//•b”*ƒtƒŒ[ƒ€
 }
 
+int GetTimer()
+{
+	return g_nTimer;
+
+}
 
 bool GetTimeOut()
 {

@@ -22,7 +22,7 @@
 #define	RATE_CHASE_CAMERA_P	(0.35f)					// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
-#define	CHASE_HEIGHT_P		(100.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P		(1000.0f)				// 追跡時の視点の高さ
 #define	CHASE_HEIGHT_R		(10.0f)					// 追跡時の注視点の高さ
 
 //*****************************************************************************

@@ -161,7 +161,7 @@ void DrawExplosion(void)
 	D3DXMATRIX mtxView,mtxScale,mtxTranslate;
 
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);				// Z”äŠr‚È‚µ
+	//pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);				// Z”äŠr‚È‚µ
 
 	for(int nCntExplosion = 0; nCntExplosion < MAX_EXPLOSION; nCntExplosion++)
 	{

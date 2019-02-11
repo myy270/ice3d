@@ -9,16 +9,24 @@
 #include "input.h"
 #include "player.h"
 #include "enemy.h"
+#include "timer.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define	VALUE_ROTATE_ITEM		(D3DX_PI * 0.025f)			// 回転速度
 #define	ITEM_RADIUS				(10.0f)						// 半径
 
+#define	ITEMLOGO_SIZE_X			(65.0f)							// ライフの数字の幅
+#define	ITEMLOGO_SIZE_Y			(65.0f)							// ライフの数字の高さ
+
+#define	ITEMLOGO_POS_X			(20.0f)							// ライフの表示基準位置Ｘ座標
+#define	ITEMLOGO_POS_Y			(95.0f)							// ライフの表示基準位置Ｙ座標
+
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-
+HRESULT MakeVertexItemLogo(LPDIRECT3DDEVICE9 pDevice);
 
 //*****************************************************************************
 // グローバル変数
@@ -38,6 +46,11 @@ bool g_dropReady;//落下するアイテムはもう設置したか
 
 int g_itemIndex;//落下するアイテムのインデクス
 
+bool g_pickItem;
+
+LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemLogo = NULL;		// 頂点バッファインターフェースへのポインタ
+
+
 const char *c_aFileNameItem[ITEMTYPE_MAX] =
 {
 	"data/MODEL/coin.x",			// コイン
@@ -51,6 +64,10 @@ const char *c_aFileNameItem[ITEMTYPE_MAX] =
 HRESULT InitItem(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	g_pickItem = false;
+
+	MakeVertexItemLogo(pDevice);
 
 	for(int nCntItemType = 0; nCntItemType < ITEMTYPE_MAX; nCntItemType++)
 	{
@@ -117,6 +134,15 @@ void UninitItem(void)
 			g_pD3DXMatBuffItem[nCntItemType] = NULL;
 		}
 	}
+
+	if (g_pD3DVtxBuffItemLogo != NULL)
+	{// テクスチャの開放
+		g_pD3DVtxBuffItemLogo->Release();
+		g_pD3DVtxBuffItemLogo = NULL;
+	}
+
+
+	
 }
 
 //=============================================================================
@@ -129,6 +155,12 @@ void UpdateItem(void)
 		g_dropItem = true;
 	}
 
+	if (GetTimer() % 300 == 0)
+	{
+		g_dropItem = true;
+	}
+
+	
 	DropItem();
 	
 
@@ -167,6 +199,8 @@ void UpdateItem(void)
 			SetColorShadow(g_aItem[nCntItem].nIdxShadow, D3DXCOLOR(1.0f, 1.0f, 1.0f, colA));
 		}
 	}
+
+
 }
 
 //=============================================================================
@@ -214,16 +248,26 @@ void DrawItem(void)
 		}
 	}
 	
-	{// マテリアルをデフォルトに戻す
-		D3DXMATERIAL mat;
-
-		mat.MatD3D.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-		mat.MatD3D.Ambient = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-		mat.MatD3D.Emissive = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);
-
-		//pDevice->SetMaterial(&mat.MatD3D);
-	}
 	pDevice->SetMaterial(&matDef);
+
+
+	if (g_pickItem)
+	{
+		//ItemLogoの描画
+		// 頂点バッファをデバイスのデータストリームにバインド
+		pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
+
+		// 頂点フォーマットの設定
+		pDevice->SetFVF(FVF_VERTEX_2D);
+
+		// テクスチャの設定
+		pDevice->SetTexture(0, NULL);
+
+		// ポリゴンの描画
+		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+	}
+
+
 }
 
 //=============================================================================
@@ -272,18 +316,81 @@ ITEM *GetItem(void)
 	return &g_aItem[0];
 }
 
+//=============================================================================
+// 頂点の作成
+//=============================================================================
+HRESULT MakeVertexItemLogo(LPDIRECT3DDEVICE9 pDevice)
+{
+	// オブジェクトの頂点バッファを生成
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * NUM_VERTEX,		// 頂点データ用に確保するバッファサイズ(バイト単位)
+		D3DUSAGE_WRITEONLY,							// 頂点バッファの使用法　
+		FVF_VERTEX_2D,								// 使用する頂点フォーマット
+		D3DPOOL_MANAGED,							// リソースのバッファを保持するメモリクラスを指定
+		&g_pD3DVtxBuffItemLogo,							// 頂点バッファインターフェースへのポインタ
+		NULL)))										// NULLに設定
+	{
+		return E_FAIL;
+	}
+
+	{//頂点バッファの中身を埋める
+		VERTEX_2D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
+
+		for (int nCntPlace = 0; nCntPlace < 1; nCntPlace++, pVtx += 4)
+		{
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+
+			// rhwの設定
+			pVtx[0].rhw =
+				pVtx[1].rhw =
+				pVtx[2].rhw =
+				pVtx[3].rhw = 1.0f;
+
+			// 反射光の設定
+			pVtx[0].diffuse = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[1].diffuse = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[2].diffuse = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[3].diffuse = D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+		}
+
+		// 頂点データをアンロックする
+		g_pD3DVtxBuffItemLogo->Unlock();
+	}
+
+	return S_OK;
+}
+
 
 void Freeze(void)
 {
 	if (GetKeyboardTrigger(DIK_SPACE))
 	{
-		if (GetEnemy()->state == NORMAL)
+		if (g_pickItem)
 		{
-			GetEnemy()->state = FROZEN;
-			GetEnemy()->stateTime = 180;//3秒
-		}
-	}
+			if (GetEnemy()->state == NORMAL)
+			{
+				GetEnemy()->state = FROZEN;
+				GetEnemy()->stateTime = 180;//3秒
 
+				SetPickItem(false);//使用したアイテムのロゴを消す
+			}
+
+		}
+
+	}
+	
 }
 
 void DropItem()
@@ -322,3 +429,12 @@ void DropItem()
 
 
 
+void SetPickItem(bool val)
+{
+	g_pickItem = val;
+}
+
+bool GetPickItem(void)
+{
+	return g_pickItem;
+}

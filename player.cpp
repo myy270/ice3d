@@ -28,7 +28,7 @@
 
 #define	PLAYER_RADIUS		(15.0f)						// 半径
 
-#define	VALUE_MOVE_PLAYER	(0.155f)					// 移動速度
+#define	VALUE_MOVE_PLAYER	(0.195f)					// 移動速度
 #define	RATE_MOVE_PLAYER	(0.025f)					// 移動慣性係数
 
 #define	VALUE_ROTATE_PLAYER	(D3DX_PI * 0.025f)			// 回転速度 4.5度
@@ -625,6 +625,12 @@ void UpdatePlayer(void)
 					g_player.rotDest.y -= D3DX_PI * 2.0f;
 				}
 			}
+
+
+
+
+
+
 		}
 
 #ifdef _DEBUG
@@ -758,26 +764,29 @@ void UpdatePlayer(void)
 
 #ifdef _DEBUG
 	// 弾発射
-	if (GetKeyboardTrigger(DIK_SPACE))
+	if (GetTimeOut() == 0)
 	{
-		D3DXVECTOR3 pos;
-		D3DXVECTOR3 move;
+		if (GetKeyboardTrigger(DIK_SPACE))
+		{
+			D3DXVECTOR3 pos;
+			D3DXVECTOR3 move;
 
-		//体を基準に
-		pos.x = g_player.part[0].srt.pos.x - sinf(g_player.part[0].srt.rot.y) * g_player.fRadius;//飛行機頭部の辺りに設定
-		pos.y = g_player.part[0].srt.pos.y;
-		pos.z = g_player.part[0].srt.pos.z - cosf(g_player.part[0].srt.rot.y) * g_player.fRadius;
+			//体を基準に
+			pos.x = g_player.part[0].srt.pos.x - sinf(g_player.part[0].srt.rot.y) * g_player.fRadius;//飛行機頭部の辺りに設定
+			pos.y = g_player.part[0].srt.pos.y;
+			pos.z = g_player.part[0].srt.pos.z - cosf(g_player.part[0].srt.rot.y) * g_player.fRadius;
 
-		//回転角度がプラスの時、時計回り
-		//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
-		move.x = -sinf(g_player.part[0].srt.rot.y) * VALUE_MOVE_BULLET;//体を基準に
-		move.y = 0.0f;
-		move.z = -cosf(g_player.part[0].srt.rot.y) * VALUE_MOVE_BULLET;
+			//回転角度がプラスの時、時計回り
+			//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
+			move.x = -sinf(g_player.part[0].srt.rot.y) * VALUE_MOVE_BULLET;//体を基準に
+			move.y = 0.0f;
+			move.z = -cosf(g_player.part[0].srt.rot.y) * VALUE_MOVE_BULLET;
 
-		SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
+			SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
 
-		// SE再生
-		PlaySound(SOUND_LABEL_SE_SHOT);
+			// SE再生
+			PlaySound(SOUND_LABEL_SE_SHOT);
+		}
 	}
 #endif
 
@@ -844,21 +853,37 @@ void UpdatePlayer(void)
 							+ (g_player.part[0].srt.pos.z - pItem->pos.z) * (g_player.part[0].srt.pos.z - pItem->pos.z);
 				if(fLength < (g_player.fRadius + pItem->fRadius) * (g_player.fRadius + pItem->fRadius))
 				{
-					// アイテム消去
-					DeleteItem(nCntItem);
+					if (GetPickItem() && (pItem->nType == ITEMTYPE_ICEBLOCK))
+					{//アイテム持っている場合、ほかのアイテムを拾えない
 
-					// スコア加算
-					ChangeScore2(100);
+					}
+					else
+					{
+						if (pItem->nType == ITEMTYPE_ICEBLOCK)
+						{
+							SetPickItem(true);
 
-					// SE再生
-					PlaySound(SOUND_LABEL_SE_COIN);
+						}
+
+						// アイテム消去
+						DeleteItem(nCntItem);
+
+						// スコア加算
+						ChangeScore2(100);
+
+						// SE再生
+						PlaySound(SOUND_LABEL_SE_COIN);
+
+					}
 				}
 			}
 		}
 	}
 
-	Freeze();
-
+	if (GetTimeOut() == 0)
+	{
+		Freeze();
+	}
 
 
 

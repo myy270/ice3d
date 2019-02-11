@@ -29,7 +29,7 @@
 
 #define	ENEMY_RADIUS		(15.0f)						// 半径
 
-#define	VALUE_MOVE_ENEMY	(0.155f)					// 移動速度
+#define	VALUE_MOVE_ENEMY	(0.195f)					// 移動速度
 #define	RATE_MOVE_ENEMY	(0.025f)						// 移動慣性係数
 
 #define	VALUE_ROTATE_ENEMY	(D3DX_PI * 0.025f)			// 回転速度 4.5度
@@ -402,7 +402,7 @@ void UninitEnemy(void)
 void UpdateEnemy(void)
 {
 
-	//AI2();
+	AI2();
 
 	if (g_enemy.state == FROZEN)
 	{	
@@ -660,6 +660,7 @@ void UpdateEnemy(void)
 							+ (g_enemy.part[0].srt.pos.z - pItem->pos.z) * (g_enemy.part[0].srt.pos.z - pItem->pos.z);
 				if(fLength < (g_enemy.fRadius + pItem->fRadius) * (g_enemy.fRadius + pItem->fRadius))
 				{
+
 					// アイテム消去
 					DeleteItem(nCntItem);
 

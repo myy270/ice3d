@@ -54,4 +54,7 @@ ITEM *GetItem(void);
 void Freeze(void);
 
 void DropItem();
+
+void SetPickItem(bool val);
+bool GetPickItem(void);
 #endif

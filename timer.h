@@ -20,6 +20,7 @@ void DrawTimer(void);
 void EnableTimer(bool bEnable);
 void ResetTimer(int nTime = 999);
 
-
+int GetTimer();
 bool GetTimeOut();
+
 #endif
