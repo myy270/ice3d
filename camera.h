@@ -27,4 +27,6 @@ void SetChaseHightP(float hight);
 //カメラの視点と注視点の距離をセット
 void SetLengthIntervalCamera(float length);
 
+CAMERA_MODE GetCameraMode();
+void SetCameraMode(CAMERA_MODE val);
 #endif

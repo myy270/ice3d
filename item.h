@@ -45,7 +45,7 @@ HRESULT InitItem(void);
 void UninitItem(void);
 void UpdateItem(void);
 void DrawItem(void);
-int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType = ITEMTYPE_COIN);
+int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType = ITEMTYPE_COIN, bool shadow = true);
 void DeleteItem(int nIdxItem);
 ITEM *GetItem(void);
 

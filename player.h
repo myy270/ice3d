@@ -98,4 +98,6 @@ D3DXVECTOR3 GetRotationDestPlayer(void);
 D3DXVECTOR3 GetMovePlayer(void);
 
 void Win();
+
+bool GetCutScene();
 #endif

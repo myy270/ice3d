@@ -94,7 +94,7 @@ HRESULT InitGame(void)
 
 	// タイマーの初期化
 	InitTimer();
-	ResetTimer(500);
+	ResetTimer(50);
 
 	// スコアの初期化
 	InitScore();
@@ -109,7 +109,7 @@ HRESULT InitGame(void)
 		//fPosY = (float)(rand() % 1400) / 10.0f + 10.0f;//10.0f~150.0f
 		fPosY = 15.0f;
 		fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
-		SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ),  D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_COIN); 
+		SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ),  D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_COIN, true);
 	}
 
 	// BGM再生 ちゃんとloopできるにする!　元の罠

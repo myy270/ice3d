@@ -248,75 +248,78 @@ void DrawItem(void)
 	
 	pDevice->SetMaterial(&matDef);
 
-	//プレイヤーの方
-	if (GetPlayer()->holdItem != ITEMTYPE_COIN)
+	//アイテムUIの描画
 	{
-		if (GetPlayer()->holdItem == ITEMTYPE_ICEBLOCK)
+		//プレイヤーの方
+		if (GetPlayer()->holdItem != ITEMTYPE_COIN)
 		{
-			//頂点バッファの中身を埋める
-			VERTEX_2D *pVtx;
+			if (GetPlayer()->holdItem == ITEMTYPE_ICEBLOCK)
+			{
+				//頂点バッファの中身を埋める
+				VERTEX_2D *pVtx;
 
-			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-			g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
+				// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+				g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
 
-			// 頂点座標の設定
-			pVtx[0].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
-			pVtx[1].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
-			pVtx[2].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
-			pVtx[3].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+				// 頂点座標の設定
+				pVtx[0].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
+				pVtx[1].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
+				pVtx[2].vtx = D3DXVECTOR3(ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+				pVtx[3].vtx = D3DXVECTOR3(ITEMLOGO_POS_X + ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
 
-			// 頂点データをアンロックする
-			g_pD3DVtxBuffItemLogo->Unlock();
+				// 頂点データをアンロックする
+				g_pD3DVtxBuffItemLogo->Unlock();
 
 
-			//ItemLogoの描画
-			// 頂点バッファをデバイスのデータストリームにバインド
-			pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
+				//ItemLogoの描画
+				// 頂点バッファをデバイスのデータストリームにバインド
+				pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
 
-			// 頂点フォーマットの設定
-			pDevice->SetFVF(FVF_VERTEX_2D);
+				// 頂点フォーマットの設定
+				pDevice->SetFVF(FVF_VERTEX_2D);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, NULL);
+				// テクスチャの設定
+				pDevice->SetTexture(0, NULL);
 
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+				// ポリゴンの描画
+				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+			}
 		}
-	}
 
-	//エネミーの方
-	if (GetEnemy()->holdItem != ITEMTYPE_COIN)
-	{
-		if (GetEnemy()->holdItem == ITEMTYPE_ICEBLOCK)
+		//エネミーの方
+		if (GetEnemy()->holdItem != ITEMTYPE_COIN)
 		{
-			//頂点バッファの中身を埋める
-			VERTEX_2D *pVtx;
+			if (GetEnemy()->holdItem == ITEMTYPE_ICEBLOCK)
+			{
+				//頂点バッファの中身を埋める
+				VERTEX_2D *pVtx;
 
-			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-			g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
+				// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+				g_pD3DVtxBuffItemLogo->Lock(0, 0, (void**)&pVtx, 0);
 
-			// 頂点座標の設定
-			pVtx[0].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X - ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
-			pVtx[1].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
-			pVtx[2].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X - ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
-			pVtx[3].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+				// 頂点座標の設定
+				pVtx[0].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X - ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y, 0.0f);
+				pVtx[1].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X, ITEMLOGO_POS_Y, 0.0f);
+				pVtx[2].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X - ITEMLOGO_SIZE_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
+				pVtx[3].vtx = D3DXVECTOR3(SCREEN_WIDTH - ITEMLOGO_POS_X, ITEMLOGO_POS_Y + ITEMLOGO_SIZE_Y, 0.0f);
 
-			// 頂点データをアンロックする
-			g_pD3DVtxBuffItemLogo->Unlock();
+				// 頂点データをアンロックする
+				g_pD3DVtxBuffItemLogo->Unlock();
 
 
-			//ItemLogoの描画
-			// 頂点バッファをデバイスのデータストリームにバインド
-			pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
+				//ItemLogoの描画
+				// 頂点バッファをデバイスのデータストリームにバインド
+				pDevice->SetStreamSource(0, g_pD3DVtxBuffItemLogo, 0, sizeof(VERTEX_2D));
 
-			// 頂点フォーマットの設定
-			pDevice->SetFVF(FVF_VERTEX_2D);
+				// 頂点フォーマットの設定
+				pDevice->SetFVF(FVF_VERTEX_2D);
 
-			// テクスチャの設定
-			pDevice->SetTexture(0, NULL);
+				// テクスチャの設定
+				pDevice->SetTexture(0, NULL);
 
-			// ポリゴンの描画
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+				// ポリゴンの描画
+				pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+			}
 		}
 	}
 }
@@ -324,7 +327,7 @@ void DrawItem(void)
 //=============================================================================
 // アイテムの設定
 //=============================================================================
-int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType)
+int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType,bool shadow)
 {
 	int itemIndex = -1;
 	for(int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
@@ -337,8 +340,11 @@ int SetItem(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int nType)
 			g_aItem[nCntItem].nType = nType;
 			g_aItem[nCntItem].bUse = true;
 
-			// 影の設定
-			g_aItem[nCntItem].nIdxShadow = SetShadow(g_aItem[nCntItem].pos, g_aItem[nCntItem].fRadius * 2.0f, g_aItem[nCntItem].fRadius * 2.0f);
+			if (shadow)
+			{
+				// 影の設定
+				g_aItem[nCntItem].nIdxShadow = SetShadow(g_aItem[nCntItem].pos, g_aItem[nCntItem].fRadius * 2.0f, g_aItem[nCntItem].fRadius * 2.0f);
+			}
 
 			itemIndex = nCntItem;
 			break;
@@ -469,7 +475,7 @@ void DropItem()
 			fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
 			fPosY = 950.0f;
 			fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
-			g_itemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_ICEBLOCK);
+			g_itemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_ICEBLOCK, false);
 			g_dropReady = true;
 		}
 		else

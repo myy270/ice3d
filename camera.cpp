@@ -18,11 +18,16 @@
 #define	VALUE_MOVE_CAMERA	(2.0f)					// カメラの移動量
 #define	VALUE_ROTATE_CAMERA	(D3DX_PI * 0.01f)		// カメラの回転量
 
-#define	INTERVAL_CAMERA_R	(0.0f)					// モデルの視線の先までの距離(プレイヤーと注視点の距離) カメラブレの原因の一つ
 #define	RATE_CHASE_CAMERA_P	(0.35f)					// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
-#define	CHASE_HEIGHT_P		(1900.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P_NEAR		(500.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P_FAR		(1900.0f)				// 追跡時の視点の高さ
+
+#define	RADIUS_NEAR		(500.0f)				// 視点と注視点のxoz面の距離
+#define	RADIUS_FAR		(300.0f)				// 視点と注視点のxoz面の距離
+
+
 #define	CHASE_HEIGHT_R		(10.0f)					// 追跡時の注視点の高さ
 
 //*****************************************************************************
@@ -40,20 +45,30 @@ D3DXVECTOR3		g_posCameraPDest;			// カメラの視点の目的位置（予想する位置）
 D3DXVECTOR3		g_posCameraRDest;			// カメラの注視点の目的位置
 D3DXVECTOR3		g_rotCamera;				// カメラの回転
 float			g_fLengthIntervalCamera;	// カメラの視点と注視点の距離
-float			g_fLengthIntervalPlayer;	// プレイヤーと注視点の距離
 D3DXMATRIX		g_mtxView;					// ビューマトリックス
 D3DXMATRIX		g_mtxProjection;			// プロジェクションマトリックス
 
 float g_chaseHightP;// 追跡時の視点の高さ
 
-float fov;
+CAMERA_MODE g_cameraMode;
+
 //=============================================================================
 // カメラの初期化
 //=============================================================================
 HRESULT InitCamera(void)
 {
-	g_chaseHightP = CHASE_HEIGHT_P;
-	g_posCameraP = D3DXVECTOR3(0.0f, 100.0f, -300.0f);
+	g_cameraMode = CAMERA_MODE_FAR;
+
+	if (g_cameraMode == CAMERA_MODE_NEAR)
+	{
+		g_chaseHightP = CHASE_HEIGHT_P_NEAR;		
+	}
+	else if (g_cameraMode == CAMERA_MODE_FAR)
+	{
+		g_chaseHightP = CHASE_HEIGHT_P_FAR;
+	}
+
+	g_posCameraP = D3DXVECTOR3(0.0f, 100.0f, - RADIUS_FAR);
 	g_posCameraR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_posCameraU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	g_posCameraPDest = D3DXVECTOR3(0.0f, 100.0f, -200.0f);
@@ -64,7 +79,6 @@ HRESULT InitCamera(void)
 	vx = g_posCameraP.x - g_posCameraR.x;
 	vz = g_posCameraP.z - g_posCameraR.z;
 	g_fLengthIntervalCamera = sqrtf(vx * vx + vz * vz);//= g_posCameraP.z
-	g_fLengthIntervalPlayer = INTERVAL_CAMERA_R;
 
 	return S_OK;
 }
@@ -84,16 +98,37 @@ void UpdateCamera(void)
 	D3DXVECTOR3 posPlayer;
 	D3DXVECTOR3 rotPlayer;
 	D3DXVECTOR3 movePlayer;
-	float fLength;
 
 	// モデルの現在の位置取得
 	posPlayer = GetPositionPlayer();
 
-	// モデルの現在の向き取得
-	rotPlayer = GetRotationPlayer();
+	//カメラモード変換
+	{
+		if (GetKeyboardTrigger(DIK_LSHIFT))
+		{
 
-	// モデルの前回の移動量取得
-	movePlayer = GetMovePlayer();
+			g_cameraMode = (CAMERA_MODE)!g_cameraMode;
+
+			if (g_cameraMode == CAMERA_MODE_NEAR)
+			{
+				g_chaseHightP = CHASE_HEIGHT_P_NEAR;
+				g_fLengthIntervalCamera = RADIUS_NEAR;
+
+				if (GetCutScene())
+				{//勝利時のカットシーン
+					g_chaseHightP = 100.0f;
+					g_fLengthIntervalCamera = 200.0f;
+				}
+
+			}
+			else if (g_cameraMode == CAMERA_MODE_FAR)
+			{
+				g_chaseHightP = CHASE_HEIGHT_P_FAR;
+				g_fLengthIntervalCamera = RADIUS_FAR;
+			}
+
+		}
+	}
 
 #ifdef _DEBUG
 	if (GetKeyboardPress(DIK_Q))
@@ -122,85 +157,71 @@ void UpdateCamera(void)
 		}
 	}
 
-	if (GetKeyboardPress(DIK_R))
+	if (GetKeyboardPress(DIK_G))
 	{//zoom
 		g_fLengthIntervalCamera -= VALUE_MOVE_CAMERA;
-	}
-
-	if (GetKeyboardPress(DIK_F))
-	{//zoom
-		g_fLengthIntervalCamera += VALUE_MOVE_CAMERA;
-	}
-
-	/*if (GetKeyboardTrigger(DIK_O))
-	{
-		fov += 0.01f;
-	}
-
-	if (GetKeyboardTrigger(DIK_P))
-	{
-		fov -= 0.01f;
-	}*/
-
-	if (GetKeyboardPress(DIK_G))
-	{
-		g_chaseHightP -= VALUE_MOVE_CAMERA;
 	}
 
 	if (GetKeyboardPress(DIK_H))
-	{
-		g_chaseHightP += VALUE_MOVE_CAMERA;
-	}
-
-	if (GetKeyboardPress(DIK_J))
-	{
-		g_fLengthIntervalCamera -= VALUE_MOVE_CAMERA;
-	}
-
-	if (GetKeyboardPress(DIK_K))
-	{
+	{//zoom
 		g_fLengthIntervalCamera += VALUE_MOVE_CAMERA;
 	}
 
-	if (GetKeyboardPress(DIK_L))
-	{
-		g_fLengthIntervalPlayer -= VALUE_MOVE_CAMERA;
+
+	if (GetKeyboardPress(DIK_J))
+	{// 追跡時の視点の高さ
+		g_chaseHightP -= VALUE_MOVE_CAMERA;
 	}
 
-	if (GetKeyboardPress(DIK_SEMICOLON))
-	{
-		g_fLengthIntervalPlayer += VALUE_MOVE_CAMERA;
+	if (GetKeyboardPress(DIK_K))
+	{// 追跡時の視点の高さ
+		g_chaseHightP += VALUE_MOVE_CAMERA;
 	}
+
 #endif
 
 
-	// 視点の目的位置 
-	g_posCameraPDest.x = - sinf(g_rotCamera.y) * g_fLengthIntervalCamera; //- sinf(g_rotCamera.y)の-が回転の方向を決める；
-	g_posCameraPDest.y = g_chaseHightP;	
-	g_posCameraPDest.z = - cosf(g_rotCamera.y) * g_fLengthIntervalCamera;//- cosf(g_rotCamera.y)の-が最初カメラの向きを決める
+	if (g_cameraMode == CAMERA_MODE_NEAR)
+	{
+		// 視点の目的位置
+		g_posCameraPDest.x = posPlayer.x - sinf(g_rotCamera.y) * g_fLengthIntervalCamera;
+		g_posCameraPDest.y = posPlayer.y + g_chaseHightP;
+		g_posCameraPDest.z = posPlayer.z - cosf(g_rotCamera.y) * g_fLengthIntervalCamera;
 
-	// 注視点の目的位置
-	g_posCameraRDest.x = 0.0f ;
-	g_posCameraRDest.y = 0.0f ;
-	g_posCameraRDest.z = 0.0f ;
+		// 注視点の目的位置
+		g_posCameraRDest.x = posPlayer.x;
+		g_posCameraRDest.y = posPlayer.y;
+		g_posCameraRDest.z = posPlayer.z;
 
-	// 視点の補間変化（グラデーション変化）
-	g_posCameraP.x += (g_posCameraPDest.x - g_posCameraP.x) * RATE_CHASE_CAMERA_P;
+	}
+	else if (g_cameraMode == CAMERA_MODE_FAR)
+	{
+		// 視点の目的位置 
+		g_posCameraPDest.x = -sinf(g_rotCamera.y) * g_fLengthIntervalCamera; //- sinf(g_rotCamera.y)の-が回転の方向を決める；
+		g_posCameraPDest.y = g_chaseHightP;
+		g_posCameraPDest.z = -cosf(g_rotCamera.y) * g_fLengthIntervalCamera;//- cosf(g_rotCamera.y)の-が最初カメラの向きを決める
+
+		// 注視点の目的位置
+		g_posCameraRDest.x = 0.0f;
+		g_posCameraRDest.y = 0.0f;
+		g_posCameraRDest.z = 0.0f;
+
+	}
+
+
+	g_posCameraP.x = g_posCameraPDest.x;
 	g_posCameraP.y = g_posCameraPDest.y;
-	g_posCameraP.z += (g_posCameraPDest.z - g_posCameraP.z) * RATE_CHASE_CAMERA_P;
+	g_posCameraP.z = g_posCameraPDest.z;
 
-	// 注視点の補間変化（グラデーション変化）
-	g_posCameraR.x += (g_posCameraRDest.x - g_posCameraR.x) * RATE_CHASE_CAMERA_R;
-	g_posCameraR.y += (g_posCameraRDest.y - g_posCameraR.y) * RATE_CHASE_CAMERA_R;
-	g_posCameraR.z += (g_posCameraRDest.z - g_posCameraR.z) * RATE_CHASE_CAMERA_R;
-
+	g_posCameraR.x = g_posCameraRDest.x;
+	g_posCameraR.y = g_posCameraRDest.y;
+	g_posCameraR.z = g_posCameraRDest.z;
 
 
 
 	PrintDebugProc("\n");
 	PrintDebugProc("\n");
 	PrintDebugProc("\n");
-	/*PrintDebugProc("fov:%f\n", VIEW_ANGLE + fov);*/
 
 	PrintDebugProc("[camera pos：(%f : %f : %f)]\n", g_posCameraP.x,
 											g_posCameraP.y, 
@@ -230,9 +251,6 @@ void UpdateCamera(void)
 
 	PrintDebugProc("\n");
 
-	PrintDebugProc("LengthIntervalPlayer:%f\n", g_fLengthIntervalPlayer);
-
-	PrintDebugProc("\n");
 }
 
 //=============================================================================
@@ -294,4 +312,14 @@ void SetChaseHightP(float hight)
 void SetLengthIntervalCamera(float length)
 {
 	g_fLengthIntervalCamera = length;
+}
+
+CAMERA_MODE GetCameraMode()
+{
+	 return g_cameraMode;
+}
+
+void SetCameraMode(CAMERA_MODE val)
+{
+	g_cameraMode = val;
 }

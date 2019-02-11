@@ -65,7 +65,7 @@ bool g_down;//AI行動
 bool g_left;//AI行動
 bool g_right;//AI行動
 
-bool g_ai = true;//AIモード
+bool g_ai;//AIモード
 
 static KEY g_anime[] =
 {
@@ -246,6 +246,8 @@ static KEY g_anime[] =
 //=============================================================================
 HRESULT InitEnemy(void)
 {
+	g_ai = true;
+
 	g_keyMax = sizeof(g_anime) / sizeof(KEY);
 
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
@@ -406,7 +408,6 @@ void UninitEnemy(void)
 //=============================================================================
 void UpdateEnemy(void)
 {
-
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_ADD))
 	{//AIモードの切替
@@ -575,28 +576,31 @@ void UpdateEnemy(void)
 
 // 弾発射
 #ifdef _DEBUG
-	if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
+	if (0)
 	{
-		if (GetKeyboardTrigger(DIK_NUMPAD1))
+		if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
 		{
-			D3DXVECTOR3 pos;
-			D3DXVECTOR3 move;
+			if (GetKeyboardTrigger(DIK_NUMPAD1))
+			{
+				D3DXVECTOR3 pos;
+				D3DXVECTOR3 move;
 
-			//体を基準に
-			pos.x = g_enemy.part[0].srt.pos.x - sinf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;//飛行機頭部の辺りに設定
-			pos.y = g_enemy.part[0].srt.pos.y;
-			pos.z = g_enemy.part[0].srt.pos.z - cosf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;
+				//体を基準に
+				pos.x = g_enemy.part[0].srt.pos.x - sinf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;//飛行機頭部の辺りに設定
+				pos.y = g_enemy.part[0].srt.pos.y;
+				pos.z = g_enemy.part[0].srt.pos.z - cosf(g_enemy.part[0].srt.rot.y) * g_enemy.fRadius;
 
-			//回転角度がプラスの時、時計回り
-			//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
-			move.x = -sinf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;//体を基準に
-			move.y = 0.0f;
-			move.z = -cosf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;
+				//回転角度がプラスの時、時計回り
+				//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
+				move.x = -sinf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;//体を基準に
+				move.y = 0.0f;
+				move.z = -cosf(g_enemy.part[0].srt.rot.y) * VALUE_MOVE_BULLET_ENEMY;
 
-			SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
+				SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
 
-			// SE再生
-			PlaySound(SOUND_LABEL_SE_SHOT);
+				// SE再生
+				PlaySound(SOUND_LABEL_SE_SHOT);
+			}
 		}
 	}
 #endif
