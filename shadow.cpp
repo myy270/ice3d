@@ -237,7 +237,9 @@ HRESULT MakeVertexShadow(LPDIRECT3DDEVICE9 pDevice)
 //=============================================================================
 void SetVertexShadow(int nIdxShadow, float fSizeX, float fSizeZ)
 {
-	{//頂点バッファの中身を埋める
+	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
+	{
+		//頂点バッファの中身を埋める
 		VERTEX_3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
@@ -261,7 +263,9 @@ void SetVertexShadow(int nIdxShadow, float fSizeX, float fSizeZ)
 //=============================================================================
 void SetColorShadow(int nIdxShadow, D3DXCOLOR col)
 {
-	{//頂点バッファの中身を埋める
+	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
+	{
+		//頂点バッファの中身を埋める
 		VERTEX_3D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
@@ -310,7 +314,10 @@ int SetShadow(D3DXVECTOR3 pos, float fSizeX, float fSizeZ)
 //=============================================================================
 void SetPositionShadow(int nIdxShadow, D3DXVECTOR3 pos)
 {
-	g_aShadow[nIdxShadow].pos = pos;
+	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
+	{
+		g_aShadow[nIdxShadow].pos = pos;
+	}
 }
 
 //=============================================================================
