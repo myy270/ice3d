@@ -44,7 +44,7 @@
 #define	FVF_VERTEX_3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
 #define SCREEN_WIDTH	(1280)				// ウインドウの幅
-#define SCREEN_HEIGHT	(960)				// ウインドウの高さ
+#define SCREEN_HEIGHT	(720)				// ウインドウの高さ
 #define SCREEN_CENTER_X	(SCREEN_WIDTH / 2)	// ウインドウの中心Ｘ座標
 #define SCREEN_CENTER_Y	(SCREEN_HEIGHT / 2)	// ウインドウの中心Ｙ座標
 

@@ -22,7 +22,7 @@
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
 #define	CHASE_HEIGHT_P_NEAR		(500.0f)				// 追跡時の視点の高さ
-#define	CHASE_HEIGHT_P_FAR		(1900.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P_FAR		(1700.0f)				// 追跡時の視点の高さ
 
 #define	RADIUS_NEAR		(500.0f)				// 視点と注視点のxoz面の距離
 #define	RADIUS_FAR		(300.0f)				// 視点と注視点のxoz面の距離

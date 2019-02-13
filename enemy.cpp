@@ -731,7 +731,7 @@ void UpdateEnemy(void)
 		}
 	}
 
-	PrintDebugProc("エネミー////////////////////\n");
+	//PrintDebugProc("エネミー////////////////////\n");
 	//PrintDebugProc("コントロールのパーツ番号：%d \n", g_conId);
 
 	//PrintDebugProc("[S：(%f : %f : %f)]\n", g_enemy.part[g_conId].srt.scl.x, 
@@ -750,10 +750,10 @@ void UpdateEnemy(void)
 
 	
 
-	PrintDebugProc("up ：%d \n", g_up);
-	PrintDebugProc("down ：%d \n", g_down);
-	PrintDebugProc("left ：%d \n", g_left);
-	PrintDebugProc("right ：%d \n", g_right);
+	//PrintDebugProc("up ：%d \n", g_up);
+	//PrintDebugProc("down ：%d \n", g_down);
+	//PrintDebugProc("left ：%d \n", g_left);
+	//PrintDebugProc("right ：%d \n", g_right);
 }
 
 //=============================================================================
