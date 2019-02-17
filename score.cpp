@@ -207,7 +207,7 @@ HRESULT MakeVertexScore(LPDIRECT3DDEVICE9 pDevice)
 		g_pD3DVtxBuffScore->Lock(0, 0, (void**)&pVtx, 0);
 
 		for(int nCntPlace = 0; nCntPlace < NUM_PLACE; nCntPlace++, pVtx += 4)
-		{
+		{//数字の頂点
 			// 頂点座標の設定
 			pVtx[0].vtx = D3DXVECTOR3(SCORE_POS_X + nCntPlace * (SCORE_SIZE_X + SCORE_INTERVAL_X), SCORE_POS_Y, 0.0f);//1 2 3 4 5 6 7 8 の格式 罠
 			pVtx[1].vtx = D3DXVECTOR3(SCORE_POS_X + nCntPlace * (SCORE_INTERVAL_X + SCORE_SIZE_X) + SCORE_SIZE_X, SCORE_POS_Y, 0.0f);
@@ -279,14 +279,15 @@ HRESULT MakeVertexScore2(LPDIRECT3DDEVICE9 pDevice)
         return E_FAIL;
 	}
 
-	{//頂点バッファの中身を埋める
+	{
+		//頂点バッファの中身を埋める
 		VERTEX_2D *pVtx;
 
 		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 		g_pD3DVtxBuffScore2->Lock(0, 0, (void**)&pVtx, 0);
 
 		for(int nCntPlace = 0; nCntPlace < NUM_PLACE; nCntPlace++, pVtx += 4)
-		{
+		{//数字の頂点
 			// 頂点座標の設定
 			pVtx[0].vtx = D3DXVECTOR3(SCORE_POS_X2 + nCntPlace * (SCORE_SIZE_X + SCORE_INTERVAL_X), SCORE_POS_Y, 0.0f);//1 2 3 4 5 6 7 8 の格式 罠
 			pVtx[1].vtx = D3DXVECTOR3(SCORE_POS_X2 + nCntPlace * (SCORE_INTERVAL_X + SCORE_SIZE_X) + SCORE_SIZE_X, SCORE_POS_Y, 0.0f);
@@ -300,10 +301,10 @@ HRESULT MakeVertexScore2(LPDIRECT3DDEVICE9 pDevice)
 			pVtx[3].rhw = 1.0f;
 
 			// 反射光の設定
-			pVtx[0].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);//黄
-			pVtx[1].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);
-			pVtx[2].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);
-			pVtx[3].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);
+			pVtx[0].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);//オレンジ
+			pVtx[1].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);
+			pVtx[2].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);
+			pVtx[3].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);
 
 			// テクスチャ座標の設定
 			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -326,10 +327,10 @@ HRESULT MakeVertexScore2(LPDIRECT3DDEVICE9 pDevice)
 			pVtx[3].rhw = 1.0f;
 
 			// 反射光の設定
-			pVtx[0].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);//黄
-			pVtx[1].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);
-			pVtx[2].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);
-			pVtx[3].diffuse = D3DXCOLOR(1.0f, 0.9f, 0.0f, 1.0f);
+			pVtx[0].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);//オレンジ
+			pVtx[1].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);
+			pVtx[2].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);
+			pVtx[3].diffuse = D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f);
 
 			// テクスチャ座標の設定
 			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);

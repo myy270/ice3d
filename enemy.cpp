@@ -246,7 +246,19 @@ static KEY g_anime[] =
 //=============================================================================
 HRESULT InitEnemy(void)
 {
-	g_ai = true;
+	
+
+	if (GetPlayMode() == PLAY_MODE_SINGLE)
+	{
+		g_ai = true;
+	}
+	else if (GetPlayMode() == PLAY_MODE_DOUBLE)
+	{
+		g_ai = false;
+	}
+
+
+
 
 	g_keyMax = sizeof(g_anime) / sizeof(KEY);
 

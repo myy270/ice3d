@@ -41,7 +41,7 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;	// Deviceオブジェクト(描画に必要)
 #ifdef _DEBUG
 int					g_nCountFPS;			// FPSカウンタ
 #endif
-MODE				g_mode = MODE_GAME;	// モード
+MODE				g_mode = MODE_TITLE;	// モード
 
 int rest;
 

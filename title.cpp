@@ -12,18 +12,29 @@
 // マクロ定義
 //*****************************************************************************
 #define	TEXTURE_TITLE		"data/TEXTURE/bg000.jpg"		// 読み込むテクスチャファイル名
-#define	TEXTURE_TITLE_LOGO	"data/TEXTURE/ice3D.png"	// 読み込むテクスチャファイル名
+#define	TEXTURE_TITLE_LOGO	"data/TEXTURE/ice3D.png"		// 読み込むテクスチャファイル名
 #define	TEXTURE_LOGO_START	"data/TEXTURE/press_enter.png"	// 読み込むテクスチャファイル名
+#define	TEXTURE_1P2P		"data/TEXTURE/1p2p.png"			// 読み込むテクスチャファイル名
 
-#define	TITLE_LOGO_POS_X		(320)		// タイトルロゴの位置(X座標)
+
+
+#define	TITLE_LOGO_POS_X		(SCREEN_WIDTH * 0.25f)		// タイトルロゴの位置(X座標) 320
 #define	TITLE_LOGO_POS_Y		(40)		// タイトルロゴの位置(Y座標)
 #define	TITLE_LOGO_WIDTH		(640)		// タイトルロゴの幅
 #define	TITLE_LOGO_HEIGHT		(640)		// タイトルロゴの高さ
 
-#define	START_POS_X				(400)		// スタートボタンの位置(X座標)
-#define	START_POS_Y				(720)		// スタートボタンの位置(Y座標)
+#define	START_POS_X				(SCREEN_WIDTH * 0.3125f)		// スタートボタンの位置(X座標) 400
+#define	START_POS_Y				(SCREEN_HEIGHT * 0.75f)		// スタートボタンの位置(Y座標) 720
 #define	START_WIDTH				(480)		// スタートボタンの幅
 #define	START_HEIGHT			(120)		// スタートボタンの高さ
+
+
+#define	ONETWO_POS_X			(SCREEN_WIDTH * 0.25f)		// スタートボタンの位置(X座標) 400
+#define	ONETWO_POS_Y			(SCREEN_HEIGHT * 0.5f)		// スタートボタンの位置(Y座標) 720
+#define	ONETWO_WIDTH			(640)		// スタートボタンの幅
+#define	ONETWO_HEIGHT			(ONETWO_WIDTH / 2.8819f)		// スタートボタンの高さ
+
+
 
 #define	COUNT_APPERA_START		(60)		// スタートボタン出現までの時間 appear
 #define	INTERVAL_DISP_START		(60)		// スタートボタン点滅の時間
@@ -45,17 +56,30 @@ LPDIRECT3DTEXTURE9		g_pD3DTextureTitleLogo = NULL;	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffTitleLogo = NULL;	// 頂点バッファインターフェースへのポインタ
 LPDIRECT3DTEXTURE9		g_pD3DTextureStart = NULL;		// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffStart = NULL;		// 頂点バッファインターフェースへのポインタ
+
+LPDIRECT3DTEXTURE9		g_pD3DTextureOneTwo = NULL;		// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffOneTwo = NULL;		// 頂点バッファインターフェースへのポインタ
+
+
+
 int						g_nCountAppearStart = 0;		// 出現までの待ち時間
 float					g_fAlphaLogo = 0.0f;			// タイトルロゴのα値
 int						g_nCountDisp = 0;				// 待ち時間
 bool					g_bDispStart = false;			//
 int						g_nConutDemo = 0;				//
 
+bool g_onetwoUI;		//1p2pUI スイッチ
+
+int g_cursorIdx;		//カーソルインデクス
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitTitle(void)
 {
+	g_onetwoUI = false;
+
+	g_cursorIdx = 0;
+
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	g_nCountAppearStart = 0;
@@ -80,6 +104,11 @@ HRESULT InitTitle(void)
 	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
 								TEXTURE_LOGO_START,			// ファイルの名前
 								&g_pD3DTextureStart);		// 読み込むメモリー
+
+	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
+								TEXTURE_1P2P,				// ファイルの名前
+								&g_pD3DTextureOneTwo);		// 読み込むメモリー
+
 
 	return S_OK;
 }
@@ -123,6 +152,18 @@ void UninitTitle(void)
 	{// 頂点バッファの開放
 		g_pD3DVtxBuffStart->Release();
 		g_pD3DVtxBuffStart = NULL;
+	}
+
+	if (g_pD3DTextureOneTwo != NULL)
+	{// テクスチャの開放
+		g_pD3DTextureOneTwo->Release();
+		g_pD3DTextureOneTwo = NULL;
+	}
+
+	if (g_pD3DVtxBuffOneTwo != NULL)
+	{// 頂点バッファの開放
+		g_pD3DVtxBuffOneTwo->Release();
+		g_pD3DVtxBuffOneTwo = NULL;
 	}
 }
 
@@ -178,11 +219,46 @@ void UpdateTitle(void)
 
 			g_nCountAppearStart = COUNT_APPERA_START;
 		}
+		else if(!g_onetwoUI)
+		{
+			//1p2p UIに入る
+			g_onetwoUI = true;
+			g_pD3DTextureTitleLogo = NULL;
+			g_pD3DTextureStart = NULL;
+
+
+		}
 		else
-		{// ゲームへ
+		{
+			// ゲームへ
 			SetFade(FADE_OUT);//MODE が　GAME に変換　
+
 		}
 	}
+
+	if (g_onetwoUI)
+	{
+		if (GetFade() == FADE_NONE)
+		{
+			if (GetKeyboardRepeat(DIK_W))
+			{
+				g_cursorIdx = (g_cursorIdx - 1) % 2;
+
+				if (g_cursorIdx < 0)
+				{
+					g_cursorIdx = 1;
+				}
+			}
+			else if (GetKeyboardRepeat(DIK_S))
+			{
+				g_cursorIdx = (g_cursorIdx + 1) % 2;
+			}
+
+		}
+
+
+	}
+
 }
 
 //=============================================================================
@@ -204,33 +280,217 @@ void DrawTitle(void)
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 
-
-	// 頂点バッファをデバイスのデータストリームにバインド
-    pDevice->SetStreamSource(0, g_pD3DVtxBuffTitleLogo, 0, sizeof(VERTEX_2D));
-
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
-
-	// テクスチャの設定
-	pDevice->SetTexture(0, g_pD3DTextureTitleLogo);
-
-	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
-
-	if(g_bDispStart == true)
-	{
+	if (!g_onetwoUI)
+	{//タイトルロゴとエンターロゴの表示
 		// 頂点バッファをデバイスのデータストリームにバインド
-		pDevice->SetStreamSource(0, g_pD3DVtxBuffStart, 0, sizeof(VERTEX_2D));
+		pDevice->SetStreamSource(0, g_pD3DVtxBuffTitleLogo, 0, sizeof(VERTEX_2D));
 
 		// 頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_2D);
 
 		// テクスチャの設定
-		pDevice->SetTexture(0, g_pD3DTextureStart);
+		pDevice->SetTexture(0, g_pD3DTextureTitleLogo);
 
 		// ポリゴンの描画
 		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+
+		if (g_bDispStart == true)
+		{
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffStart, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_pD3DTextureStart);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+		}
 	}
+	else
+	{//1p2pUI表示
+
+		if (g_cursorIdx == 0)
+		{
+			//1p
+			//頂点バッファの中身を埋める
+			VERTEX_2D *pVtx;
+
+			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+			g_pD3DVtxBuffOneTwo->Lock(0, 0, (void**)&pVtx, 0);
+
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(ONETWO_POS_X, ONETWO_POS_Y, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(ONETWO_POS_X, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+
+
+			// 反射光の設定
+			pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 0.5f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 0.5f);
+
+			// 頂点データをアンロックする
+			g_pD3DVtxBuffOneTwo->Unlock();
+
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffOneTwo, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_pD3DTextureOneTwo);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+
+			//2p
+			//頂点バッファの中身を埋める
+
+			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+			g_pD3DVtxBuffOneTwo->Lock(0, 0, (void**)&pVtx, 0);
+
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH * 0.1735f, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH * 0.1735f, ONETWO_POS_Y + ONETWO_HEIGHT, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT, 0.0f);
+
+
+			// 反射光の設定
+			pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+			pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+			pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+			pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.1735f, 0.5f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.5f);
+			pVtx[2].tex = D3DXVECTOR2(0.1735f, 1.0f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+			// 頂点データをアンロックする
+			g_pD3DVtxBuffOneTwo->Unlock();
+
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffOneTwo, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_pD3DTextureOneTwo);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+
+
+
+
+			
+		}
+		else if (g_cursorIdx == 1)
+		{
+			//1p
+			//頂点バッファの中身を埋める
+			VERTEX_2D *pVtx;
+
+			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+			g_pD3DVtxBuffOneTwo->Lock(0, 0, (void**)&pVtx, 0);
+
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH * 0.1735f, ONETWO_POS_Y, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH * 0.1735f, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+
+
+			// 反射光の設定
+			pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+			pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+			pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+			pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.1735f, 0.0f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+			pVtx[2].tex = D3DXVECTOR2(0.1735f, 0.5f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 0.5f);
+
+			// 頂点データをアンロックする
+			g_pD3DVtxBuffOneTwo->Unlock();
+
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffOneTwo, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_pD3DTextureOneTwo);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+
+
+			//2p
+			//頂点バッファの中身を埋める
+			
+			// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+			g_pD3DVtxBuffOneTwo->Lock(0, 0, (void**)&pVtx, 0);
+
+			// 頂点座標の設定
+			pVtx[0].vtx = D3DXVECTOR3(ONETWO_POS_X, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+			pVtx[1].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT / 2, 0.0f);
+			pVtx[2].vtx = D3DXVECTOR3(ONETWO_POS_X, ONETWO_POS_Y + ONETWO_HEIGHT, 0.0f);
+			pVtx[3].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT, 0.0f);
+
+
+			// 反射光の設定
+			pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+			// テクスチャ座標の設定
+			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.5f);
+			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.5f);
+			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+			// 頂点データをアンロックする
+			g_pD3DVtxBuffOneTwo->Unlock();
+
+			// 頂点バッファをデバイスのデータストリームにバインド
+			pDevice->SetStreamSource(0, g_pD3DVtxBuffOneTwo, 0, sizeof(VERTEX_2D));
+
+			// 頂点フォーマットの設定
+			pDevice->SetFVF(FVF_VERTEX_2D);
+
+			// テクスチャの設定
+			pDevice->SetTexture(0, g_pD3DTextureOneTwo);
+
+			// ポリゴンの描画
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+
+
+
+		}
+
+
+	}
+
 }
 
 //=============================================================================
@@ -374,6 +634,52 @@ HRESULT MakeVertexTitle(LPDIRECT3DDEVICE9 pDevice)
 		g_pD3DVtxBuffStart->Unlock();
 	}
 
+	//1p2pUI
+	// オブジェクトの頂点バッファを生成
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+		D3DUSAGE_WRITEONLY,			// 頂点バッファの使用法　
+		FVF_VERTEX_2D,				// 使用する頂点フォーマット
+		D3DPOOL_MANAGED,			// リソースのバッファを保持するメモリクラスを指定
+		&g_pD3DVtxBuffOneTwo,		// 頂点バッファインターフェースへのポインタ
+		NULL)))						// NULLに設定
+	{
+		return E_FAIL;
+	}
+
+	{//頂点バッファの中身を埋める
+		VERTEX_2D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		g_pD3DVtxBuffOneTwo->Lock(0, 0, (void**)&pVtx, 0);
+
+		// 頂点座標の設定
+		pVtx[0].vtx = D3DXVECTOR3(ONETWO_POS_X, ONETWO_POS_Y, 0.0f);
+		pVtx[1].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y, 0.0f);
+		pVtx[2].vtx = D3DXVECTOR3(ONETWO_POS_X, ONETWO_POS_Y + ONETWO_HEIGHT, 0.0f);
+		pVtx[3].vtx = D3DXVECTOR3(ONETWO_POS_X + ONETWO_WIDTH, ONETWO_POS_Y + ONETWO_HEIGHT, 0.0f);
+
+		// テクスチャのパースペクティブコレクト用
+		pVtx[0].rhw =
+		pVtx[1].rhw =
+		pVtx[2].rhw =
+		pVtx[3].rhw = 1.0f;
+
+		// 反射光の設定
+		pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
+		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
+		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+
+		// 頂点データをアンロックする
+		g_pD3DVtxBuffOneTwo->Unlock();
+	}
+
 	return S_OK;
 }
 
@@ -400,3 +706,7 @@ void SetColorTitleLogo(void)
 
 }
 
+int GetCursorIdx()
+{
+	return g_cursorIdx;
+}
