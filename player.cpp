@@ -42,7 +42,6 @@
 void WriteAnime();
 void AnimeWalk();
 
-void Win();
 
 //*****************************************************************************
 // グローバル変数
@@ -59,7 +58,6 @@ bool g_animeState = 0;		//動くかどうか
 
 float g_cancelTime = 0.0f;// 最初状態に戻る時間
 
-bool g_cutScene;//カットシーンかどうか
 
 KEY g_anime[] =
 {
@@ -240,7 +238,7 @@ KEY g_anime[] =
 //=============================================================================
 HRESULT InitPlayer(void)
 {
-	g_cutScene = false;
+	
 
 	g_keyMax = sizeof(g_anime) / sizeof(KEY);
 
@@ -1233,24 +1231,5 @@ void AnimeWalk()
 }
 
 
-void Win()
-{
-	//カットシーン
-	/*SetCameraMode(CAMERA_MODE_NEAR);*/
-	if (!g_cutScene)
-	{//勝利時の第一画面は必ずカットシーン
-		SetCameraMode(CAMERA_MODE_NEAR);
-		SetChaseHightP(100.0f);
-		SetLengthIntervalCamera(200.0f);
 
-		g_cutScene = true;
-	}
 
-	
-
-}
-
-bool GetCutScene()
-{
-	return g_cutScene;
-}

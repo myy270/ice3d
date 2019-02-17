@@ -6,6 +6,7 @@
 //=============================================================================
 #include "score.h"
 #include "player.h"
+#include "camera.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -44,17 +45,22 @@ int						g_score;						// 敵のスコア
 
 int						g_score2;						// プレイヤーのスコア
 
+OBJECT g_winner;
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitScore(void)
 {
+
+
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	g_winner = OBJECT_MAX;
 
 	// スコアの初期化
 	g_score = 0;
 	g_score2 = 0;
-
+	
 	// 頂点情報の作成
 	MakeVertexScore(pDevice);
 
@@ -411,19 +417,30 @@ void ChangeScore2(int value)
 
 }
 
-bool compScore()
+void compScore()
 {
 	if (g_score2 >= g_score)
 	{//プレイヤー勝つ場合
 
-		Win();//カットシーンする
-		return true;
+		WinScene();//カットシーンする
+		g_winner = OBJECT_PLAYER;
 	}
 	else
 	{//プレイヤー負ける
 
-		return false;
+		if (GetPlayMode() == PLAY_MODE_DOUBLE)
+		{//2pの場合、2pにカットシーン
+			WinScene();//カットシーンする
+			g_winner = OBJECT_ENEMY;
+		}
+
 
 	}
+
+}
+
+OBJECT GetWinner()
+{
+	return g_winner;
 
 }

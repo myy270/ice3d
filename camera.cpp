@@ -8,7 +8,8 @@
 #include "player.h"
 #include "input.h"
 #include "debugproc.h"
-
+#include "enemy.h"
+#include "score.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -41,8 +42,7 @@
 D3DXVECTOR3		g_posCameraP;				// カメラの視点
 D3DXVECTOR3		g_posCameraR;				// カメラの注視点
 D3DXVECTOR3		g_posCameraU;				// カメラの上方向
-D3DXVECTOR3		g_posCameraPDest;			// カメラの視点の目的位置（予想する位置）
-D3DXVECTOR3		g_posCameraRDest;			// カメラの注視点の目的位置
+
 D3DXVECTOR3		g_rotCamera;				// カメラの回転
 float			g_fLengthIntervalCamera;	// カメラの視点と注視点の距離
 D3DXMATRIX		g_mtxView;					// ビューマトリックス
@@ -53,11 +53,16 @@ float g_chaseHightP;// 追跡時の視点の高さ
 CAMERA_MODE g_cameraMode;
 
 PLAY_MODE g_playMode;
+
+bool g_cutScene;//カットシーンかどうか
+
 //=============================================================================
 // カメラの初期化
 //=============================================================================
 HRESULT InitCamera(void)
 {
+	g_cutScene = false;
+
 	g_cameraMode = CAMERA_MODE_FAR;//デフォルト設定
 
 	g_playMode = PLAY_MODE_SINGLE;//デフォルト設定
@@ -74,8 +79,7 @@ HRESULT InitCamera(void)
 	g_posCameraP = D3DXVECTOR3(0.0f, 100.0f, - RADIUS_FAR);
 	g_posCameraR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	g_posCameraU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	g_posCameraPDest = D3DXVECTOR3(0.0f, 100.0f, -200.0f);
-	g_posCameraRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
 	g_rotCamera = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	float vx,vz;
@@ -119,7 +123,7 @@ void UpdateCamera(void)
 			g_chaseHightP = CHASE_HEIGHT_P_NEAR;
 			g_fLengthIntervalCamera = RADIUS_NEAR;
 
-			if (GetCutScene())
+			if (g_cutScene)
 			{//勝利時のカットシーン
 				g_chaseHightP = 100.0f;
 				g_fLengthIntervalCamera = 200.0f;
@@ -188,38 +192,43 @@ void UpdateCamera(void)
 	if (g_cameraMode == CAMERA_MODE_NEAR)
 	{
 		// 視点の目的位置
-		g_posCameraPDest.x = posPlayer.x - sinf(g_rotCamera.y) * g_fLengthIntervalCamera;
-		g_posCameraPDest.y = posPlayer.y + g_chaseHightP;
-		g_posCameraPDest.z = posPlayer.z - cosf(g_rotCamera.y) * g_fLengthIntervalCamera;
+		g_posCameraP.x = posPlayer.x - sinf(g_rotCamera.y) * g_fLengthIntervalCamera;
+		g_posCameraP.y = posPlayer.y + g_chaseHightP;
+		g_posCameraP.z = posPlayer.z - cosf(g_rotCamera.y) * g_fLengthIntervalCamera;
 
 		// 注視点の目的位置
-		g_posCameraRDest.x = posPlayer.x;
-		g_posCameraRDest.y = posPlayer.y;
-		g_posCameraRDest.z = posPlayer.z;
+		g_posCameraR.x = posPlayer.x;
+		g_posCameraR.y = posPlayer.y;
+		g_posCameraR.z = posPlayer.z;
+
+		if (GetWinner() == OBJECT_ENEMY)
+		{
+			// 視点の目的位置
+			g_posCameraP.x = GetPositionEnemy().x - sinf(g_rotCamera.y) * g_fLengthIntervalCamera;
+			g_posCameraP.y = GetPositionEnemy().y + g_chaseHightP;
+			g_posCameraP.z = GetPositionEnemy().z - cosf(g_rotCamera.y) * g_fLengthIntervalCamera;
+
+			// 注視点の目的位置
+			g_posCameraR.x = GetPositionEnemy().x;
+			g_posCameraR.y = GetPositionEnemy().y;
+			g_posCameraR.z = GetPositionEnemy().z;
+
+		}
 
 	}
 	else if (g_cameraMode == CAMERA_MODE_FAR)
 	{
 		// 視点の目的位置 
-		g_posCameraPDest.x = -sinf(g_rotCamera.y) * g_fLengthIntervalCamera; //- sinf(g_rotCamera.y)の-が回転の方向を決める；
-		g_posCameraPDest.y = g_chaseHightP;
-		g_posCameraPDest.z = -cosf(g_rotCamera.y) * g_fLengthIntervalCamera;//- cosf(g_rotCamera.y)の-が最初カメラの向きを決める
+		g_posCameraP.x = -sinf(g_rotCamera.y) * g_fLengthIntervalCamera; //- sinf(g_rotCamera.y)の-が回転の方向を決める；
+		g_posCameraP.y = g_chaseHightP;
+		g_posCameraP.z = -cosf(g_rotCamera.y) * g_fLengthIntervalCamera;//- cosf(g_rotCamera.y)の-が最初カメラの向きを決める
 
 		// 注視点の目的位置
-		g_posCameraRDest.x = 0.0f;
-		g_posCameraRDest.y = 0.0f;
-		g_posCameraRDest.z = 0.0f;
+		g_posCameraR.x = 0.0f;
+		g_posCameraR.y = 0.0f;
+		g_posCameraR.z = 0.0f;
 
 	}
-
-
-	g_posCameraP.x = g_posCameraPDest.x;
-	g_posCameraP.y = g_posCameraPDest.y;
-	g_posCameraP.z = g_posCameraPDest.z;
-
-	g_posCameraR.x = g_posCameraRDest.x;
-	g_posCameraR.y = g_posCameraRDest.y;
-	g_posCameraR.z = g_posCameraRDest.z;
 
 
 
@@ -234,16 +243,6 @@ void UpdateCamera(void)
 	PrintDebugProc("[camera at：(%f : %f : %f)]\n", g_posCameraR.x,
 											g_posCameraR.y, 
 											g_posCameraR.z);
-
-	PrintDebugProc("\n");
-
-	PrintDebugProc("[camera posDest：(%f : %f : %f)]\n", g_posCameraPDest.x,
-											g_posCameraPDest.y,
-											g_posCameraPDest.z);
-
-	PrintDebugProc("[camera atDest：(%f : %f : %f)]\n", g_posCameraRDest.x,
-											g_posCameraRDest.y, 
-											g_posCameraRDest.z);
 
 	PrintDebugProc("\n");
 
@@ -336,4 +335,23 @@ void SetPlayMode(PLAY_MODE val)
 PLAY_MODE GetPlayMode()
 {
 	return g_playMode;
+}
+
+bool GetCutScene()
+{
+	return g_cutScene;
+}
+
+
+void WinScene()
+{//カットシーン
+	if (!g_cutScene)
+	{//勝利時の第一画面は必ずカットシーン
+		SetCameraMode(CAMERA_MODE_NEAR);
+		SetChaseHightP(100.0f);
+		SetLengthIntervalCamera(200.0f);
+
+		g_cutScene = true;
+	}
+
 }

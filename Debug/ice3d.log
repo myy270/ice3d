@@ -1,6 +1,2 @@
-﻿  result.cpp
-c:\users\user_mai\source\repos\ice3d\result.cpp(259): warning C4305: '引数': 'double' から 'FLOAT' へ切り詰めます。
-c:\users\user_mai\source\repos\ice3d\result.cpp(260): warning C4305: '引数': 'double' から 'FLOAT' へ切り詰めます。
-c:\users\user_mai\source\repos\ice3d\result.cpp(261): warning C4305: '引数': 'double' から 'FLOAT' へ切り詰めます。
-c:\users\user_mai\source\repos\ice3d\result.cpp(262): warning C4305: '引数': 'double' から 'FLOAT' へ切り詰めます。
+﻿  camera.cpp
   ice3d.vcxproj -> C:\Users\USER_MAI\source\repos\ice3d\Debug\ice3d.exe

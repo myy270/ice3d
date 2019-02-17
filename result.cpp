@@ -8,6 +8,7 @@
 #include "input.h"
 #include "fade.h"
 #include "score.h"
+#include "camera.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -19,8 +20,8 @@
 
 
 
-#define	RESULT_LOGO_POS_X	(SCREEN_WIDTH * 0.19)		// リザルトロゴの位置(X座標) 240
-#define	RESULT_LOGO_POS_Y	(SCREEN_HEIGHT * 0.65)		// リザルトロゴの位置(Y座標) 620
+#define	RESULT_LOGO_POS_X	(SCREEN_WIDTH * 0.19f)		// リザルトロゴの位置(X座標) 240
+#define	RESULT_LOGO_POS_Y	(SCREEN_HEIGHT * 0.65f)		// リザルトロゴの位置(Y座標) 620
 #define	RESULT_LOGO_WIDTH	(800)		// リザルトロゴの幅
 #define	RESULT_LOGO_HEIGHT	(240)		// リザルトロゴの高さ
 
@@ -47,11 +48,18 @@ int						g_nCountAppearResult = 0;		// 出現までの待ち時間
 float					g_fAlphaResult = 0.0f;			// リザルトロゴのα値
 int						g_nCountWaitResult = 0;			// 待ち時間
 
+LPDIRECT3DTEXTURE9 g_textureBuff = NULL;//作業用
+
+bool textureDecide;
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitResult(void)
 {
+	g_textureBuff = NULL;
+
+	textureDecide = false;
+
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	g_nCountAppearResult = 0;
@@ -150,39 +158,39 @@ void DrawResult(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点バッファをデバイスのデータストリームにバインド
-    pDevice->SetStreamSource(0, g_pD3DVtxBuffResult, 0, sizeof(VERTEX_2D));
-
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
-
-	// テクスチャの設定
-	pDevice->SetTexture(0, g_pD3DTextureResult);
-
-	// ポリゴンの描画
-	//pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
-
-
-
-
+	
 	// 頂点バッファをデバイスのデータストリームにバインド
     pDevice->SetStreamSource(0, g_pD3DVtxBuffResultLogo, 0, sizeof(VERTEX_2D));
 
 	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_2D);
 
-
-	if (compScore())
+	if (!textureDecide)
 	{
-		// テクスチャの設定
-		pDevice->SetTexture(0, g_pD3DTextureResultLogo);
+		if (GetPlayMode() == PLAY_MODE_SINGLE)
+		{
+			if (GetWinner() == OBJECT_PLAYER)
+			{
+				// テクスチャの設定
+				g_textureBuff = g_pD3DTextureResultLogo;
+				
+			}
+			else
+			{
+				// テクスチャの設定
+				g_textureBuff = g_pD3DTextureResultLogo2;
+			}
+		}
+		else if (GetPlayMode() == PLAY_MODE_DOUBLE)
+		{
+			// テクスチャの設定
+			g_textureBuff = g_pD3DTextureResultLogo;
+		}
+		textureDecide = true;
+	}
 
-	}
-	else
-	{
-		// テクスチャの設定
-		pDevice->SetTexture(0, g_pD3DTextureResultLogo2);
-	}
+
+	pDevice->SetTexture(0, g_textureBuff);
 
 	// ポリゴンの描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);

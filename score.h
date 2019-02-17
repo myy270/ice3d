@@ -20,5 +20,7 @@ void DrawScore(void);
 void ChangeScore(int value);//敵の
 void ChangeScore2(int value);//プレイヤーの
 
-bool compScore(); //プレイヤー勝つ場合true 
+void compScore(); //プレイヤー勝つ場合true 
+
+OBJECT GetWinner();
 #endif
