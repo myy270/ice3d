@@ -21,10 +21,10 @@
 #define	RATE_CHASE_CAMERA_P	(0.35f)					// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
-#define	CHASE_HEIGHT_P_NEAR		(500.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P_NEAR		(1000.0f)				// 追跡時の視点の高さ
 #define	CHASE_HEIGHT_P_FAR		(1700.0f)				// 追跡時の視点の高さ
 
-#define	RADIUS_NEAR		(500.0f)				// 視点と注視点のxoz面の距離
+#define	RADIUS_NEAR		(400.0f)				// 視点と注視点のxoz面の距離
 #define	RADIUS_FAR		(300.0f)				// 視点と注視点のxoz面の距離
 
 
@@ -52,12 +52,15 @@ float g_chaseHightP;// 追跡時の視点の高さ
 
 CAMERA_MODE g_cameraMode;
 
+PLAY_MODE g_playMode;
 //=============================================================================
 // カメラの初期化
 //=============================================================================
 HRESULT InitCamera(void)
 {
-	g_cameraMode = CAMERA_MODE_FAR;
+	g_cameraMode = CAMERA_MODE_FAR;//デフォルト設定
+
+	g_playMode = PLAY_MODE_SINGLE;//デフォルト設定
 
 	if (g_cameraMode == CAMERA_MODE_NEAR)
 	{
@@ -104,30 +107,31 @@ void UpdateCamera(void)
 
 	//カメラモード変換
 	{
-		if (GetKeyboardTrigger(DIK_LSHIFT))
-		{
+		if (GetKeyboardTrigger(DIK_LSHIFT)&&(g_playMode == PLAY_MODE_SINGLE))
+		{//シングルモードだけ、カメラの切替可能にする
 
 			g_cameraMode = (CAMERA_MODE)!g_cameraMode;
 
-			if (g_cameraMode == CAMERA_MODE_NEAR)
-			{
-				g_chaseHightP = CHASE_HEIGHT_P_NEAR;
-				g_fLengthIntervalCamera = RADIUS_NEAR;
+		}
 
-				if (GetCutScene())
-				{//勝利時のカットシーン
-					g_chaseHightP = 100.0f;
-					g_fLengthIntervalCamera = 200.0f;
-				}
+		if (g_cameraMode == CAMERA_MODE_NEAR)
+		{
+			g_chaseHightP = CHASE_HEIGHT_P_NEAR;
+			g_fLengthIntervalCamera = RADIUS_NEAR;
 
-			}
-			else if (g_cameraMode == CAMERA_MODE_FAR)
-			{
-				g_chaseHightP = CHASE_HEIGHT_P_FAR;
-				g_fLengthIntervalCamera = RADIUS_FAR;
+			if (GetCutScene())
+			{//勝利時のカットシーン
+				g_chaseHightP = 100.0f;
+				g_fLengthIntervalCamera = 200.0f;
 			}
 
 		}
+		else if (g_cameraMode == CAMERA_MODE_FAR)
+		{
+			g_chaseHightP = CHASE_HEIGHT_P_FAR;
+			g_fLengthIntervalCamera = RADIUS_FAR;
+		}
+
 	}
 
 #ifdef _DEBUG
@@ -322,4 +326,14 @@ CAMERA_MODE GetCameraMode()
 void SetCameraMode(CAMERA_MODE val)
 {
 	g_cameraMode = val;
+}
+
+void SetPlayMode(PLAY_MODE val)
+{
+	g_playMode = val;
+}
+
+PLAY_MODE GetPlayMode()
+{
+	return g_playMode;
 }

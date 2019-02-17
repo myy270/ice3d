@@ -19,8 +19,8 @@
 
 
 
-#define	RESULT_LOGO_POS_X	(240)		// リザルトロゴの位置(X座標)
-#define	RESULT_LOGO_POS_Y	(620)		// リザルトロゴの位置(Y座標)
+#define	RESULT_LOGO_POS_X	(SCREEN_WIDTH * 0.19)		// リザルトロゴの位置(X座標) 240
+#define	RESULT_LOGO_POS_Y	(SCREEN_HEIGHT * 0.65)		// リザルトロゴの位置(Y座標) 620
 #define	RESULT_LOGO_WIDTH	(800)		// リザルトロゴの幅
 #define	RESULT_LOGO_HEIGHT	(240)		// リザルトロゴの高さ
 

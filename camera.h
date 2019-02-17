@@ -29,4 +29,6 @@ void SetLengthIntervalCamera(float length);
 
 CAMERA_MODE GetCameraMode();
 void SetCameraMode(CAMERA_MODE val);
+void SetPlayMode(PLAY_MODE val);
+PLAY_MODE GetPlayMode();
 #endif

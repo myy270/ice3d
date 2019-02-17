@@ -40,9 +40,9 @@ D3DXMATRIX			g_mtxWorldItem;				// ワールドマトリックス
 
 ITEM				g_aItem[MAX_ITEM];			// アイテムワーク
 
-bool g_dropItem;//落下するか
+bool g_dropItem;//アイテム落下するか
 
-bool g_dropReady;//落下するアイテムはもう設置したか
+bool g_dropReady;//落下するアイテムはもう生成したか
 
 int g_itemIndex;//落下するアイテムのインデクス
 
@@ -148,12 +148,12 @@ void UninitItem(void)
 //=============================================================================
 void UpdateItem(void)
 {
-	if (GetKeyboardTrigger(DIK_3))
+	if (GetKeyboardPress(DIK_3))
 	{
 		g_dropItem = true;
 	}
 
-	if (GetTimer() % 300 == 0)
+	if ((GetTimer() % 300 == 0)&&(GetTimer() != 0))
 	{
 		g_dropItem = true;
 	}
@@ -473,7 +473,7 @@ void DropItem()
 			float fPosX, fPosY, fPosZ;
 
 			fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
-			fPosY = 950.0f;
+			fPosY = 950.0f;//アイテムの投下高さ
 			fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
 			g_itemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_ICEBLOCK, false);
 			g_dropReady = true;
