@@ -22,6 +22,10 @@
 #define	ITEMLOGO_POS_X			(20.0f)							// ライフの表示基準位置Ｘ座標
 #define	ITEMLOGO_POS_Y			(95.0f)							// ライフの表示基準位置Ｙ座標
 
+#define	DROP_TIME				(300)							// 落下アイテムの間隔時間　1秒＝60
+#define	DROP_HIGHT				(1800.0f)						// 落下アイテムの初期高さ
+#define	DROP_SPEED				(15.0f)							// 落下アイテムの落下速度
+
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -148,12 +152,15 @@ void UninitItem(void)
 //=============================================================================
 void UpdateItem(void)
 {
+
+#ifdef _DEBUG
 	if (GetKeyboardPress(DIK_3))
 	{
 		g_dropItem = true;
 	}
+#endif
 
-	if ((GetTimer() % 300 == 0)&&(GetTimer() != 0))
+	if ((GetTimer() % DROP_TIME == 0)&&(GetTimer() != 0))
 	{
 		g_dropItem = true;
 	}
@@ -473,7 +480,7 @@ void DropItem()
 			float fPosX, fPosY, fPosZ;
 
 			fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
-			fPosY = 950.0f;//アイテムの投下高さ
+			fPosY = DROP_HIGHT;//アイテムの投下高さ
 			fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
 			g_itemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_ICEBLOCK, false);
 			g_dropReady = true;
@@ -482,10 +489,10 @@ void DropItem()
 		{
 			if (g_itemIndex != -1)
 			{
-				(GetItem() + g_itemIndex)->pos.y -= 15.0f;
+				(GetItem() + g_itemIndex)->pos.y -= DROP_SPEED;
 
 				if ((GetItem() + g_itemIndex)->pos.y <= 15.0f)
-				{
+				{//アイテムの着地高さ
 					(GetItem() + g_itemIndex)->pos.y = 15.0f;
 
 					g_dropItem = false;

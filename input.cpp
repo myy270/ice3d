@@ -12,6 +12,10 @@
 //*****************************************************************************
 #define	NUM_KEY_MAX			(256)
 
+#define	NUM_BUTTON_MAX		(32)
+
+#define	REPEAT_TIME			(40)
+
 // game pad用設定値
 //#define DEADZONE		2500			// 各軸の25%を無効ゾーンとする
 //#define RANGE_MAX		1000			// 有効範囲の最大値
@@ -62,6 +66,9 @@ static DWORD	padState[GAMEPADMAX];	// パッド情報（複数対応）
 static DWORD	padTrigger[GAMEPADMAX];
 static DWORD	padRelease[GAMEPADMAX];
 static int		padCount = 0;			// 検出したパッドの数
+
+DWORD			padRepeat[GAMEPADMAX];
+int				padRepeatCnt[GAMEPADMAX][NUM_BUTTON_MAX];
 
 
 //=============================================================================
@@ -201,7 +208,7 @@ HRESULT UpdateKeyboard(void)
 			if(g_keyState[cnt])
 			{
 				g_keyStateRepeatCnt[cnt]++;
-				if(g_keyStateRepeatCnt[cnt] >= 20)
+				if(g_keyStateRepeatCnt[cnt] >= REPEAT_TIME)
 				{
 					g_keyStateRepeat[cnt] = g_keyState[cnt];
 				}
@@ -549,6 +556,28 @@ void UpdatePad(void)
 		// Release設定
 		padRelease[i] = (lastPadState ^ padState[i]) & ~padState[i];
 		
+		//Repeat設定
+		padRepeat[i] = padTrigger[i];
+
+		for (int cnt = 0; cnt < NUM_BUTTON_MAX; cnt++)
+		{
+			DWORD buff = padState[i] & (DWORD)(1 * powf(2.0f, (float)cnt));
+		
+			if (buff)
+			{
+				padRepeatCnt[i][cnt]++;
+				if (padRepeatCnt[i][cnt] >= REPEAT_TIME)
+				{
+					padRepeat[i] = padRepeat[i] | buff;
+				}
+			}
+			else
+			{
+				padRepeatCnt[i][cnt] = 0;
+				
+			}
+		}
+
 	}
 
 }
@@ -566,6 +595,11 @@ BOOL IsButtonTrigger(int padNo,DWORD button)
 BOOL IsButtonRelease(int padNo, DWORD button)
 {
 	return (button & padRelease[padNo]);
+}
+
+BOOL IsButtonRepeat(int padNo, DWORD button)
+{
+	return (button & padRepeat[padNo]);
 }
 
 

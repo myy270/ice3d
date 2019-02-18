@@ -240,7 +240,7 @@ void DrawMeshWall(void)
 	// ライティングを無効に
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	//pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 
 	for(nCntMeshField = 0; nCntMeshField < g_nNumMeshField; nCntMeshField++)
 	{

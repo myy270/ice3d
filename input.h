@@ -82,5 +82,6 @@ long GetMouseZ(void);               // マウスホイールが動いた相対値
 BOOL IsButtonPress(int padNo,DWORD button);
 BOOL IsButtonTrigger(int padNo,DWORD button);
 BOOL IsButtonRelease(int padNo, DWORD button);
+BOOL IsButtonRepeat(int padNo, DWORD button);
 
 #endif

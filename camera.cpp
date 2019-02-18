@@ -123,31 +123,32 @@ void UpdateCamera(void)
 
 	//カメラモード変換
 	{
-		if (GetKeyboardTrigger(DIK_LSHIFT)&&(g_playMode == PLAY_MODE_SINGLE))
+		if ((GetKeyboardTrigger(DIK_LSHIFT) || IsButtonTrigger(0, BUTTON_CROSS)) && (g_playMode == PLAY_MODE_SINGLE))
 		{//シングルモードだけ、カメラの切替可能にする
 
 			g_cameraMode = (CAMERA_MODE)!g_cameraMode;
 
 		}
 
-		if (g_cameraMode == CAMERA_MODE_NEAR)
-		{
-			g_chaseHightP = CHASE_HEIGHT_P_NEAR;
-			g_fLengthIntervalCamera = RADIUS_NEAR;
+		{//これを消すと、カメラが自由に移動できる
+			if (g_cameraMode == CAMERA_MODE_NEAR)
+			{
+				g_chaseHightP = CHASE_HEIGHT_P_NEAR;
+				g_fLengthIntervalCamera = RADIUS_NEAR;
 
-			if (g_cutScene)
-			{//勝利時のカットシーン
-				g_chaseHightP = 100.0f;
-				g_fLengthIntervalCamera = 200.0f;
+				if (g_cutScene)
+				{//勝利時のカットシーン
+					g_chaseHightP = 100.0f;
+					g_fLengthIntervalCamera = 200.0f;
+				}
+
 			}
-
+			else if (g_cameraMode == CAMERA_MODE_FAR)
+			{
+				g_chaseHightP = CHASE_HEIGHT_P_FAR;
+				g_fLengthIntervalCamera = RADIUS_FAR;
+			}
 		}
-		else if (g_cameraMode == CAMERA_MODE_FAR)
-		{
-			g_chaseHightP = CHASE_HEIGHT_P_FAR;
-			g_fLengthIntervalCamera = RADIUS_FAR;
-		}
-
 	}
 
 #ifdef _DEBUG

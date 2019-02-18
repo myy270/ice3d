@@ -139,7 +139,7 @@ void UpdateResult(void)
 		}
 	}
 
-	if(GetKeyboardTrigger(DIK_RETURN))
+	if(GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))
 	{// Enter押したら、フェードアウトしてモードを切り替えいく
 		SetFade(FADE_OUT);
 	}

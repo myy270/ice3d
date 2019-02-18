@@ -41,7 +41,7 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;	// Deviceオブジェクト(描画に必要)
 #ifdef _DEBUG
 int					g_nCountFPS;			// FPSカウンタ
 #endif
-MODE				g_mode = MODE_TITLE;	// モード
+MODE				g_mode = MODE_GAME;	// モード
 
 int rest;
 
@@ -86,8 +86,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	hWnd = CreateWindow(CLASS_NAME,
 						WINDOW_NAME,
 						WS_OVERLAPPEDWINDOW,
-						CW_USEDEFAULT,
-						CW_USEDEFAULT,
+						100,
+						0,
 						SCREEN_WIDTH + GetSystemMetrics(SM_CXDLGFRAME) * 2,
 						SCREEN_HEIGHT + GetSystemMetrics(SM_CXDLGFRAME) * 2 + GetSystemMetrics(SM_CYCAPTION),
 						NULL,

@@ -453,18 +453,18 @@ void UpdateEnemy(void)
 
 		if ((GetTimeOut() == 0) && (g_enemy.state != FROZEN))
 		{//移動
-			if (g_ai ? g_left : GetKeyboardPress(DIK_LEFT))
+			if (g_ai ? g_left : GetKeyboardPress(DIK_LEFT) || IsButtonPress(1, BUTTON_LEFT) || IsButtonPress(1, BUTTON_LSTICK_LEFT))
 			{
 				g_animeState = 1;//動く状態にする
 
-				if (g_ai ? g_up : GetKeyboardPress(DIK_UP))
+				if (g_ai ? g_up : GetKeyboardPress(DIK_UP) || IsButtonPress(1, BUTTON_UP) || IsButtonPress(1, BUTTON_LSTICK_UP))
 				{// 左前移動
 					g_enemy.move.x -= sinf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 
 					g_enemy.rotDest.y = rotCamera.y + D3DX_PI * 0.75f;
 				}
-				else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN))
+				else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN) || IsButtonPress(1, BUTTON_DOWN) || IsButtonPress(1, BUTTON_LSTICK_DOWN))
 				{// 左後移動
 					g_enemy.move.x -= sinf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
@@ -479,18 +479,18 @@ void UpdateEnemy(void)
 					g_enemy.rotDest.y = rotCamera.y + D3DX_PI * 0.50f;
 				}
 			}
-			else if (g_ai ? g_right : GetKeyboardPress(DIK_RIGHT))
+			else if (g_ai ? g_right : GetKeyboardPress(DIK_RIGHT) || IsButtonPress(1, BUTTON_RIGHT) || IsButtonPress(1, BUTTON_LSTICK_RIGHT))
 			{
 				g_animeState = 1;//動く状態にする
 
-				if (g_ai ? g_up : GetKeyboardPress(DIK_UP))
+				if (g_ai ? g_up : GetKeyboardPress(DIK_UP) || IsButtonPress(1, BUTTON_UP) || IsButtonPress(1, BUTTON_LSTICK_UP))
 				{// 右前移動
 					g_enemy.move.x -= sinf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_ENEMY;
 
 					g_enemy.rotDest.y = rotCamera.y - D3DX_PI * 0.75f;
 				}
-				else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN))
+				else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN) || IsButtonPress(1, BUTTON_DOWN) || IsButtonPress(1, BUTTON_LSTICK_DOWN))
 				{// 右後移動
 					g_enemy.move.x -= sinf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
 					g_enemy.move.z -= cosf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_ENEMY;
@@ -505,7 +505,7 @@ void UpdateEnemy(void)
 					g_enemy.rotDest.y = rotCamera.y - D3DX_PI * 0.50f;
 				}
 			}
-			else if (g_ai ? g_up : GetKeyboardPress(DIK_UP))
+			else if (g_ai ? g_up : GetKeyboardPress(DIK_UP) || IsButtonPress(1, BUTTON_UP) || IsButtonPress(1, BUTTON_LSTICK_UP))
 			{
 				g_animeState = 1;//動く状態にする
 
@@ -515,7 +515,7 @@ void UpdateEnemy(void)
 
 				g_enemy.rotDest.y = D3DX_PI + rotCamera.y;
 			}
-			else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN))
+			else if (g_ai ? g_down : GetKeyboardPress(DIK_DOWN) || IsButtonPress(1, BUTTON_DOWN) || IsButtonPress(1, BUTTON_LSTICK_DOWN))
 			{
 				g_animeState = 1;//動く状態にする
 
@@ -727,7 +727,7 @@ void UpdateEnemy(void)
 		}
 		else 
 		{
-			if (GetKeyboardTrigger(DIK_NUMPAD1))
+			if (GetKeyboardTrigger(DIK_NUMPAD1) || IsButtonTrigger(1, BUTTON_CIRCLE))
 			{
 				Freeze(OBJECT_PLAYER);
 			}

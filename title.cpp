@@ -68,7 +68,7 @@ int						g_nCountDisp = 0;				// 待ち時間
 bool					g_bDispStart = false;			//
 int						g_nConutDemo = 0;				//
 
-bool g_onetwoUI;		//1p2pUI スイッチ
+bool g_onetwoUI;		//1p2pUI　表示してるかどうか
 
 int g_cursorIdx;		//カーソルインデクス
 //=============================================================================
@@ -210,7 +210,7 @@ void UpdateTitle(void)
 		}
 	}
 
-	if(GetKeyboardTrigger(DIK_RETURN))
+	if(GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))
 	{
 		if(g_nCountAppearStart == 0)
 		{// タイトル登場スキップ
@@ -228,19 +228,30 @@ void UpdateTitle(void)
 
 
 		}
-		else
+		//else
+		//{
+		//	// ゲームへ
+		//	SetFade(FADE_OUT);//MODE が　GAME に変換　
+
+		//}
+	}
+
+	if (g_onetwoUI)
+	{
+		if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTrigger(0, BUTTON_CIRCLE))
 		{
 			// ゲームへ
 			SetFade(FADE_OUT);//MODE が　GAME に変換　
-
 		}
 	}
+
+
 
 	if (g_onetwoUI)
 	{
 		if (GetFade() == FADE_NONE)
 		{
-			if (GetKeyboardRepeat(DIK_W))
+			if (GetKeyboardRepeat(DIK_W) || IsButtonRepeat(0, BUTTON_UP) || IsButtonRepeat(0, BUTTON_LSTICK_UP))
 			{
 				g_cursorIdx = (g_cursorIdx - 1) % 2;
 
@@ -249,7 +260,7 @@ void UpdateTitle(void)
 					g_cursorIdx = 1;
 				}
 			}
-			else if (GetKeyboardRepeat(DIK_S))
+			else if (GetKeyboardRepeat(DIK_S) || IsButtonRepeat(0, BUTTON_DOWN) || IsButtonRepeat(0, BUTTON_LSTICK_DOWN))
 			{
 				g_cursorIdx = (g_cursorIdx + 1) % 2;
 			}
