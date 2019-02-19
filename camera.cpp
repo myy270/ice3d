@@ -23,7 +23,7 @@
 #define	RATE_CHASE_CAMERA_P	(0.35f)					// カメラの視点への補正係数
 #define	RATE_CHASE_CAMERA_R	(0.20f)					// カメラの注視点への補正係数
 
-#define	CHASE_HEIGHT_P_NEAR		(1000.0f)				// 追跡時の視点の高さ
+#define	CHASE_HEIGHT_P_NEAR		(400.0f)				// 追跡時の視点の高さ
 #define	CHASE_HEIGHT_P_FAR		(1700.0f)				// 追跡時の視点の高さ
 
 #define	RADIUS_NEAR		(400.0f)				// 視点と注視点のxoz面の距離
@@ -64,7 +64,7 @@ HRESULT InitCamera(void)
 {
 	g_cutScene = false;
 
-	g_cameraMode = CAMERA_MODE_FAR;//デフォルト設定
+	g_cameraMode = CAMERA_MODE_NEAR;//デフォルト設定
 
 
 	if (GetCursorIdx() == 0)

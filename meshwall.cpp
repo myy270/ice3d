@@ -11,7 +11,9 @@
 // マクロ定義
 //*****************************************************************************
 #define	MAX_MESH_WALL		(128)							// 壁の総数
-#define	TEXTURE_FILENAME	"data/TEXTURE/ice.bmp"		// 読み込むテクスチャファイル名
+#define	TEXTURE_FILENAME	"data/TEXTURE/ice2.png"		// 読み込むテクスチャファイル名
+//#define	TEXTURE_FILENAME2	"data/TEXTURE/field002.jpg"		// 読み込むテクスチャファイル名
+
 #define	VALUE_MOVE_WALL		(5.0f)							// 移動速度
 #define	VALUE_ROTATE_WALL	(D3DX_PI * 0.001f)				// 回転速度
 
@@ -19,6 +21,7 @@
 // グローバル変数
 //*****************************************************************************
 LPDIRECT3DTEXTURE9 g_pD3DTexture = NULL;		// テクスチャ読み込み場所
+LPDIRECT3DTEXTURE9 g_pD3DTexture2 = NULL;		// テクスチャ読み込み場所
 
 typedef struct
 {
@@ -59,6 +62,14 @@ HRESULT InitMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col,
 									TEXTURE_FILENAME,		// ファイルの名前
 									&g_pD3DTexture);		// 読み込むメモリー
 	}
+
+	if (!g_pD3DTexture2)
+	{
+		D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
+			TEXTURE_FILENAME2,		// ファイルの名前
+			&g_pD3DTexture2);		// 読み込むメモリー
+	}
+
 
 	pMesh = &g_aMeshWall[g_nNumMeshField];
 	g_nNumMeshField++;
@@ -214,6 +225,14 @@ void UninitMeshWall(void)
 		g_pD3DTexture->Release();
 		g_pD3DTexture = NULL;
 	}
+
+	if (g_pD3DTexture2)
+	{// テクスチャの開放
+		g_pD3DTexture2->Release();
+		g_pD3DTexture2 = NULL;
+	}
+
+
 	//壁の数をリセット　元の罠
 	g_nNumMeshField = 0;
 }
@@ -269,7 +288,6 @@ void DrawMeshWall(void)
 		// 頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
-		// テクスチャの設定
 		pDevice->SetTexture(0, g_pD3DTexture);
 
 		// ポリゴンの描画
