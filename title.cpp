@@ -317,7 +317,7 @@ void DrawTitle(void)
 			pDevice->SetTexture(0, g_pD3DTextureStart);
 
 			// ƒ|ƒŠƒSƒ“‚Ì•`‰æ
-			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+			//pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 		}
 	}
 	else

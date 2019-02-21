@@ -41,7 +41,7 @@ LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;	// Deviceオブジェクト(描画に必要)
 #ifdef _DEBUG
 int					g_nCountFPS;			// FPSカウンタ
 #endif
-MODE				g_mode = MODE_GAME;	// モード
+MODE				g_mode = MODE_TITLE;	// モード
 
 int rest;
 
@@ -152,12 +152,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				// 入力更新
 				UpdateInput();
 
-#ifdef _DEBUG
-				if (GetKeyboardTrigger(DIK_NUMPADENTER))
+//#ifdef _DEBUG
+				if (GetKeyboardTrigger(DIK_NUMPADENTER) || ((IsButtonPress(0, BUTTON_SHARE))&&(IsButtonTrigger(0, BUTTON_OPTIONS))) || ((IsButtonTrigger(0, BUTTON_SHARE)) && (IsButtonPress(0, BUTTON_OPTIONS))))
 				{
 					rest = !rest;
 				}
-#endif
+//#endif
 
 				if (rest == 0)
 				{
@@ -362,7 +362,11 @@ void Uninit(void)
 //=============================================================================
 void Update(void)
 {
-	
+	if ((IsButtonPress(0, BUTTON_L3) && IsButtonTrigger(0, BUTTON_R3)) || (IsButtonTrigger(0, BUTTON_L3) && IsButtonPress(0, BUTTON_R3)))
+	{
+		//強制的にタイトル画面に戻る
+		SetMode(MODE_TITLE);
+	}
 
 	UpdateDebugProc();
 

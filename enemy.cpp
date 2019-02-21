@@ -437,7 +437,7 @@ void UpdateEnemy(void)
 
 	if (g_ai)
 	{
-		AI2();
+		AI3();
 	}
 	
 
@@ -696,6 +696,7 @@ void UpdateEnemy(void)
 						if (pItem->nType == ITEMTYPE_ICEBLOCK)
 						{
 							g_enemy.holdItem = ITEMTYPE_ICEBLOCK;
+
 						}
 						else if (pItem->nType == ITEMTYPE_COIN)
 						{

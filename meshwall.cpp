@@ -12,7 +12,7 @@
 //*****************************************************************************
 #define	MAX_MESH_WALL		(128)							// 壁の総数
 #define	TEXTURE_FILENAME	"data/TEXTURE/ice2.png"		// 読み込むテクスチャファイル名
-//#define	TEXTURE_FILENAME2	"data/TEXTURE/field002.jpg"		// 読み込むテクスチャファイル名
+#define	TEXTURE_FILENAME2	"data/TEXTURE/field002.jpg"		// 読み込むテクスチャファイル名
 
 #define	VALUE_MOVE_WALL		(5.0f)							// 移動速度
 #define	VALUE_ROTATE_WALL	(D3DX_PI * 0.001f)				// 回転速度

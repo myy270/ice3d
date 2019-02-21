@@ -22,7 +22,7 @@
 #define	ITEMLOGO_POS_X			(20.0f)							// ライフの表示基準位置Ｘ座標
 #define	ITEMLOGO_POS_Y			(95.0f)							// ライフの表示基準位置Ｙ座標
 
-#define	DROP_TIME				(300)							// 落下アイテムの間隔時間　1秒＝60
+#define	DROP_TIME				(420)							// 落下アイテムの間隔時間　1秒＝60
 #define	DROP_HIGHT				(1800.0f)						// 落下アイテムの初期高さ
 #define	DROP_SPEED				(15.0f)							// 落下アイテムの落下速度
 

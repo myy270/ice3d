@@ -33,7 +33,7 @@ DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 // 各音素材のパラメータ
 PARAM g_aParam[SOUND_LABEL_MAX] =
 {
-	{"data/BGM/bgm000.wav", true},		// BGM0
+	{"data/BGM/bgm_maoudamashii_cyber01.wav", true},		// BGM0
 	{"data/BGM/bgm001.wav", true},		// BGM1
 	{"data/SE/shot000.wav", false},			// 弾発射音
 	{"data/SE/explosion000.wav", false},	// 爆発音
