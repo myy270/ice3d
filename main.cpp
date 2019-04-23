@@ -153,10 +153,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				UpdateInput();
 
 //#ifdef _DEBUG
-				if (GetKeyboardTrigger(DIK_NUMPADENTER) || ((IsButtonPress(0, BUTTON_SHARE))&&(IsButtonTrigger(0, BUTTON_OPTIONS))) || ((IsButtonTrigger(0, BUTTON_SHARE)) && (IsButtonPress(0, BUTTON_OPTIONS))))
+			if (g_mode == MODE_GAME)
+			{
+				if (GetKeyboardTrigger(DIK_F3) || ((IsButtonPress(0, BUTTON_SHARE)) && (IsButtonTrigger(0, BUTTON_OPTIONS))) || ((IsButtonTrigger(0, BUTTON_SHARE)) && (IsButtonPress(0, BUTTON_OPTIONS))))
 				{
 					rest = !rest;
 				}
+			}
+
 //#endif
 
 				if (rest == 0)
@@ -362,7 +366,7 @@ void Uninit(void)
 //=============================================================================
 void Update(void)
 {
-	if ((IsButtonPress(0, BUTTON_L3) && IsButtonTrigger(0, BUTTON_R3)) || (IsButtonTrigger(0, BUTTON_L3) && IsButtonPress(0, BUTTON_R3)))
+	if (GetKeyboardTrigger(DIK_F4) || (IsButtonPress(0, BUTTON_L3) && IsButtonTrigger(0, BUTTON_R3)) || (IsButtonTrigger(0, BUTTON_L3) && IsButtonPress(0, BUTTON_R3)))
 	{
 		//強制的にタイトル画面に戻る
 		SetMode(MODE_TITLE);

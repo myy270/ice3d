@@ -270,14 +270,14 @@ void DrawGame(void)
 	// 弾処理の描画
 	DrawBullet();
 
+	// エフェクト処理の描画
+	DrawEffect();
+
 	// 壁処理の描画
 	DrawMeshWall();
 
 	// 爆発処理の描画
 	DrawExplosion();
-
-	// エフェクト処理の描画
-	DrawEffect();
 
 	// ライフ処理の描画
 	//DrawLife();

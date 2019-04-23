@@ -13,27 +13,24 @@
 //*****************************************************************************
 #define	TEXTURE_TITLE		"data/TEXTURE/bg000.jpg"		// 読み込むテクスチャファイル名
 #define	TEXTURE_TITLE_LOGO	"data/TEXTURE/ice3D.png"		// 読み込むテクスチャファイル名
-#define	TEXTURE_LOGO_START	"data/TEXTURE/press_enter.png"	// 読み込むテクスチャファイル名
+#define	TEXTURE_LOGO_START	"data/TEXTURE/PRESS_START.png"	// 読み込むテクスチャファイル名
 #define	TEXTURE_1P2P		"data/TEXTURE/1p2p.png"			// 読み込むテクスチャファイル名
 
 
+#define	TITLE_LOGO_WIDTH		(640 * 0.7f * (SCREEN_WIDTH  / 1280.0f))		// タイトルロゴの幅
+#define	TITLE_LOGO_HEIGHT		(640 * 0.7f * (SCREEN_HEIGHT /  720.0f))		// タイトルロゴの高さ
+#define	TITLE_LOGO_POS_X		((SCREEN_WIDTH - TITLE_LOGO_WIDTH)/ 2.0f)		// タイトルロゴの位置(X座標)
+#define	TITLE_LOGO_POS_Y		(SCREEN_HEIGHT * 0.05f)							// タイトルロゴの位置(Y座標)
 
-#define	TITLE_LOGO_POS_X		(SCREEN_WIDTH * 0.25f)		// タイトルロゴの位置(X座標) 320
-#define	TITLE_LOGO_POS_Y		(40)		// タイトルロゴの位置(Y座標)
-#define	TITLE_LOGO_WIDTH		(640)		// タイトルロゴの幅
-#define	TITLE_LOGO_HEIGHT		(640)		// タイトルロゴの高さ
+#define	START_WIDTH				(289 * 1.3f * (SCREEN_WIDTH  / 1280.0f))		// スタートボタンの幅
+#define	START_HEIGHT			(145 * 1.3f * (SCREEN_HEIGHT /  720.0f))		// スタートボタンの高さ
+#define	START_POS_X				((SCREEN_WIDTH - START_WIDTH)/ 2.0f)			// スタートボタンの位置(X座標)
+#define	START_POS_Y				(SCREEN_HEIGHT * 0.70f)							// スタートボタンの位置(Y座標)
 
-#define	START_POS_X				(SCREEN_WIDTH * 0.3125f)		// スタートボタンの位置(X座標) 400
-#define	START_POS_Y				(SCREEN_HEIGHT * 0.75f)		// スタートボタンの位置(Y座標) 720
-#define	START_WIDTH				(480)		// スタートボタンの幅
-#define	START_HEIGHT			(120)		// スタートボタンの高さ
-
-
-#define	ONETWO_POS_X			(SCREEN_WIDTH * 0.25f)		// スタートボタンの位置(X座標) 400
-#define	ONETWO_POS_Y			(SCREEN_HEIGHT * 0.5f)		// スタートボタンの位置(Y座標) 720
-#define	ONETWO_WIDTH			(640)		// スタートボタンの幅
-#define	ONETWO_HEIGHT			(ONETWO_WIDTH / 2.8819f)		// スタートボタンの高さ
-
+#define	ONETWO_WIDTH			(1660 * 0.35f * (SCREEN_WIDTH  / 1280.0f))		// 1p2pボタンの幅			
+#define	ONETWO_HEIGHT			(576  * 0.35f * (SCREEN_HEIGHT /  720.0f))		// 1p2pボタンの高さ
+#define	ONETWO_POS_X			((SCREEN_WIDTH - ONETWO_WIDTH)/ 2.0f)			// 1p2pボタンの位置(X座標)
+#define	ONETWO_POS_Y			(SCREEN_HEIGHT * 0.6f)							// 1p2pボタンの位置(Y座標)
 
 
 #define	COUNT_APPERA_START		(60)		// スタートボタン出現までの時間 appear
@@ -317,7 +314,7 @@ void DrawTitle(void)
 			pDevice->SetTexture(0, g_pD3DTextureStart);
 
 			// ポリゴンの描画
-			//pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+			pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
 		}
 	}
 	else
