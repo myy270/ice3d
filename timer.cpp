@@ -8,6 +8,7 @@
 #include "fade.h"
 #include "score.h"
 #include "input.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -78,22 +79,10 @@ HRESULT InitTimer(void)
 //=============================================================================
 void UninitTimer(void)
 {
-	if(g_pD3DTextureTimer[0] != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureTimer[0]->Release();
-		g_pD3DTextureTimer[0] = NULL;
-	}
-	if(g_pD3DTextureTimer[1] != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureTimer[1]->Release();
-		g_pD3DTextureTimer[1] = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureTimer[0]);
+	SAFE_RELEASE(g_pD3DTextureTimer[1]);
+	SAFE_RELEASE(g_pD3DVtxBuffTimer);
 
-	if(g_pD3DVtxBuffTimer != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffTimer->Release();
-		g_pD3DVtxBuffTimer = NULL;
-	}
 }
 
 //=============================================================================

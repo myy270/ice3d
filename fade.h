@@ -7,7 +7,7 @@
 #ifndef _FADE_H_
 #define _FADE_H_
 
-#include "main.h"
+#include "function.h"
 
 //*************************************
 // フェードの状態

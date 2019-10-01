@@ -7,7 +7,7 @@
 #ifndef _TITLE_H_
 #define _TITLE_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言

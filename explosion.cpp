@@ -91,17 +91,9 @@ HRESULT InitExplosion(void)
 //=============================================================================
 void UninitExplosion(void)
 {
-	if(g_pD3DTextureExplosion != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureExplosion->Release();
-		g_pD3DTextureExplosion = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureExplosion);
+	SAFE_RELEASE(g_pD3DVtxBuffExplosion);
 
-	if(g_pD3DVtxBuffExplosion != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffExplosion->Release();
-		g_pD3DVtxBuffExplosion = NULL;
-	}
 }
 
 //=============================================================================

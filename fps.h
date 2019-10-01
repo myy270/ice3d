@@ -1,21 +1,26 @@
 //=============================================================================
 //
-// メッシュ地面の処理 [meshfield.h]
+// fpsロックの機能 [fps.h]
 // Author : 麦英泳
 //
 //=============================================================================
-#ifndef _MESHFIELD_H_
-#define _MESHFIELD_H_
+#ifndef _FPS_H_
+#define _FPS_H_
 
 #include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT InitMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
-							int nNumBlockX, int nNumBlockZ, float nBlockSizeX, float nBlockSizeZ);
-void UninitMeshField(void);
-void UpdateMeshField(void);
-void DrawMeshField(void);
+
+void InitFPS(void);
+bool UpdateFPS(void);
+void UnitFPS(void);
+
+void ShowFPS(void);
 
 #endif
+
+
+
+

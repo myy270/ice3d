@@ -7,7 +7,7 @@
 #ifndef _EFFECT_H_
 #define _EFFECT_H_
 
-#include "main.h"
+#include "function.h"
 
 
 typedef struct

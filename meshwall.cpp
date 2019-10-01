@@ -207,31 +207,13 @@ void UninitMeshWall(void)
 	{
 		pMesh = &g_aMeshWall[nCntMeshField];
 
-		if(pMesh->pD3DVtxBuff)
-		{// 頂点バッファの開放
-			pMesh->pD3DVtxBuff->Release();
-			pMesh->pD3DVtxBuff = NULL;
-		}
+		SAFE_RELEASE(pMesh->pD3DVtxBuff);
+		SAFE_RELEASE(pMesh->pD3DIdxBuff);
 
-		if(pMesh->pD3DIdxBuff)
-		{// インデックスバッファの開放
-			pMesh->pD3DIdxBuff->Release();
-			pMesh->pD3DIdxBuff = NULL;
-		}
 	}
 
-	if(g_pD3DTexture)
-	{// テクスチャの開放
-		g_pD3DTexture->Release();
-		g_pD3DTexture = NULL;
-	}
-
-	if (g_pD3DTexture2)
-	{// テクスチャの開放
-		g_pD3DTexture2->Release();
-		g_pD3DTexture2 = NULL;
-	}
-
+	SAFE_RELEASE(g_pD3DTexture);
+	SAFE_RELEASE(g_pD3DTexture2);
 
 	//壁の数をリセット　元の罠
 	g_nNumMeshField = 0;

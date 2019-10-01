@@ -7,10 +7,10 @@
 #ifndef _ENEMY_H_
 #define _ENEMY_H_
 
-#include "main.h"
+#include "function.h"
 #include "item.h"
 
-#define PART_MAX_ENEMY	(7)		// パーツの数
+
 
 //*****************************************************************************
 // 構造体定義

@@ -118,33 +118,14 @@ void UninitItem(void)
 {
 	for(int nCntItemType = 0; nCntItemType < ITEMTYPE_MAX; nCntItemType++)
 	{
-		if(g_pD3DTextureItem[nCntItemType] != NULL)
-		{// テクスチャの開放
-			g_pD3DTextureItem[nCntItemType]->Release();
-			g_pD3DTextureItem[nCntItemType] = NULL;
-		}
+		SAFE_RELEASE(g_pD3DTextureItem[nCntItemType]);
+		SAFE_RELEASE(g_pMeshItem[nCntItemType]);
+		SAFE_RELEASE(g_pD3DXMatBuffItem[nCntItemType]);
 
-		if(g_pMeshItem[nCntItemType] != NULL)
-		{// メッシュの開放
-			g_pMeshItem[nCntItemType]->Release();
-			g_pMeshItem[nCntItemType] = NULL;
-		}
-
-		if(g_pD3DXMatBuffItem[nCntItemType] != NULL)
-		{// マテリアルの開放
-			g_pD3DXMatBuffItem[nCntItemType]->Release();
-			g_pD3DXMatBuffItem[nCntItemType] = NULL;
-		}
 	}
 
-	if (g_pD3DVtxBuffItemLogo != NULL)
-	{// テクスチャの開放
-		g_pD3DVtxBuffItemLogo->Release();
-		g_pD3DVtxBuffItemLogo = NULL;
-	}
+	SAFE_RELEASE(g_pD3DVtxBuffItemLogo);
 
-
-	
 }
 
 //=============================================================================

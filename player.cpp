@@ -4,6 +4,10 @@
 // Author : 麦英泳
 //
 //=============================================================================
+
+#define _CRT_SECURE_NO_WARNINGS			// stdio.hとセットで先に書く、書かないとエラー
+#include <stdio.h>						// 標準入出力関連のライブラリー
+
 #include "player.h"
 #include "camera.h"
 #include "input.h"
@@ -15,6 +19,7 @@
 #include "sound.h"
 #include "debugproc.h"
 #include "timer.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -375,24 +380,12 @@ void UninitPlayer(void)
 {
 	for (int i = 0; i < PART_MAX; i++)//パーツ番号
 	{
-		if (g_player.part[i].pMesh != NULL)
-		{// メッシュの開放
-			g_player.part[i].pMesh->Release();
-			g_player.part[i].pMesh = NULL;
-		}
+		SAFE_RELEASE(g_player.part[i].pMesh);
+		SAFE_RELEASE(g_player.part[i].pMatBuff);
+		SAFE_RELEASE(g_pD3DTexturePlayer);
 
-		if (g_player.part[i].pMatBuff != NULL)
-		{// マテリアルの開放
-			g_player.part[i].pMatBuff->Release();
-			g_player.part[i].pMatBuff = NULL;
-		}
 	}
 
-	if (g_pD3DTexturePlayer != NULL)
-	{// テクスチャの開放
-		g_pD3DTexturePlayer->Release();
-		g_pD3DTexturePlayer = NULL;
-	}
 }
 
 //=============================================================================

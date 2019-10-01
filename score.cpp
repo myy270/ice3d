@@ -83,29 +83,11 @@ HRESULT InitScore(void)
 //=============================================================================
 void UninitScore(void)
 {
-	if(g_pD3DTextureScore[0] != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureScore[0]->Release();
-		g_pD3DTextureScore[0] = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureScore[0]);
+	SAFE_RELEASE(g_pD3DTextureScore[1]);
+	SAFE_RELEASE(g_pD3DVtxBuffScore);
+	SAFE_RELEASE(g_pD3DVtxBuffScore2);
 
-	if(g_pD3DTextureScore[1] != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureScore[1]->Release();
-		g_pD3DTextureScore[1] = NULL;
-	}
-
-	if(g_pD3DVtxBuffScore != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffScore->Release();
-		g_pD3DVtxBuffScore = NULL;
-	}
-
-	if (g_pD3DVtxBuffScore2 != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffScore2->Release();
-		g_pD3DVtxBuffScore2 = NULL;
-	}
 }
 
 //=============================================================================

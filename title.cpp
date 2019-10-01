@@ -115,53 +115,15 @@ HRESULT InitTitle(void)
 //=============================================================================
 void UninitTitle(void)
 {
-	if(g_pD3DTextureTitle != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureTitle->Release();
-		g_pD3DTextureTitle = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureTitle);
+	SAFE_RELEASE(g_pD3DVtxBuffTitle);
+	SAFE_RELEASE(g_pD3DTextureTitleLogo);
+	SAFE_RELEASE(g_pD3DVtxBuffTitleLogo);
+	SAFE_RELEASE(g_pD3DTextureStart);
+	SAFE_RELEASE(g_pD3DVtxBuffStart);
+	SAFE_RELEASE(g_pD3DTextureOneTwo);
+	SAFE_RELEASE(g_pD3DVtxBuffOneTwo);
 
-	if(g_pD3DVtxBuffTitle != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffTitle->Release();
-		g_pD3DVtxBuffTitle = NULL;
-	}
-
-	if(g_pD3DTextureTitleLogo != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureTitleLogo->Release();
-		g_pD3DTextureTitleLogo = NULL;
-	}
-
-	if(g_pD3DVtxBuffTitleLogo != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffTitleLogo->Release();
-		g_pD3DVtxBuffTitleLogo = NULL;
-	}
-
-	if(g_pD3DTextureStart != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureStart->Release();
-		g_pD3DTextureStart = NULL;
-	}
-
-	if(g_pD3DVtxBuffStart != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffStart->Release();
-		g_pD3DVtxBuffStart = NULL;
-	}
-
-	if (g_pD3DTextureOneTwo != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureOneTwo->Release();
-		g_pD3DTextureOneTwo = NULL;
-	}
-
-	if (g_pD3DVtxBuffOneTwo != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffOneTwo->Release();
-		g_pD3DVtxBuffOneTwo = NULL;
-	}
 }
 
 //=============================================================================

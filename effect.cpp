@@ -75,17 +75,9 @@ HRESULT InitEffect(void)
 //=============================================================================
 void UninitEffect(void)
 {
-	if(g_pD3DTextureEffect != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureEffect->Release();
-		g_pD3DTextureEffect = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureEffect);
+	SAFE_RELEASE(g_pD3DVtxBuffEffect);
 
-	if(g_pD3DVtxBuffEffect != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffEffect->Release();
-		g_pD3DVtxBuffEffect = NULL;
-	}
 }
 
 //=============================================================================

@@ -91,17 +91,9 @@ HRESULT InitBullet(void)
 //=============================================================================
 void UninitBullet(void)
 {
-	if(g_pD3DTextureBullet != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureBullet->Release();
-		g_pD3DTextureBullet = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureBullet);
+	SAFE_RELEASE(g_pD3DVtxBuffBullet);
 
-	if(g_pD3DVtxBuffBullet != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffBullet->Release();
-		g_pD3DVtxBuffBullet = NULL;
-	}
 }
 
 //=============================================================================

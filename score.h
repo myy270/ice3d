@@ -7,7 +7,7 @@
 #ifndef _SCORE_H_
 #define _SCORE_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言

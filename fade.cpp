@@ -8,6 +8,7 @@
 #include "timer.h"
 #include "score.h"
 
+#include "scene.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -45,15 +46,9 @@ HRESULT InitFade(void)
 //=============================================================================
 void UninitFade(void)
 {
-	if(g_p3DTextureFade != NULL)
-	{// テクスチャの開放
-		g_p3DTextureFade->Release();
-	}
+	SAFE_RELEASE(g_p3DTextureFade);
+	SAFE_RELEASE(g_pD3DVtxBuffFade);
 
-	if(g_pD3DVtxBuffFade != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffFade->Release();
-	}
 }
 
 //=============================================================================
@@ -68,19 +63,19 @@ void UpdateFade(void)
 			g_color.a += FADE_RATE;		// α値を加算して画面を消していく　//50フレーム完成
 			if(g_color.a >= 1.0f)
 			{
-				MODE mode;
+				SCENE scene;
 
 				// フェードイン処理に切り替え
 				g_color.a = 1.0f;
 				SetFade(FADE_IN);
 
-				// 現在のモードを取得
-				mode = GetMode();
+				// 現在のシーンを取得
+				scene = GetScene();
 
-				mode = (MODE)((mode + 1) % MODE_MAX);	// モードを１つ進める　//intからMODEにキャストする必要ある
+				scene = (SCENE)((scene + 1) % SCENE_MAX);	// シーンを１つ進める　//intからsceneにキャストする必要ある
 
-				// モードを設定
-				SetMode(mode);
+				// シーンを設定
+				SetScene(scene);
 
 				if (GetTimeOut() == 1)
 				{

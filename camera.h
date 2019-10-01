@@ -7,7 +7,7 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言

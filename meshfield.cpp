@@ -7,6 +7,7 @@
 #include "meshfield.h"
 #include "input.h"
 
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -166,23 +167,10 @@ HRESULT InitMeshField(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 //=============================================================================
 void UninitMeshField(void)
 {
-	if(g_pD3DVtxBuffField)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffField->Release();
-		g_pD3DVtxBuffField = NULL;
-	}
+	SAFE_RELEASE(g_pD3DVtxBuffField);
+	SAFE_RELEASE(g_pD3DIdxBuffField);
+	SAFE_RELEASE(g_pD3DTextureField);
 
-	if(g_pD3DIdxBuffField)
-	{// インデックスバッファの開放
-		g_pD3DIdxBuffField->Release();
-		g_pD3DIdxBuffField = NULL;
-	}
-
-	if(g_pD3DTextureField)
-	{// テクスチャの開放
-		g_pD3DTextureField->Release();
-		g_pD3DTextureField = NULL;
-	}
 }
 
 //=============================================================================

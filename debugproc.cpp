@@ -3,11 +3,14 @@
 // デバッグ表示処理 [debugproc.cpp]
 // Author : 麦英泳 
 //
-//=============================================================================
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
+
+#define _CRT_SECURE_NO_WARNINGS			// stdio.hとセットで先に書く、書かないとエラー
+#include <stdio.h>						// 標準入出力関連のライブラリー
+
+
 #include "debugproc.h"
 #include "input.h"
+
 
 //*****************************************************************************
 // マクロ定義
@@ -23,7 +26,11 @@
 LPD3DXFONT	g_pD3DXFont = NULL;			// フォントへのポインタ
 char		g_aStrDebug[1024] = {"\0"};	// デバッグ情報
 
+#ifdef _DEBUG
+bool		g_bDispDebug = 1;	// デバッグ表示ON/OFF
+#else
 bool		g_bDispDebug = 0;	// デバッグ表示ON/OFF
+#endif
 
 //=============================================================================
 // デバッグ表示処理の初期化
@@ -48,11 +55,8 @@ HRESULT InitDebugProc(void)
 //=============================================================================
 void UninitDebugProc(void)
 {
-	if(g_pD3DXFont != NULL)
-	{// 情報表示用フォントの開放
-		g_pD3DXFont->Release();
-		g_pD3DXFont = NULL;
-	}
+	SAFE_RELEASE(g_pD3DXFont);
+
 }
 
 //=============================================================================

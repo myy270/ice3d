@@ -7,7 +7,8 @@
 #ifndef _SOUND_H_
 #define _SOUND_H_
 
-#include "main.h"
+#include "function.h"
+#include <xaudio2.h>					// DXサウンド関連のライブラリー
 
 // サウンドファイル
 typedef enum

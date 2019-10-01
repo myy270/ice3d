@@ -94,29 +94,14 @@ HRESULT InitResult(void)
 //=============================================================================
 void UninitResult(void)
 {
-	if(g_pD3DTextureResult != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureResult->Release();
-		g_pD3DTextureResult = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureResult);
+	SAFE_RELEASE(g_pD3DVtxBuffResult);
 
-	if(g_pD3DVtxBuffResult != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffResult->Release();
-		g_pD3DVtxBuffResult = NULL;
-	}
-
-	if(g_pD3DTextureResultLogo != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureResultLogo->Release();
-		g_pD3DTextureResultLogo = NULL;
-	}
-
-	if(g_pD3DVtxBuffResultLogo != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffResultLogo->Release();
-		g_pD3DVtxBuffResultLogo = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureResultLogo);
+	SAFE_RELEASE(g_pD3DVtxBuffResultLogo);
+	
+	SAFE_RELEASE(g_pD3DTextureResultLogo2);
+	SAFE_RELEASE(g_textureBuff);
 }
 
 //=============================================================================

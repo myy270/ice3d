@@ -7,7 +7,7 @@
 #ifndef _EXPLOSION_H_
 #define _EXPLOSION_H_
 
-#include "main.h"
+#include "function.h"
 
 //**************************************
 // Ží—Þ

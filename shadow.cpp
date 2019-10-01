@@ -70,17 +70,9 @@ HRESULT InitShadow(void)
 //=============================================================================
 void UninitShadow(void)
 {
-	if(g_pD3DTextureShadow != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureShadow->Release();
-		g_pD3DTextureShadow = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureShadow);
+	SAFE_RELEASE(g_pD3DVtxBuffShadow);
 
-	if(g_pD3DVtxBuffShadow != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffShadow->Release();
-		g_pD3DVtxBuffShadow = NULL;
-	}
 }
 
 //=============================================================================

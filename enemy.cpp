@@ -395,24 +395,13 @@ void UninitEnemy(void)
 {
 	for (int i = 0; i < PART_MAX_ENEMY; i++)//パーツ番号
 	{
-		if (g_enemy.part[i].pMesh != NULL)
-		{// メッシュの開放
-			g_enemy.part[i].pMesh->Release();
-			g_enemy.part[i].pMesh = NULL;
-		}
+		SAFE_RELEASE(g_enemy.part[i].pMesh);
+		SAFE_RELEASE(g_enemy.part[i].pMatBuff);
 
-		if (g_enemy.part[i].pMatBuff != NULL)
-		{// マテリアルの開放
-			g_enemy.part[i].pMatBuff->Release();
-			g_enemy.part[i].pMatBuff = NULL;
-		}
 	}
 
-	if (g_pD3DTextureEnemy != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureEnemy->Release();
-		g_pD3DTextureEnemy = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureEnemy);
+
 }
 
 //=============================================================================

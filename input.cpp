@@ -4,7 +4,7 @@
 * 作成者:		GP11A341 33 麦英泳
 * 作成日:		2018/08/17
 *******************************************************************************/
-#include "main.h"
+
 #include "input.h"
 
 //*****************************************************************************
@@ -111,11 +111,8 @@ void UninitInput(void)
 	// パッドの終了処理
 	UninitPad();
 
-	if(g_pDInput)
-	{
-		g_pDInput->Release();
-		g_pDInput = NULL;
-	}
+	SAFE_RELEASE(g_pDInput);
+
 }
 
 //=============================================================================
@@ -177,11 +174,8 @@ HRESULT InitKeyboard(HINSTANCE hInst, HWND hWnd)
 //=============================================================================
 void UninitKeyboard(void)
 {
-	if(g_pDIDevKeyboard)
-	{
-		g_pDIDevKeyboard->Release();
-		g_pDIDevKeyboard = NULL;
-	}
+	SAFE_RELEASE(g_pDIDevKeyboard);
+
 }
 
 //=============================================================================
@@ -471,6 +465,7 @@ void UninitPad(void)
 		{
 			pGamePad[i]->Unacquire();
 			pGamePad[i]->Release();
+			pGamePad[i] = NULL;
 		}
 	}
 

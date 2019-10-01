@@ -6,6 +6,7 @@
 //=============================================================================
 #include "life.h"
 
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -69,22 +70,10 @@ HRESULT InitLife(void)
 //=============================================================================
 void UninitLife(void)
 {
-	if(g_pD3DTextureLife[0] != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureLife[0]->Release();
-		g_pD3DTextureLife[0] = NULL;
-	}
-	if(g_pD3DTextureLife[1] != NULL)
-	{// テクスチャの開放
-		g_pD3DTextureLife[1]->Release();
-		g_pD3DTextureLife[1] = NULL;
-	}
+	SAFE_RELEASE(g_pD3DTextureLife[0]);
+	SAFE_RELEASE(g_pD3DTextureLife[1]);
+	SAFE_RELEASE(g_pD3DVtxBuffLife);
 
-	if(g_pD3DVtxBuffLife != NULL)
-	{// 頂点バッファの開放
-		g_pD3DVtxBuffLife->Release();
-		g_pD3DVtxBuffLife = NULL;
-	}
 }
 
 //=============================================================================

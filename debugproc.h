@@ -7,7 +7,7 @@
 #ifndef _DEBUGPROC_H_
 #define _DEBUGPROC_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
