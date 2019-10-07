@@ -5,28 +5,29 @@
 //
 //=============================================================================
 #include "fade.h"
+#include "scene.h"
 #include "timer.h"
 #include "score.h"
 
-#include "scene.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	FADE_RATE		(0.02f)		// フェード係数
+#define	FADE_RATE				(0.02f)									// フェードのアルファ値変化量
+#define	DEFAULT_FADETYPE		(FADE_IN)								// デフォルトのフェードの状態
+#define	FADE_COLOR				(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))		// フェードの幕の色
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexFade(LPDIRECT3DDEVICE9 pDevice);
-void SetColor(D3DCOLOR col);
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_p3DTextureFade = NULL;	// テクスチャへのポインタ
+LPDIRECT3DTEXTURE9		g_pD3DTextureFade = NULL;	// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffFade = NULL;	// 頂点バッファインターフェースへのポインタ
-D3DXCOLOR				g_color;
-FADE					g_fade = FADE_IN;//開く時のフェードイン
+FADETYPE				g_fade;						// フェードの状態
+D3DXCOLOR				g_colorFade;				// フェードの幕の色
+
 
 //=============================================================================
 // 初期化処理
@@ -35,8 +36,13 @@ HRESULT InitFade(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点情報の設定
-	MakeVertexFade(pDevice);
+	g_fade = DEFAULT_FADETYPE;						// ゲームを開くとき、フェードインする。
+
+	g_colorFade = FADE_COLOR;
+
+	// 頂点情報の作成
+	MakeVertex(pDevice, g_pD3DVtxBuffFade, D3DXVECTOR3(0.0f, 0.0f, 0.0f), SCREEN_WIDTH, SCREEN_HEIGHT);
+	SetVtxData(g_pD3DVtxBuffFade, g_colorFade);		// 色を再設定
 
 	return S_OK;
 }
@@ -46,7 +52,7 @@ HRESULT InitFade(void)
 //=============================================================================
 void UninitFade(void)
 {
-	SAFE_RELEASE(g_p3DTextureFade);
+	SAFE_RELEASE(g_pD3DTextureFade);
 	SAFE_RELEASE(g_pD3DVtxBuffFade);
 
 }
@@ -60,155 +66,65 @@ void UpdateFade(void)
 	{// フェード処理中
 		if(g_fade == FADE_OUT)
 		{// フェードアウト処理
-			g_color.a += FADE_RATE;		// α値を加算して画面を消していく　//50フレーム完成
-			if(g_color.a >= 1.0f)
-			{
-				SCENE scene;
+			g_colorFade.a += FADE_RATE;						// α値を加算して画面を消していく
 
-				// フェードイン処理に切り替え
-				g_color.a = 1.0f;
-				SetFade(FADE_IN);
+			if(g_colorFade.a >= 1.0f)
+			{// フェードアウト完成の時	
+				g_colorFade.a = 1.0f;
 
-				// 現在のシーンを取得
-				scene = GetScene();
-
+				SetFade(FADE_IN);							// フェードイン処理に切り替え
+				
+				// 次のシーンの設定
+				SCENE scene = GetScene();					// 現在のシーンを取得
 				scene = (SCENE)((scene + 1) % SCENE_MAX);	// シーンを１つ進める　//intからsceneにキャストする必要ある
+				SetScene(scene);							// シーンを設定
 
-				// シーンを設定
-				SetScene(scene);
-
-				if (GetTimeOut() == 1)
-				{
-					compScore();//スコアを比較する
+				if (GetTimeOut() == 1)//??
+				{//時間切れだったら
+					compScore();							//スコアを比較する
 
 				}
 			}
 
-			// 色を設定
-			SetColor(g_color);
 		}
 		else if(g_fade == FADE_IN)
 		{// フェードイン処理
-			g_color.a -= FADE_RATE;		// α値を減算して画面を浮き上がらせる　//50フレーム完成
-			if(g_color.a <= 0.0f)
-			{
-				// フェード処理終了
-				g_color.a = 0.0f;
+			g_colorFade.a -= FADE_RATE;						// α値を減算して画面を浮き上がらせる
+
+			if(g_colorFade.a <= 0.0f)
+			{// フェードイン完成の時				
+				g_colorFade.a = 0.0f;
+
 				SetFade(FADE_NONE);
 			}
-
-			// 色を設定
-			SetColor(g_color);//引数として　D3DXCOLOR から　D3DCOLOR　に転化して、
 		}
+			
+		SetVtxData(g_pD3DVtxBuffFade, g_colorFade);			// 色を再設定
 	}
 }
 
 //=============================================================================
-// タイトル画面
+// 描画処理
 //=============================================================================
 void DrawFade(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点バッファをデバイスのデータストリームにバインド
-    pDevice->SetStreamSource(0, g_pD3DVtxBuffFade, 0, sizeof(VERTEX_2D));
-
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
-
-	// テクスチャの設定
-	pDevice->SetTexture(0, NULL);
-
-	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+	DrawPolygon(pDevice, g_pD3DVtxBuffFade, g_pD3DTextureFade);
 }
 
 //=============================================================================
-// 頂点の作成
+// フェードの状態の設定
 //=============================================================================
-HRESULT MakeVertexFade(LPDIRECT3DDEVICE9 pDevice)
-{
-	// オブジェクトの頂点バッファを生成
-    if( FAILED( pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * NUM_VERTEX,		// 頂点データ用に確保するバッファサイズ(バイト単位)
-												D3DUSAGE_WRITEONLY,				// 頂点バッファの使用法　
-												FVF_VERTEX_2D,					// 使用する頂点フォーマット
-												D3DPOOL_MANAGED,				// リソースのバッファを保持するメモリクラスを指定
-												&g_pD3DVtxBuffFade,				// 頂点バッファインターフェースへのポインタ
-												NULL)))							// NULLに設定
-	{
-        return E_FAIL;
-	}
-
-	{//頂点バッファの中身を埋める
-		VERTEX_2D *pVtx;
-
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		g_pD3DVtxBuffFade->Lock(0, 0, (void**)&pVtx, 0);
-
-		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(SCREEN_WIDTH, 0.0f, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(0.0f, SCREEN_HEIGHT, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(SCREEN_WIDTH, SCREEN_HEIGHT, 0.0f);
-
-		// テクスチャのパースペクティブコレクト用
-		pVtx[0].rhw =
-		pVtx[1].rhw =
-		pVtx[2].rhw =
-		pVtx[3].rhw = 1.0f;
-
-		// 反射光の設定
-		g_color = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-		pVtx[0].diffuse = g_color;//D3DXCOLOR から　D3DCOLOR　に転化
-		pVtx[1].diffuse = g_color;
-		pVtx[2].diffuse = g_color;
-		pVtx[3].diffuse = g_color;
-
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);	
-
-		// 頂点データをアンロックする
-		g_pD3DVtxBuffFade->Unlock();
-	}
-
-	return S_OK;
-}
-
-//=============================================================================
-// 色を設定
-//=============================================================================
-void SetColor(D3DCOLOR col)
-{
-	VERTEX_2D *pVtx;
-
-	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-	g_pD3DVtxBuffFade->Lock(0, 0, (void**)&pVtx, 0);
-
-	// 反射光の設定
-	pVtx[0].diffuse = col;
-	pVtx[1].diffuse = col;
-	pVtx[2].diffuse = col;
-	pVtx[3].diffuse = col;
-
-	// 頂点データをアンロックする
-	g_pD3DVtxBuffFade->Unlock();
-}
-
-//=============================================================================
-// フェードの状態設定
-//=============================================================================
-void SetFade(FADE fade)
+void SetFade(FADETYPE fade)
 {
 	g_fade = fade;
 }
 
 //=============================================================================
-// フェードの状態取得
+// フェードの状態の取得
 //=============================================================================
-FADE GetFade(void)
+FADETYPE GetFade(void)
 {
 	return g_fade;
 }

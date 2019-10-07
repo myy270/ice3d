@@ -13,6 +13,7 @@
 //*****************************************************************************
 // ライブラリのリンク
 //*****************************************************************************
+
 #if 1	// [ここを"0"にした場合、"構成プロパティ" -> "リンカ" -> "入力" -> "追加の依存ファイル"に対象ライブラリを設定する]
 #pragma comment (lib, "d3d9.lib")		//DX関係
 #pragma comment (lib, "d3dx9.lib")		//DX関係
@@ -24,6 +25,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+
 // ２Ｄポリゴン頂点フォーマット( 頂点座標[2D] / 反射光 / テクスチャ座標 )
 #define	FVF_VERTEX_2D	(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 // ３Ｄポリゴン頂点フォーマット( 頂点座標[3D] / 法線 / 反射光 / テクスチャ座標 )
@@ -50,7 +52,7 @@
 
 #define SAFE_RELEASE(ptr)		{ if(ptr) { (ptr)->Release(); (ptr) = NULL; } }		//オブジェクトの解放
 
-#define PART_MAX	(7)			// プレイヤーパーツ数
+#define PART_MAX		(7)		// プレイヤーパーツ数
 #define PART_MAX_ENEMY	(7)		// 敵パーツの数
 
 #define	FPS	(60)
@@ -58,16 +60,37 @@
 #define	FIRST_SCENE		(SCENE_TITLE)		//最初の画面
 
 //*****************************************************************************
+// プロトタイプ宣言
+//*****************************************************************************
+
+HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vec, float width, float height);
+
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height);
+
+void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
+
+//*****************************************************************************
 // 列挙型定義
 //*****************************************************************************
 
-//ゲームの画面
+// フェードの状態
+enum FADETYPE
+{
+	FADE_NONE = 0,			// フェード処理なしの状態
+	FADE_IN,				// フェードイン処理
+	FADE_OUT,				// フェードアウト処理
+	FADE_MAX
+};
+
+// ゲーム画面
 enum SCENE
 {				
-	SCENE_TITLE,				// タイトル画面
-	SCENE_GAME,					// ゲーム画面
-	SCENE_RESULT,				// リザルト画面
-	SCENE_MAX					// デフォルト値(なにもない状態、SetScene()を使わないとダメ)
+	SCENE_TITLE,			// タイトル画面
+	SCENE_GAME,				// ゲーム画面
+	SCENE_RESULT,			// リザルト画面
+	SCENE_MAX				// デフォルト値(なにもない状態、SetScene()を使わないとダメ)
 };
 
 enum OBJECT
@@ -86,11 +109,10 @@ enum CAMERA_MODE
 
 enum PLAY_MODE
 {
-	PLAY_MODE_SINGLE,//一つのプレイヤー
-	PLAY_MODE_DOUBLE,//二つのプレイヤー
+	PLAY_MODE_SINGLE,		//一つのプレイヤー
+	PLAY_MODE_DOUBLE,		//二つのプレイヤー
 	PLAY_MODE_MAX
 };
-
 
 enum STATE
 {
@@ -115,12 +137,18 @@ enum APPLIMODE
 	APPLIMODE_MAX
 };
 
+enum ITEMTYPE
+{
+	ITEMTYPE_COIN,			// コイン
+	ITEMTYPE_ICEBLOCK,		// アイスブロック
 
-
+	ITEMTYPE_MAX
+};
 
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
+
 // 上記２Ｄポリゴン頂点フォーマットに合わせた構造体を定義
 struct VERTEX_2D
 {
@@ -139,7 +167,6 @@ struct VERTEX_3D
 	D3DXVECTOR2 tex;		// テクスチャ座標
 };
 
-
 struct SRT
 {
 	D3DXVECTOR3 scl;		// 拡大縮小	
@@ -156,24 +183,15 @@ struct KEY
 
 struct PART
 {
-	char *partFile;
-	//xファイル情報
+	char *partFile;							//xファイル情報
 	LPD3DXBUFFER		pMatBuff;			// メッシュのマテリアル情報を格納
 	DWORD				nNumMat;			// マテリアル情報の総数
 	LPD3DXMESH			pMesh;				// ID3DXMeshインターフェイスへのポインタ
 
-	SRT			srt;		//Scaling Rotation Translation
+	SRT			srt;						//Scaling Rotation Translation
 	D3DXMATRIX	mtxWorld;
 	PART		*parent;
 	bool		use;
-};
-
-enum ITEMTYPE
-{
-	ITEMTYPE_COIN,		// コイン
-	ITEMTYPE_ICEBLOCK,		// アイスブロック
-
-	ITEMTYPE_MAX
 };
 
 struct PLAYER
@@ -189,10 +207,6 @@ struct PLAYER
 	STATE state;
 	int stateTime;
 };
-//*****************************************************************************
-// プロトタイプ宣言
-//*****************************************************************************
-
 
 #endif
 
