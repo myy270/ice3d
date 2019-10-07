@@ -125,7 +125,7 @@ HRESULT Init(HINSTANCE hInstance, int nCmdShow)
 	// サウンドの初期化
 	InitSound(hWnd);
 
-	// 最初の画面をセット
+	// ゲーム起動後の最初のシーンを設定して初期化する
 	SetScene(FIRST_SCENE);
 
 

@@ -17,5 +17,6 @@ void UninitTitle(void);
 void UpdateTitle(void);
 void DrawTitle(void);
 
-int GetCursorIdx();
+//1p2p‚Ì‘I‘ð“š‚¦‚ðƒQƒbƒg
+int GetCursorIdx(void);
 #endif

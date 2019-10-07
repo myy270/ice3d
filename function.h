@@ -29,10 +29,21 @@
 // ３Ｄポリゴン頂点フォーマット( 頂点座標[3D] / 法線 / 反射光 / テクスチャ座標 )
 #define	FVF_VERTEX_3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
-#define SCREEN_WIDTH	(1280)				// ウインドウの幅
-#define SCREEN_HEIGHT	(720)				// ウインドウの高さ
-#define SCREEN_CENTER_X	(SCREEN_WIDTH / 2)	// ウインドウの中心Ｘ座標
-#define SCREEN_CENTER_Y	(SCREEN_HEIGHT / 2)	// ウインドウの中心Ｙ座標
+#define SCREEN_WIDTH	(1280)				// 実際のウインドウの幅(int型必須)
+#define SCREEN_HEIGHT	(720)				// 実際のウインドウの高さ(int型必須)
+
+#define DESIGN_SCREEN_WIDTH		(1280.0f)			// 設計するときのウインドウの幅(小数点必須)
+#define DESIGN_SCREEN_HEIGHT	(720.0f)			// 設計するときのウインドウの高さ(小数点必須)
+
+#define TEXTURE_AUTOFIT_WIDTH			(SCREEN_WIDTH  / DESIGN_SCREEN_WIDTH)			// 画面サイズに応じての幅の調整比率
+#define TEXTURE_AUTOFIT_HEIGHT			(SCREEN_HEIGHT / DESIGN_SCREEN_HEIGHT)			// 画面サイズに応じての高さの調整比率
+
+#define TEXTURE_WIDTH(width,rate)		((width) * (rate) * TEXTURE_AUTOFIT_WIDTH)		// テクスチャの調整後の幅の計算式  (width:リソースの幅,rate:拡縮率)
+#define TEXTURE_HEIGHT(height,rate)		((height) * (rate) * TEXTURE_AUTOFIT_HEIGHT)	// テクスチャの調整後の高さの計算式  (height:リソースの高さ,rate:拡縮率)
+
+#define TEXTURE_CENTER_X(width)			((SCREEN_WIDTH - (width)) / 2.0f)				// 画面の横方向の真中におくようにテクスチャの左上X座標  (width:テクスチャの調整後の幅)
+#define TEXTURE_CENTER_Y(height)		((SCREEN_HEIGHT - (height)) / 2.0f)				// 画面の縦方向の真中におくようにテクスチャの左上Y座標  (height:テクスチャの調整後の高さ)
+
 
 #define	NUM_VERTEX		(4)		// 頂点数
 #define	NUM_POLYGON		(2)		// ポリゴン数
@@ -56,7 +67,7 @@ enum SCENE
 	SCENE_TITLE,				// タイトル画面
 	SCENE_GAME,					// ゲーム画面
 	SCENE_RESULT,				// リザルト画面
-	SCENE_MAX					// デフォルト(なにもない状態、SetScene()を使わないとダメ)
+	SCENE_MAX					// デフォルト値(なにもない状態、SetScene()を使わないとダメ)
 };
 
 enum OBJECT
@@ -103,6 +114,9 @@ enum APPLIMODE
 	MODE_EDIT,
 	APPLIMODE_MAX
 };
+
+
+
 
 //*****************************************************************************
 // 構造体定義

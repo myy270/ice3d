@@ -13,7 +13,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_RESULT			"data/TEXTURE/bg001.jpg"		// 読み込むテクスチャファイル名
+//#define	TEXTURE_RESULT			"data/TEXTURE/bg001.jpg"		// このテクスチャを削除された
 
 #define	TEXTURE_RESULT_LOGO		"data/TEXTURE/win_logo.png"		// 勝つ テクスチャファイル名
 #define	TEXTURE_RESULT_LOGO_2	"data/TEXTURE/over_logo.png"	// 負ける テクスチャファイル名
@@ -69,10 +69,10 @@ HRESULT InitResult(void)
 	// 頂点情報の作成
 	MakeVertexResult(pDevice);
 
-	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
-								TEXTURE_RESULT,				// ファイルの名前
-								&g_pD3DTextureResult);		// 読み込むメモリー
+	//// テクスチャの読み込み
+	//D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
+	//							TEXTURE_RESULT,				// ファイルの名前
+	//							&g_pD3DTextureResult);		// 読み込むメモリー
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
