@@ -6,22 +6,32 @@
 //=============================================================================
 #include "timer.h"
 #include "fade.h"
-#include "score.h"
 #include "input.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_TIMER		"data/TEXTURE/number000.png"	// 読み込むテクスチャファイル名
-#define	TEXTURE_FRAME_TIMER	"data/TEXTURE/frame_timer.png"	// 読み込むテクスチャファイル名
-#define	TIMER_SIZE_X		(35.0f)							// タイマーの数字の幅
-#define	TIMER_SIZE_Y		(50.0f)							// タイマーの数字の高さ
-#define	TIMER_INTERVAL_X	(0.0f)							// タイマーの数字の表示間隔
+#define	TEXTURE_NUM_TIMER		"data/TEXTURE/number000.png"	// タイマーの数字
+#define	TEXTURE_FRAME_TIMER		"data/TEXTURE/frame_timer.png"	// タイマーの枠
 
-#define	NUM_PLACE			(3)			// タイマーの桁数
+#define	NUM_WIDTH				FIT_WIDTH(35)													// タイマーの単体の数字の幅
+#define	NUM_HEIGHT				FIT_HEIGHT(50)													// タイマーの単体の数字の高さ
+#define	NUM_INTERVAL			FIT_WIDTH(0)													// タイマーの数字の表示間隔
+#define	NUM_PLACE				(3)																// タイマーの数字の桁数
+#define	NUM_ALL_WIDTH			NUM_WIDTH * NUM_PLACE + NUM_INTERVAL * (NUM_PLACE - 1)			// タイマーの全部の数字の幅
+#define	NUM_POS_X				TEXTURE_CENTER_X(NUM_ALL_WIDTH)									// 一番左の数字の左上頂点のX座標
+#define	NUM_POS_Y				SCREEN_HEIGHT * 0.035f											// 一番左の数字の左上頂点のY座標
 
-#define	TIMER_POS_X			(SCREEN_WIDTH / 2 - ((TIMER_SIZE_X * NUM_PLACE + TIMER_INTERVAL_X * (NUM_PLACE - 1)) / 2) )	// タイマーの表示基準位置Ｘ座標
-#define	TIMER_POS_Y			(25.0f)																						// タイマーの表示基準位置Ｙ座標
+#define	TIMER_PADDING_LEFT		FIT_WIDTH(17.5)													// タイマーの数字とフレームの左間隔
+#define	TIMER_PADDING_RIGHT		FIT_WIDTH(17.5)													// タイマーの数字とフレームの右間隔
+#define	TIMER_PADDING_TOP		FIT_HEIGHT(25)													// タイマーの数字とフレームの上間隔
+#define	TIMER_PADDING_BOTTOM	FIT_HEIGHT(5)													// タイマーの数字とフレームの下間隔
+#define	TIMER_POS_X				NUM_POS_X - TIMER_PADDING_LEFT									// タイマーのフレームの左上頂点のX座標
+#define	TIMER_POS_Y				NUM_POS_Y - TIMER_PADDING_TOP									// タイマーのフレームの左上頂点のY座標
+#define	TIMER_WIDTH				NUM_ALL_WIDTH + TIMER_PADDING_LEFT + TIMER_PADDING_RIGHT		// タイマーの幅
+#define	TIMER_HEIGHT			NUM_HEIGHT + TIMER_PADDING_TOP + TIMER_PADDING_BOTTOM			// タイマーの高さ
+
+#define SECOND_MAX				(int)(powf(10.0f, (float)NUM_PLACE) - 1)						//タイマーの最大値	単位は秒
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -29,44 +39,44 @@
 HRESULT MakeVertexTimer(LPDIRECT3DDEVICE9 pDevice);
 void SetTextureTimer(int idx, int number);
 
-
-
 //*****************************************************************************
 // グローバル変数宣言
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTextureTimer[2] = {};		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffTimer = NULL;		// 頂点バッファインターフェースへのポインタ
-
-D3DXVECTOR3				g_posTimer;
-D3DXVECTOR3				g_rotTimer;
-
-int						g_nTimer;						// タイマーの制限時間
-bool					g_bEnableTimer;					// タイマー動作ON/OFF
-
-bool g_timeOut;//時間切れかどうか
+LPDIRECT3DTEXTURE9		g_pD3DTextureTimer[2] = {NULL, NULL};		// [0]:タイマーの数字のテクスチャ―　[1]:タイマーの枠のテクスチャ―
+LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffTimer = NULL;					// 頂点バッファインターフェースへのポインタ
+				
+int						g_nTimerCount;								// タイマーのカウント		単位はフレーム
+bool					g_bEnableTimer;								// タイマー動作ON/OFF
+bool					g_bClockOver;								// 時間が終わるかどうか
 //=============================================================================
 // 初期化処理
+// second:タイマーの初期設定時間	単位は秒
 //=============================================================================
-HRESULT InitTimer(void)
+HRESULT InitTimer(int second)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	g_timeOut = 0;
+	if (second > SECOND_MAX)		//最大値を超えれば
+	{
+		second = SECOND_MAX;		//最大値になる
+	}
 
-	g_posTimer = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	g_rotTimer = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
-	// タイマーの初期化
-	g_nTimer = 999 * 60;
+	g_nTimerCount = second * FPS;
+
+
 	g_bEnableTimer = true;
+
+	g_bClockOver = false;
 
 	// 頂点情報の作成
 	MakeVertexTimer(pDevice);
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
-								TEXTURE_TIMER,			// ファイルの名前
+								TEXTURE_NUM_TIMER,			// ファイルの名前
 								&g_pD3DTextureTimer[0]);	// 読み込むメモリー
+
 	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
 								TEXTURE_FRAME_TIMER,			// ファイルの名前
 								&g_pD3DTextureTimer[1]);	// 読み込むメモリー
@@ -94,41 +104,39 @@ void UpdateTimer(void)
 #ifdef _DEBUG
 	if (GetKeyboardTrigger(DIK_SUBTRACT))
 	{
-		g_nTimer = 300;
+		g_nTimerCount = 5 * FPS;	//開発者機能、タイマーの時間を5秒にする
 	}
 #endif
 
 	if(g_bEnableTimer)
 	{
-		g_nTimer--;
-
-		if((g_nTimer < 0) && (g_timeOut == 0))
-		{
-			g_timeOut = 1;
-
-			SetFade(FADE_OUT);
-
-		}
-
-		if (g_nTimer < 0)
-		{
-			g_nTimer = 0;
-		}
-		else if((g_nTimer / 60) >= (int)(powf(10.0f, (float)NUM_PLACE)))//最大値を超えれば 元罠
-		{
-			g_nTimer = ((int)(powf(10.0f, (float)NUM_PLACE)) - 1) * 60;//最大値になる　元罠
-		}
+		g_nTimerCount--;			//毎フレームにカウントダウン
 	}
 
-	for(int nCntPlace = 0; nCntPlace < NUM_PLACE; nCntPlace++)
+	if (g_nTimerCount < 0)
 	{
-		int number;
-		int timer;
+		g_nTimerCount = 0;
+	}
+
+	if ((g_nTimerCount <= 0) && (g_bClockOver == false))
+	{
+		g_bClockOver = true;	//時間が終わった
+
+		SetFade(FADE_OUT);		//リザルト画面へフェード
+	}
+
+	//タイマーの各桁の数字を求める
+	for(int i = 0; i < NUM_PLACE; i++)			//iは数字の左から始まる添え字
+	{
+		int count = g_nTimerCount + 59;			//例えば、残り0.5秒としても、画面上には1秒として表示するための役割
+		count = count / FPS;					//フレーム単位から秒単位に転化する
 		
-		timer = g_nTimer + 59;
-		//スコアの考え方と一緒
-		number = ((timer / 60) % (int)(powf(10.0f, (float)(NUM_PLACE - nCntPlace)))) / (int)(powf(10.0f, (float)(NUM_PLACE - nCntPlace - 1)));
-		SetTextureTimer(nCntPlace, number);
+		//タイマーのの各桁の数字を左から計算する
+		int number = (count % (int)(powf(10.0f, (float)(NUM_PLACE - i))))	//指している桁の左部分を捨てて、残りの部分をとる;	例えば、count = 123, NUM_PLACE = 3 , i = 1,ここの分子 = 23
+						/ (int)(powf(10.0f, (float)(NUM_PLACE - i - 1)));	//例えば、count = 123, NUM_PLACE = 3 ,i = 1,ここの分母 = 10
+
+		//その桁に対応のテクスチャをセット
+		SetTextureTimer(i, number);
 	}
 }
 
@@ -139,26 +147,9 @@ void DrawTimer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点バッファをデバイスのデータストリームにバインド
-    pDevice->SetStreamSource(0, g_pD3DVtxBuffTimer, 0, sizeof(VERTEX_2D));
+	DrawPolygon(pDevice, g_pD3DVtxBuffTimer, g_pD3DTextureTimer[0], 0, NUM_PLACE - 1);
 
-	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
-
-	// テクスチャの設定
-	pDevice->SetTexture(0, g_pD3DTextureTimer[0]);
-
-	// ポリゴンの描画
-	for(int nCntPlace = 0; nCntPlace < NUM_PLACE; nCntPlace++)
-	{
-		pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, (nCntPlace * 4), NUM_POLYGON);
-	}
-
-	// テクスチャの設定
-	pDevice->SetTexture(0, g_pD3DTextureTimer[1]);
-
-	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, (NUM_PLACE * 4), NUM_POLYGON);
+	DrawPolygon(pDevice, g_pD3DVtxBuffTimer, g_pD3DTextureTimer[1], NUM_PLACE, NUM_PLACE);
 }
 
 //=============================================================================
@@ -166,76 +157,39 @@ void DrawTimer(void)
 //=============================================================================
 HRESULT MakeVertexTimer(LPDIRECT3DDEVICE9 pDevice)
 {
-	// オブジェクトの頂点バッファを生成
-    if( FAILED( pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * (NUM_VERTEX * NUM_PLACE + 4),	// 頂点データ用に確保するバッファサイズ(バイト単位)
-												D3DUSAGE_WRITEONLY,								// 頂点バッファの使用法　
-												FVF_VERTEX_2D,									// 使用する頂点フォーマット
-												D3DPOOL_MANAGED,								// リソースのバッファを保持するメモリクラスを指定
-												&g_pD3DVtxBuffTimer,							// 頂点バッファインターフェースへのポインタ
-												NULL)))											// NULLに設定
-	{
-        return E_FAIL;
-	}
 
-	{//頂点バッファの中身を埋める
-		VERTEX_2D *pVtx;
+	MakeVertex(pDevice, g_pD3DVtxBuffTimer, NUM_PLACE + 1);		//+1 はタイマーのフレームを含むこと
 
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		g_pD3DVtxBuffTimer->Lock(0, 0, (void**)&pVtx, 0);
-
-		for(int nCntPlace = 0; nCntPlace < NUM_PLACE; nCntPlace++, pVtx += 4)
+	{//頂点バッファの中身を埋める		
+		for(int nCntPlace = 0; nCntPlace <= NUM_PLACE; nCntPlace++)		//nCntPlaceは数字の左から始める添え字
 		{
-			// 頂点座標の設定
-			pVtx[0].vtx = D3DXVECTOR3(TIMER_POS_X + nCntPlace * (TIMER_SIZE_X + TIMER_INTERVAL_X), TIMER_POS_Y, 0.0f);
-			pVtx[1].vtx = D3DXVECTOR3(TIMER_POS_X + nCntPlace * (TIMER_INTERVAL_X + TIMER_SIZE_X) + TIMER_SIZE_X, TIMER_POS_Y, 0.0f);
-			pVtx[2].vtx = D3DXVECTOR3(TIMER_POS_X + nCntPlace * (TIMER_SIZE_X + TIMER_INTERVAL_X), TIMER_POS_Y + TIMER_SIZE_Y, 0.0f);
-			pVtx[3].vtx = D3DXVECTOR3(TIMER_POS_X + nCntPlace * (TIMER_INTERVAL_X + TIMER_SIZE_X) + TIMER_SIZE_X, TIMER_POS_Y + TIMER_SIZE_Y, 0.0f);
+			if (nCntPlace < NUM_PLACE)
+			{//	タイマーの数字
+				
+				// 頂点座標の設定
+				SetVtxData(g_pD3DVtxBuffTimer, D3DXVECTOR3(NUM_POS_X + nCntPlace * (NUM_WIDTH + NUM_INTERVAL), NUM_POS_Y, 0.0f), NUM_WIDTH, NUM_HEIGHT, nCntPlace);
+
+				//テクスチャ―座標の設定	初期値、あとで変更する
+				SetVtxData(g_pD3DVtxBuffTimer, D3DXVECTOR2(0.0f, 0.0f), 0.1f, 1.0f, nCntPlace);
+			}
+			else
+			{//タイマーのフレーム
+
+				// 頂点座標の設定
+				SetVtxData(g_pD3DVtxBuffTimer, D3DXVECTOR3(TIMER_POS_X, TIMER_POS_Y, 0.0f), TIMER_WIDTH, TIMER_HEIGHT, nCntPlace);
+
+				//テクスチャ―座標の設定
+				SetVtxData(g_pD3DVtxBuffTimer, D3DXVECTOR2(0.0f, 0.0f), 1.0f, 1.0f, nCntPlace);
+			}
 
 			// rhwの設定
-			pVtx[0].rhw =
-			pVtx[1].rhw =
-			pVtx[2].rhw =
-			pVtx[3].rhw = 1.0f;
+			SetVtxData(g_pD3DVtxBuffTimer, 1.0f, nCntPlace);
 
-			// 反射光の設定
-			pVtx[0].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
-			pVtx[1].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
-			pVtx[2].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
-			pVtx[3].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
+			// 反射光の設定		シアン色にする
+			SetVtxData(g_pD3DVtxBuffTimer, D3DCOLOR_RGBA(0, 255, 255, 255), nCntPlace);
 
-			// テクスチャ座標の設定
-			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-			pVtx[1].tex = D3DXVECTOR2(0.1f, 0.0f);
-			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-			pVtx[3].tex = D3DXVECTOR2(0.1f, 1.0f);
+
 		}
-
-		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(TIMER_POS_X - 17.5f, TIMER_POS_Y - 25, 0.0f);
-		pVtx[1].vtx = D3DXVECTOR3(TIMER_POS_X + (TIMER_INTERVAL_X + TIMER_SIZE_X) * (NUM_PLACE - 1) + TIMER_SIZE_X + 17.5f, TIMER_POS_Y - 25, 0.0f);
-		pVtx[2].vtx = D3DXVECTOR3(TIMER_POS_X - 17.5f, TIMER_POS_Y + 55, 0.0f);
-		pVtx[3].vtx = D3DXVECTOR3(TIMER_POS_X + (TIMER_INTERVAL_X + TIMER_SIZE_X) * (NUM_PLACE - 1) + TIMER_SIZE_X + 17.5f, TIMER_POS_Y + 55, 0.0f);
-
-		// rhwの設定
-		pVtx[0].rhw =
-		pVtx[1].rhw =
-		pVtx[2].rhw =
-		pVtx[3].rhw = 1.0f;
-
-		// 反射光の設定
-		pVtx[0].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);//シアン
-		pVtx[1].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
-		pVtx[2].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
-		pVtx[3].diffuse = D3DCOLOR_RGBA(0, 255, 255, 255);
-
-		// テクスチャ座標の設定
-		pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-		pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-		pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-		pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-
-		// 頂点データをアンロックする
-		g_pD3DVtxBuffTimer->Unlock();
 	}
 
 	return S_OK;
@@ -243,50 +197,49 @@ HRESULT MakeVertexTimer(LPDIRECT3DDEVICE9 pDevice)
 
 //=============================================================================
 // テクスチャ座標の設定
+// idx:数字の左から始まる添え字
+// number:この桁の数字
 //=============================================================================
 void SetTextureTimer(int idx, int number)
 {
-	VERTEX_2D *pVtx;
+	//安全のために
+	if (idx >= NUM_PLACE)
+	{
+		return;
+	}
 
-	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-	g_pD3DVtxBuffTimer->Lock(0, 0, (void**)&pVtx, 0);
+	SetVtxData(g_pD3DVtxBuffTimer, D3DXVECTOR2(number * 0.1f, 0.0f), 0.1f, 1.0f, idx);
 
-	pVtx += (idx * 4);
-
-	// 頂点座標の設定
-	pVtx[0].tex = D3DXVECTOR2(number * 0.1f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(number * 0.1f + 0.1f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(number * 0.1f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(number * 0.1f + 0.1f, 1.0f);
-
-	// 頂点データをアンロックする
-	g_pD3DVtxBuffTimer->Unlock();
 }
 
 //=============================================================================
-// タイマーの開始
+// 
 //=============================================================================
-void EnableTimer(bool bEnable)
+void SetEnableTimer(bool b)
 {
-	g_bEnableTimer = bEnable;
+	g_bEnableTimer = b;
 }
 
 //=============================================================================
-// タイマーのリセット
+// 
 //=============================================================================
-void ResetTimer(int nTime)
+void SetTimer(int second)
 {
-	g_nTimer = nTime * 60;//秒数*フレーム
+	g_nTimerCount = second * FPS;	//秒数*フレーム
 }
 
+//=============================================================================
+// 
+//=============================================================================
 int GetTimer()
 {
-	return g_nTimer;
-
+	return g_nTimerCount;
 }
 
-bool GetTimeOut()
+//=============================================================================
+// 
+//=============================================================================
+bool IsClockOver()
 {
-	return g_timeOut;
-
+	return g_bClockOver;
 }

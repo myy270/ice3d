@@ -121,8 +121,7 @@ HRESULT InitGame(void)
 	InitLife();
 
 	// タイマーの初期化
-	InitTimer();
-	ResetTimer(50);
+	InitTimer(50);
 
 	// スコアの初期化
 	InitScore();

@@ -17,18 +17,18 @@
 #define	TEXTURE_MENU_1P2P		"data/TEXTURE/MENU_1P2P.png"			// 1p2p選択メニュー
 
 
-#define	TITLE_LOGO_WIDTH		TEXTURE_WIDTH(640,0.7f)					// タイトルロゴの幅
-#define	TITLE_LOGO_HEIGHT		TEXTURE_HEIGHT(640,0.7f)				// タイトルロゴの高さ
+#define	TITLE_LOGO_WIDTH		FIT_WIDTH(640 * 0.7f)					// タイトルロゴの幅
+#define	TITLE_LOGO_HEIGHT		FIT_HEIGHT(640 * 0.7f)				// タイトルロゴの高さ
 #define	TITLE_LOGO_POS_X		TEXTURE_CENTER_X(TITLE_LOGO_WIDTH)		// タイトルロゴの左上頂点のX座標
 #define	TITLE_LOGO_POS_Y		(SCREEN_HEIGHT * 0.05f)					// タイトルロゴの左上頂点のY座標
 
-#define	PRESS_START_WIDTH		TEXTURE_WIDTH(289,1.3f) 				// 「PRESS START」ロゴの幅
-#define	PRESS_START_HEIGHT		TEXTURE_HEIGHT(145,1.3f) 				// 「PRESS START」ロゴの高さ
+#define	PRESS_START_WIDTH		FIT_WIDTH(289 * 1.3f) 				// 「PRESS START」ロゴの幅
+#define	PRESS_START_HEIGHT		FIT_HEIGHT(145 * 1.3f) 				// 「PRESS START」ロゴの高さ
 #define	PRESS_START_POS_X		TEXTURE_CENTER_X(PRESS_START_WIDTH)		// 「PRESS START」ロゴの左上頂点のX座標
 #define	PRESS_START_POS_Y		(SCREEN_HEIGHT * 0.7f)					// 「PRESS START」ロゴの左上頂点のY座標
 
-#define	MENU_1P2P_WIDTH			TEXTURE_WIDTH(1660,0.35f)				// 1p2p選択メニューの幅			
-#define	MENU_1P2P_HEIGHT		TEXTURE_HEIGHT(576,0.35f) 				// 1p2p選択メニューの高さ
+#define	MENU_1P2P_WIDTH			FIT_WIDTH(1660 * 0.35f)					// 1p2p選択メニューの幅			
+#define	MENU_1P2P_HEIGHT		FIT_HEIGHT(576 * 0.35f) 				// 1p2p選択メニューの高さ
 #define	MENU_1P2P_POS_X			TEXTURE_CENTER_X(MENU_1P2P_WIDTH)		// 1p2p選択メニューの左上頂点のX座標
 #define	MENU_1P2P_POS_Y			(SCREEN_HEIGHT * 0.6f)					// 1p2p選択メニューの左上頂点のY座標
 

@@ -40,11 +40,11 @@
 #define TEXTURE_AUTOFIT_WIDTH			(SCREEN_WIDTH  / DESIGN_SCREEN_WIDTH)			// 画面サイズに応じての幅の調整比率
 #define TEXTURE_AUTOFIT_HEIGHT			(SCREEN_HEIGHT / DESIGN_SCREEN_HEIGHT)			// 画面サイズに応じての高さの調整比率
 
-#define TEXTURE_WIDTH(width,rate)		((width) * (rate) * TEXTURE_AUTOFIT_WIDTH)		// テクスチャの調整後の幅の計算式  (width:リソースの幅,rate:拡縮率)
-#define TEXTURE_HEIGHT(height,rate)		((height) * (rate) * TEXTURE_AUTOFIT_HEIGHT)	// テクスチャの調整後の高さの計算式  (height:リソースの高さ,rate:拡縮率)
+#define FIT_WIDTH(width)		((width) * TEXTURE_AUTOFIT_WIDTH)		// 調整後の幅の計算式  (width:リソースの幅)
+#define FIT_HEIGHT(height)		((height) * TEXTURE_AUTOFIT_HEIGHT)		// 調整後の高さの計算式  (height:リソースの高さ)
 
-#define TEXTURE_CENTER_X(width)			((SCREEN_WIDTH - (width)) / 2.0f)				// 画面の横方向の真中におくようにテクスチャの左上X座標  (width:テクスチャの調整後の幅)
-#define TEXTURE_CENTER_Y(height)		((SCREEN_HEIGHT - (height)) / 2.0f)				// 画面の縦方向の真中におくようにテクスチャの左上Y座標  (height:テクスチャの調整後の高さ)
+#define TEXTURE_CENTER_X(width)			((SCREEN_WIDTH - (width)) / 2.0f)				// 画面の横方向の真中におくようにポリゴンの左上頂点のX座標  (width:テクスチャの調整後の幅)
+#define TEXTURE_CENTER_Y(height)		((SCREEN_HEIGHT - (height)) / 2.0f)				// 画面の縦方向の真中におくようにポリゴンの左上頂点のY座標  (height:テクスチャの調整後の高さ)
 
 
 #define	NUM_VERTEX		(4)		// 頂点数
@@ -64,12 +64,16 @@
 //*****************************************************************************
 
 HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vec, float width, float height);
+HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int num);
 
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index = 0);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index = 0);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height, int index = 0);
+
 
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
+void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
 
 //*****************************************************************************
 // 列挙型定義

@@ -533,7 +533,7 @@ void UpdatePlayer(void)
 
 		g_animeState = 0;//運動状態をリセット
 
-		if((GetTimeOut() == 0) && (g_player.state != FROZEN))
+		if((IsClockOver() == 0) && (g_player.state != FROZEN))
 		{//移動
 			if (GetKeyboardPress(DIK_A) || IsButtonPress(0, BUTTON_LEFT) || IsButtonPress(0, BUTTON_LSTICK_LEFT))
 			{
@@ -770,7 +770,7 @@ void UpdatePlayer(void)
 #ifdef _DEBUG
 	if (0)
 	{
-		if ((GetTimeOut() == 0) && (g_player.state != FROZEN))
+		if ((IsClockOver() == 0) && (g_player.state != FROZEN))
 		{
 			if (GetKeyboardTrigger(DIK_SPACE))
 			{
@@ -890,7 +890,7 @@ void UpdatePlayer(void)
 	}
 
 
-	if ((GetTimeOut() == 0) && (g_player.state != FROZEN))
+	if ((IsClockOver() == 0) && (g_player.state != FROZEN))
 	{
 		if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTrigger(0, BUTTON_CIRCLE))
 		{//凍結アイテムを使う
