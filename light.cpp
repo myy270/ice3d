@@ -6,7 +6,6 @@
 //=============================================================================
 #include "light.h"
 
-
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -14,6 +13,7 @@
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+void SetDirectionalLight(LPDIRECT3DDEVICE9 pDevice, D3DLIGHT9& light, int idx, D3DCOLORVALUE color, D3DXVECTOR3 vec);
 
 //*****************************************************************************
 // グローバル変数
@@ -26,95 +26,39 @@ D3DLIGHT9 g_aLight[3];				// ライトのワーク
 HRESULT InitLight(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	D3DXVECTOR3 vecDir;
 
-	// D3DLIGHT9構造体を0でクリアする
-	ZeroMemory(&g_aLight[0], sizeof(D3DLIGHT9));
+	SetDirectionalLight(pDevice, g_aLight[0], 0, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),	D3DXVECTOR3(0.20f, -0.60f, 0.80f));		//右下後に指す
 
-	// ライトのタイプの設定
-	g_aLight[0].Type = D3DLIGHT_DIRECTIONAL;
+	SetDirectionalLight(pDevice, g_aLight[1], 1, D3DXCOLOR(0.75f, 0.75f, 0.75f, 1.0f), D3DXVECTOR3(-0.20f, 1.00f, -0.50f));	//左上前に指す
 
-	// 拡散光
-	g_aLight[0].Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	// 環境光
-	g_aLight[0].Ambient = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
-
-	// ライトの方向の設定
-	vecDir = D3DXVECTOR3(0.20f, -0.60f, 0.80f);//右下後
-	D3DXVec3Normalize((D3DXVECTOR3*)&g_aLight[0].Direction, &vecDir);//ベクトルを正規化
-
-	// ライトをレンダリングパイプラインに設定
-	pDevice->SetLight(0, &g_aLight[0]);
-
-	// ライトの設定
-	pDevice->LightEnable(0, TRUE);
-
-
-	// D3DLIGHT9構造体を0でクリアする
-	ZeroMemory(&g_aLight[1], sizeof(D3DLIGHT9));
-
-	// ライトのタイプの設定
-	g_aLight[1].Type = D3DLIGHT_DIRECTIONAL;
-
-	// 拡散光
-	g_aLight[1].Diffuse = D3DXCOLOR(0.75f, 0.75f, 0.75f, 1.0f);
-
-	// 環境光
-	g_aLight[1].Ambient = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
-
-    // ライトの方向の設定
-	vecDir = D3DXVECTOR3(-0.20f, 1.00f, -0.50f);//左上前
-	D3DXVec3Normalize((D3DXVECTOR3*)&g_aLight[1].Direction, &vecDir);
-
-	// ライトをレンダリングパイプラインに設定
-	pDevice->SetLight(1, &g_aLight[1]);
-
-	// ライトの設定
-	pDevice->LightEnable(1, TRUE);
-
-	// D3DLIGHT9構造体を0でクリアする
-	ZeroMemory(&g_aLight[2], sizeof(D3DLIGHT9));
-
-	// ライトのタイプの設定
-	g_aLight[2].Type = D3DLIGHT_DIRECTIONAL;
-
-	// 拡散光
-	g_aLight[2].Diffuse = D3DXCOLOR(0.25f, 0.25f, 0.25f, 1.0f);
-
-	// 環境光
-	g_aLight[2].Ambient = D3DXCOLOR(0.3f, 0.3f, 0.3f, 1.0f);
-
-    // ライトの方向の設定
-	vecDir = D3DXVECTOR3(0.80f, 0.10f, 0.50f);//右上後
-	D3DXVec3Normalize((D3DXVECTOR3*)&g_aLight[2].Direction, &vecDir);
-
-	// ライトをレンダリングパイプラインに設定
-	pDevice->SetLight(2, &g_aLight[2]);
-
-	// ライトの設定
-	pDevice->LightEnable(2, TRUE);
-
+	SetDirectionalLight(pDevice, g_aLight[2], 2, D3DXCOLOR(0.25f, 0.25f, 0.25f, 1.0f), D3DXVECTOR3(0.80f, 0.10f, 0.50f));	//右上後に指す
 
 	// ライティングモード
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	//pDevice->SetRenderState(D3DRS_AMBIENT, TRUE);//default: ture
-	//pDevice->SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, D3DMCS_COLOR1);//default: D3DMCS_MATERIAL
 
 	return S_OK;
 }
 
 //=============================================================================
-// ライトの終了処理
+// Directionalライトの設定
 //=============================================================================
-void UninitLight(void)
+void SetDirectionalLight(LPDIRECT3DDEVICE9 pDevice,D3DLIGHT9& light, int idx, D3DCOLORVALUE color, D3DXVECTOR3 vec)
 {
-}
+	// D3DLIGHT9構造体を0でクリアする
+	ZeroMemory(&light, sizeof(D3DLIGHT9));
 
-//=============================================================================
-// ライトの更新処理
-//=============================================================================
-void UpdateLight(void)
-{
+	// ライトのタイプの設定
+	light.Type = D3DLIGHT_DIRECTIONAL;
+
+	// 拡散光の設定
+	light.Diffuse = color;
+
+	// 方向の設定
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &vec);//ベクトルを正規化
+
+	// ライトをレンダリングパイプラインに設定
+	pDevice->SetLight(idx, &light);
+
+	// ライトの設定
+	pDevice->LightEnable(idx, TRUE);
 }

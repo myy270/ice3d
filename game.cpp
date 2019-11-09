@@ -138,9 +138,6 @@ HRESULT InitGame(void)
 //=============================================================================
 void UninitGame(void)
 {
-	// ライトの終了処理
-	UninitLight();
-
 	// カメラの終了処理
 	UninitCamera();
 
@@ -179,9 +176,6 @@ void UninitGame(void)
 //=============================================================================
 void UpdateGame(void)
 {
-	// ライト処理の更新
-	UpdateLight();
-
 	// カメラ処理の更新
 	UpdateCamera();
 

@@ -13,7 +13,5 @@
 // プロトタイプ宣言
 //*****************************************************************************
 HRESULT InitLight(void);
-void UninitLight(void);
-void UpdateLight(void);
 
 #endif
