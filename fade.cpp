@@ -79,9 +79,9 @@ void UpdateFade(void)
 				scene = (SCENE)((scene + 1) % SCENE_MAX);	// シーンを１つ進める　//intからsceneにキャストする必要ある
 				SetScene(scene);							// シーンを設定
 
-				if (IsClockOver() == 1)//??
+				if (IsTimeEnd() == 1)//??
 				{//時間切れだったら
-					compScore();							//スコアを比較する
+					CompareScore();							//スコアを比較する
 
 				}
 			}

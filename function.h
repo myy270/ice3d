@@ -43,8 +43,8 @@
 #define FIT_WIDTH(width)		((width) * TEXTURE_AUTOFIT_WIDTH)		// 調整後の幅の計算式  (width:リソースの幅)
 #define FIT_HEIGHT(height)		((height) * TEXTURE_AUTOFIT_HEIGHT)		// 調整後の高さの計算式  (height:リソースの高さ)
 
-#define TEXTURE_CENTER_X(width)			((SCREEN_WIDTH - (width)) / 2.0f)				// 画面の横方向の真中におくようにポリゴンの左上頂点のX座標  (width:テクスチャの調整後の幅)
-#define TEXTURE_CENTER_Y(height)		((SCREEN_HEIGHT - (height)) / 2.0f)				// 画面の縦方向の真中におくようにポリゴンの左上頂点のY座標  (height:テクスチャの調整後の高さ)
+#define TEXTURE_CENTER_X(width)			((SCREEN_WIDTH - (width)) / 2.0f)				// 画面の横方向の真中におくようにポリゴンの左上頂点のX座標	(width:テクスチャの調整後の幅)
+#define TEXTURE_CENTER_Y(height)		((SCREEN_HEIGHT - (height)) / 2.0f)				// 画面の縦方向の真中におくようにポリゴンの左上頂点のY座標	(height:テクスチャの調整後の高さ)
 
 
 #define	NUM_VERTEX		(4)		// 頂点数
@@ -57,20 +57,25 @@
 
 #define	FPS	(60)
 
-#define	FIRST_SCENE		(SCENE_TITLE)		//最初の画面
+#define	FIRST_SCENE		(SCENE_GAME)		//最初の画面
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 
 HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vec, float width, float height);
-HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int num);
+
+HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numPlace,
+											D3DXVECTOR3 numPos, float numWidth, float numHeight, float numInterval,
+											D3DXVECTOR3 framePos, float frameWidth, float frameHeight,
+											D3DCOLOR diffuse = D3DCOLOR_RGBA(255, 255, 255, 255));
 
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index = 0);
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index = 0);
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height, int index = 0);
 
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
 
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
@@ -97,7 +102,7 @@ enum SCENE
 	SCENE_MAX				// デフォルト値(なにもない状態、SetScene()を使わないとダメ)
 };
 
-enum OBJECT
+enum OBJECT		//
 {
 	OBJECT_PLAYER,
 	OBJECT_ENEMY,

@@ -533,7 +533,7 @@ void UpdatePlayer(void)
 
 		g_animeState = 0;//運動状態をリセット
 
-		if((IsClockOver() == 0) && (g_player.state != FROZEN))
+		if((IsTimeEnd() == 0) && (g_player.state != FROZEN))
 		{//移動
 			if (GetKeyboardPress(DIK_A) || IsButtonPress(0, BUTTON_LEFT) || IsButtonPress(0, BUTTON_LSTICK_LEFT))
 			{
@@ -770,7 +770,7 @@ void UpdatePlayer(void)
 #ifdef _DEBUG
 	if (0)
 	{
-		if ((IsClockOver() == 0) && (g_player.state != FROZEN))
+		if ((IsTimeEnd() == 0) && (g_player.state != FROZEN))
 		{
 			if (GetKeyboardTrigger(DIK_SPACE))
 			{
@@ -874,7 +874,7 @@ void UpdatePlayer(void)
 						else if(pItem->nType == ITEMTYPE_COIN)
 						{
 							// スコア加算
-							ChangeScore2(100);
+							ChangeScore(OBJECT_PLAYER, 100);
 
 							// SE再生
 							PlaySound(SOUND_LABEL_SE_COIN);
@@ -890,7 +890,7 @@ void UpdatePlayer(void)
 	}
 
 
-	if ((IsClockOver() == 0) && (g_player.state != FROZEN))
+	if ((IsTimeEnd() == 0) && (g_player.state != FROZEN))
 	{
 		if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTrigger(0, BUTTON_CIRCLE))
 		{//凍結アイテムを使う

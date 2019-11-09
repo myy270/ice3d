@@ -440,7 +440,7 @@ void UpdateEnemy(void)
 		g_animeState = 0;//運動状態をリセット
 
 
-		if ((IsClockOver() == 0) && (g_enemy.state != FROZEN))
+		if ((IsTimeEnd() == 0) && (g_enemy.state != FROZEN))
 		{//移動
 			if (g_ai ? g_left : GetKeyboardPress(DIK_LEFT) || IsButtonPress(1, BUTTON_LEFT) || IsButtonPress(1, BUTTON_LSTICK_LEFT))
 			{
@@ -586,7 +586,7 @@ void UpdateEnemy(void)
 #ifdef _DEBUG
 	if (0)
 	{
-		if ((IsClockOver() == 0) && (g_enemy.state != FROZEN))
+		if ((IsTimeEnd() == 0) && (g_enemy.state != FROZEN))
 		{
 			if (GetKeyboardTrigger(DIK_NUMPAD1))
 			{
@@ -690,7 +690,7 @@ void UpdateEnemy(void)
 						else if (pItem->nType == ITEMTYPE_COIN)
 						{
 							// スコア加算
-							ChangeScore(100);
+							ChangeScore(OBJECT_ENEMY, 100);
 
 							// SE再生
 							PlaySound(SOUND_LABEL_SE_COIN);
@@ -705,7 +705,7 @@ void UpdateEnemy(void)
 	}
 
 
-	if ((IsClockOver() == 0) && (g_enemy.state != FROZEN))
+	if ((IsTimeEnd() == 0) && (g_enemy.state != FROZEN))
 	{//凍結アイテムを使う
 		if (g_ai)
 		{

@@ -13,14 +13,14 @@
 // プロトタイプ宣言
 //*****************************************************************************
 
-HRESULT InitTimer(int second);
+HRESULT InitTimer(int second = 999);
 void UninitTimer(void);
 void UpdateTimer(void);
 void DrawTimer(void);
 
 void SetEnableTimer(bool b);
-void SetTimer(int second = 999);
+void SetTimer(int second);
 int GetTimer();
-bool IsClockOver();
+bool IsTimeEnd();
 
 #endif
