@@ -13,7 +13,6 @@
 #include "enemy.h"
 #include "shadow.h"
 #include "effect.h"
-#include "explosion.h"
 #include "timer.h"
 #include "score.h"
 #include "item.h"
@@ -106,9 +105,6 @@ HRESULT InitGame(void)
 
 	InitEnemy();
 
-	// 爆発の初期化
-	InitExplosion();
-
 	// エフェクトの初期化
 	InitEffect();
 
@@ -162,9 +158,6 @@ void UninitGame(void)
 
 	UninitEnemy();
 
-	// 爆発の終了処理
-	UninitExplosion();
-
 	// エフェトの終了処理
 	UninitEffect();
 
@@ -205,9 +198,6 @@ void UpdateGame(void)
 	UpdatePlayer();
 
 	UpdateEnemy();
-
-	// 爆発処理の更新
-	UpdateExplosion();
 
 	// エフェクト処理の更新
 	UpdateEffect();
@@ -251,12 +241,6 @@ void DrawGame(void)
 
 	// 壁処理の描画
 	DrawMeshWall();
-
-	// 爆発処理の描画
-	DrawExplosion();
-
-	// ライフ処理の描画
-	//DrawLife();
 
 	// タイマー処理の描画
 	DrawTimer();
