@@ -42,60 +42,9 @@ HRESULT InitGame(void)
 	// カメラの初期化
 	InitCamera();
 
-	// 地面の初期化
-	InitMeshField(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 16, 16, 80.0f, 80.0f);//1280*1280
+	InitMeshField();
 
-	// 壁の初期化 
-
-	//北壁の地面
-	InitMeshWall(D3DXVECTOR3(0.0f, 0.0f, 640.0f), D3DXVECTOR3(D3DX_PI * 0.50f, 0.0f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 48, 16, 80.0f, 80.0f);
-	//南壁の地面
-	InitMeshWall(D3DXVECTOR3(0.0f, 0.0f, -640.0f), D3DXVECTOR3(D3DX_PI * 0.50f, D3DX_PI, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 48, 16, 80.0f, 80.0f);
-	//西壁の地面　反時計回転90度
-	InitMeshWall(D3DXVECTOR3(-640.0f, 0.0f, 0.0f), D3DXVECTOR3(D3DX_PI * 0.50f, 0.0f, D3DX_PI * 0.50f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 16, 16, 80.0f, 80.0f);
-	//東壁の地面　時計回転90度
-	InitMeshWall(D3DXVECTOR3(640.0f, 0.0f, 0.0f), D3DXVECTOR3(D3DX_PI * 0.50f, D3DX_PI * 0.50f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 16, 16, 80.0f, 80.0f);
-
-	//北壁
-	InitMeshWall(D3DXVECTOR3(0.0f, 0.0f, 640.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-	//南壁　時計回転180度
-	InitMeshWall(D3DXVECTOR3(0.0f, 0.0f, -640.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-	//西壁　反時計回転90度
-	InitMeshWall(D3DXVECTOR3(-640.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -D3DX_PI * 0.50f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-	//東壁　時計回転90度
-	InitMeshWall(D3DXVECTOR3(640.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.50f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-
-
-	//北壁の屋上
-	InitMeshWall(D3DXVECTOR3(0.0f, 160.0f, 640.0f), D3DXVECTOR3(D3DX_PI * 0.50f, 0.0f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), 48, 16, 80.0f, 80.0f);
-	////南壁の屋上
-	InitMeshWall(D3DXVECTOR3(0.0f, 160.0f, -640.0f), D3DXVECTOR3(D3DX_PI * 0.50f, D3DX_PI, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), 48, 16, 80.0f, 80.0f);
-	////西壁の屋上　反時計回転90度
-	InitMeshWall(D3DXVECTOR3(-640.0f, 160.0f, 0.0f), D3DXVECTOR3(D3DX_PI * 0.50f, 0.0f, D3DX_PI * 0.50f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), 16, 16, 80.0f, 80.0f);
-	////東壁の屋上　時計回転90度
-	InitMeshWall(D3DXVECTOR3(640.0f, 160.0f, 0.0f), D3DXVECTOR3(D3DX_PI * 0.50f, D3DX_PI * 0.50f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), 16, 16, 80.0f, 80.0f);
-
-	//壁(裏側用)
-	InitMeshWall(D3DXVECTOR3(0.0f, 0.0f, 640.0f), D3DXVECTOR3(0.0f, D3DX_PI, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(D3DXVECTOR3(-640.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, D3DX_PI * 0.50f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(D3DXVECTOR3(640.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -D3DX_PI * 0.50f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(D3DXVECTOR3(0.0f, 0.0f, -640.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-									D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
+	InitMeshWall();
 
 	// 影の初期化
 	InitShadow();

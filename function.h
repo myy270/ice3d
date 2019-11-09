@@ -60,6 +60,16 @@
 #define	FIRST_SCENE		(SCENE_GAME)		//最初の画面
 
 //*****************************************************************************
+// 列挙型定義
+//*****************************************************************************
+enum MAPPINGTYPE
+{
+	MAPPINGTYPE_ONE,			// テクスチャーを一枚に描画する
+	MAPPINGTYPE_ALL,			// テクスチャーを重複に描画する
+
+};
+
+//*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 
@@ -70,6 +80,12 @@ HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& v
 											D3DXVECTOR3 framePos, float frameWidth, float frameHeight,
 											D3DCOLOR diffuse = D3DCOLOR_RGBA(255, 255, 255, 255));
 
+HRESULT MakeVertexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numVertex,
+														int numBlockH, int numBlockV,
+														float blockSizeH, float blockSizeV, D3DCOLOR col, MAPPINGTYPE type);
+
+HRESULT MakeIndexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DINDEXBUFFER9& idxBuff, int numIndex, int numBlockX, int numBlockZ);
+
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index = 0);
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
 void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index = 0);
@@ -79,6 +95,10 @@ void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
 
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
+
+void DrawPolygonMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DINDEXBUFFER9 idxBuff,
+														D3DXVECTOR3 pos, D3DXVECTOR3 rot, LPDIRECT3DTEXTURE9 tex,
+														int numVertex, int numPolygon);
 
 //*****************************************************************************
 // 列挙型定義
@@ -95,7 +115,7 @@ enum FADETYPE
 
 // ゲーム画面
 enum SCENE
-{				
+{
 	SCENE_TITLE,			// タイトル画面
 	SCENE_GAME,				// ゲーム画面
 	SCENE_RESULT,			// リザルト画面
@@ -153,6 +173,7 @@ enum ITEMTYPE
 
 	ITEMTYPE_MAX
 };
+
 
 //*****************************************************************************
 // 構造体定義

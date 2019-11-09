@@ -6,7 +6,6 @@
 //=============================================================================
 #include "function.h"
 
-
 //=============================================================================
 // 頂点の作成
 //=============================================================================
@@ -93,13 +92,141 @@ HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& v
 			// 反射光の設定
 			SetVtxData(vtxBuff, diffuse, nCntPlace);
 
-
 		}
 	}
 
 	return S_OK;
 }
 
+//=============================================================================
+// メッシュフィールドの頂点バッファの作成
+// numVertex: 頂点の数、
+// numBlockH：横方向のブロックの数、numBlockV:縦方向のブロックの数
+// blockSizeH:横方向のブロックのサイズ、blockSizeV:縦方向のブロックのサイズ
+// type:テクスチャ―の貼り方
+//=============================================================================
+HRESULT MakeVertexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff,int numVertex,
+												int numBlockH, int numBlockV,
+												float blockSizeH, float blockSizeV, D3DCOLOR col, MAPPINGTYPE type)
+{
+	// オブジェクトの頂点バッファを生成
+	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * numVertex,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+		D3DUSAGE_WRITEONLY,					// 頂点バッファの使用法　
+		FVF_VERTEX_3D,						// 使用する頂点フォーマット
+		D3DPOOL_MANAGED,					// リソースのバッファを保持するメモリクラスを指定
+		&vtxBuff,							// 頂点バッファインターフェースへのポインタ
+		NULL)))								// NULLに設定
+	{
+		return E_FAIL;
+	}
+
+	float texSizeH;		//横テクスチャ―座標
+	float texSizeV;		//縦テクスチャ―座標
+
+	// テクスチャ―座標
+	if (type == MAPPINGTYPE_ONE)
+	{//テクスチャーを一枚に描画する場合
+		texSizeH = 1.0f / numBlockH;
+		texSizeV = 1.0f / numBlockV;
+
+	}
+	else if(type == MAPPINGTYPE_ALL)
+	{//テクスチャーを重複に描画する場合
+		texSizeH = 1.0f;
+		texSizeV = 1.0f;
+	}
+
+	{//頂点バッファの中身を埋める
+		VERTEX_3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		for (int i = 0; i < (numBlockV + 1); i++)
+		{
+			for (int j = 0; j < (numBlockH + 1); j++)
+			{
+				int idx = i * (numBlockH + 1) + j;
+
+				// 頂点座標の設定　初期位置はXOZ平面
+				pVtx[idx].vtx.x = -(numBlockH / 2.0f) * blockSizeH + j * blockSizeH;
+				pVtx[idx].vtx.y = 0.0f;
+				pVtx[idx].vtx.z = (numBlockV / 2.0f) * blockSizeV - i * blockSizeV;
+
+				// 法線の設定	ノーマルは上にさす
+				pVtx[idx].nor = D3DXVECTOR3(0.0f, 1.0, 0.0f);
+
+				// 反射光の設定
+				pVtx[idx].diffuse = col;
+
+				// テクスチャ座標の設定
+				pVtx[idx].tex.x = texSizeH * j;
+				pVtx[idx].tex.y = texSizeV * i;
+			}
+		}
+
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+	}
+
+	return S_OK;
+}
+
+
+//=============================================================================
+// メッシュフィールドのインデックスバッファの作成
+// numIndex: インデックスの数、
+// numBlockH：横方向のブロックの数、numBlockV:縦方向のブロックの数
+//=============================================================================
+HRESULT MakeIndexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DINDEXBUFFER9& idxBuff, int numIndex,int numBlockH, int numBlockV)
+{
+	// オブジェクトのインデックスバッファを生成
+	if (FAILED(pDevice->CreateIndexBuffer(sizeof(WORD) * numIndex,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+		D3DUSAGE_WRITEONLY,					// 頂点バッファの使用法　
+		D3DFMT_INDEX16,						// 使用するインデックスフォーマット
+		D3DPOOL_MANAGED,					// リソースのバッファを保持するメモリクラスを指定
+		&idxBuff,							// インデックスバッファインターフェースへのポインタ
+		NULL)))								// NULLに設定
+	{
+		return E_FAIL;
+	}
+
+	{//インデックスバッファの中身を埋める
+		WORD *pIdx;
+
+		// インデックスデータの範囲をロックし、インデックスバッファへのポインタを取得
+		idxBuff->Lock(0, 0, (void**)&pIdx, 0);
+
+		int nCntIdx = 0;
+		for (int i = 0; i < numBlockV; i++)
+		{//ここで、頂点描画の順番がわかるようになる
+			if (i > 0)//最初の循環だけ、実行しない
+			{// 縮退ポリゴンのためのダブりの設定
+				pIdx[nCntIdx] = (i + 1) * (numBlockH + 1);
+				nCntIdx++;
+			}
+
+			for (int nCntVtxX = 0; nCntVtxX < (numBlockH + 1); nCntVtxX++)
+			{
+				pIdx[nCntIdx] = (i + 1) * (numBlockH + 1) + nCntVtxX;
+				nCntIdx++;
+				pIdx[nCntIdx] = i * (numBlockH + 1) + nCntVtxX;
+				nCntIdx++;
+			}
+
+			if (i < (numBlockV - 1))//最後の循環だけ、実行しない
+			{// 縮退ポリゴンのためのダブりの設定
+				pIdx[nCntIdx] = i * (numBlockH + 1) + numBlockH;
+				nCntIdx++;
+			}
+		}
+
+		// インデックスデータをアンロックする
+		idxBuff->Unlock();
+	}
+
+	return S_OK;
+}
 
 //=============================================================================
 // 頂点の座標をセット
@@ -259,3 +386,46 @@ void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPD
 	}
 
 }
+
+//=============================================================================
+//　メッシュを描画する
+//  pos:ポリゴン表示位置の中心座標、rot:ポリゴンの回転量
+//  numVertex:頂点数	numPolygon:ポリゴン数
+//=============================================================================
+void DrawPolygonMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DINDEXBUFFER9 idxBuff, 
+															D3DXVECTOR3 pos, D3DXVECTOR3 rot,LPDIRECT3DTEXTURE9 tex,
+															int numVertex, int numPolygon)
+{
+	D3DXMATRIX mtxRot, mtxTranslate, mtxWorldField;
+
+	// ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&mtxWorldField);
+
+	// 回転を反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, rot.y, rot.x, rot.z);
+	D3DXMatrixMultiply(&mtxWorldField, &mtxWorldField, &mtxRot);
+
+	// 移動を反映
+	D3DXMatrixTranslation(&mtxTranslate, pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply(&mtxWorldField, &mtxWorldField, &mtxTranslate);
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &mtxWorldField);
+
+	// 頂点バッファをレンダリングパイプラインに設定
+	pDevice->SetStreamSource(0, vtxBuff, 0, sizeof(VERTEX_3D));
+
+	// インデックスバッファをレンダリングパイプラインに設定 indicesはindexの複数
+	pDevice->SetIndices(idxBuff);
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_3D);
+
+	// テクスチャの設定
+	pDevice->SetTexture(0, tex);
+
+	// ポリゴンの描画
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, numVertex, 0, numPolygon);
+
+}
+
