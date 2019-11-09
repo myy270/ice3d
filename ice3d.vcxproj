@@ -121,7 +121,6 @@
     <ClCompile Include="dx.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="enemy.cpp" />
-    <ClCompile Include="explosion.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="fps.cpp" />
     <ClCompile Include="function.cpp" />
@@ -148,7 +147,6 @@
     <ClInclude Include="dx.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="enemy.h" />
-    <ClInclude Include="explosion.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="fps.h" />
     <ClInclude Include="function.h" />

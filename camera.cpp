@@ -53,7 +53,7 @@ float g_chaseHightP;// 追跡時の視点の高さ
 
 CAMERA_MODE g_cameraMode;
 
-PLAY_MODE g_playMode;
+PLAY_MODE g_playMode;		//title.cppに置くほうがいいじゃないの
 
 bool g_cutScene;//カットシーンかどうか
 
@@ -213,8 +213,8 @@ void UpdateCamera(void)
 		g_posCameraR.y = posPlayer.y;
 		g_posCameraR.z = posPlayer.z;
 
-		if (GetWinner() == OBJECT_ENEMY)
-		{
+		if ((GetWinner() == OBJECT_ENEMY) && (GetPlayMode() == PLAY_MODE_DOUBLE))
+		{//敵に注目する
 			// 視点の目的位置
 			g_posCameraP.x = GetPositionEnemy().x - sinf(g_rotCamera.y) * g_fLengthIntervalCamera;
 			g_posCameraP.y = GetPositionEnemy().y + g_chaseHightP;
@@ -354,7 +354,9 @@ bool GetCutScene()
 	return g_cutScene;
 }
 
-
+//=============================================================================
+// カメラがズームする
+//=============================================================================
 void WinScene()
 {//カットシーン
 	if (!g_cutScene)

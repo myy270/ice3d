@@ -75,13 +75,14 @@ HRESULT InitScore(void)
 	MakeVertexNumFrame(pDevice, g_pD3DVtxBuffScore, NUM_PLACE,
 		D3DXVECTOR3(NUM_POS_X, NUM_POS_Y, 0.0f), NUM_WIDTH, NUM_HEIGHT, NUM_INTERVAL,
 		D3DXVECTOR3(FRAME_POS_X, FRAME_POS_Y, 0.0f), FRAME_WIDTH, FRAME_HEIGHT,
-		D3DCOLOR_RGBA(255, 170, 192, 255));	//ピンク
+		D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f));	//オレンジ
 
 	// 右スコアの　頂点情報の作成
 	MakeVertexNumFrame(pDevice, g_pD3DVtxBuffScore2, NUM_PLACE,
 		D3DXVECTOR3(NUM_POS_X2, NUM_POS_Y, 0.0f), NUM_WIDTH, NUM_HEIGHT, NUM_INTERVAL,
 		D3DXVECTOR3(FRAME_POS_X2, FRAME_POS_Y, 0.0f), FRAME_WIDTH, FRAME_HEIGHT,
-		D3DXCOLOR(1.0f, 0.7f, 0.0f, 1.0f));	//オレンジ
+		D3DCOLOR_RGBA(255, 170, 192, 255));	//ピンク
+		
 
 
 	// テクスチャの読み込み
@@ -174,20 +175,21 @@ void CompareScore()
 {
 	if (g_score >= g_score2)
 	{//プレイヤー勝つ場合
-
-		WinScene();//カットシーンする
-		g_winner = OBJECT_PLAYER;
+		g_winner = OBJECT_PLAYER;		
 	}
 	else
 	{//プレイヤー負ける場合
-
-		if (GetPlayMode() == PLAY_MODE_DOUBLE)
-		{//二人プレイの場合、2pにカットシーン
-			WinScene();//カットシーンする
-			g_winner = OBJECT_ENEMY;
-		}
+		g_winner = OBJECT_ENEMY;
 	}
 
+	if ((GetPlayMode() == PLAY_MODE_SINGLE) && (g_winner == OBJECT_ENEMY))
+	{
+		//AIが勝つ場合、ズームしない
+	}
+	else
+	{
+		WinScene();		//1pか2pが勝つ場合、ズームする
+	}
 }
 
 //=============================================================================
@@ -196,5 +198,4 @@ void CompareScore()
 OBJECT GetWinner()
 {
 	return g_winner;
-
 }
