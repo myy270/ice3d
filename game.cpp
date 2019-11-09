@@ -12,10 +12,8 @@
 #include "player.h"
 #include "enemy.h"
 #include "shadow.h"
-#include "bullet.h"
 #include "effect.h"
 #include "explosion.h"
-#include "life.h"
 #include "timer.h"
 #include "score.h"
 #include "item.h"
@@ -108,17 +106,11 @@ HRESULT InitGame(void)
 
 	InitEnemy();
 
-	// 弾の初期化
-	InitBullet();
-
 	// 爆発の初期化
 	InitExplosion();
 
 	// エフェクトの初期化
 	InitEffect();
-
-	// ライフの初期化
-	InitLife();
 
 	// タイマーの初期化
 	InitTimer(50);
@@ -170,17 +162,11 @@ void UninitGame(void)
 
 	UninitEnemy();
 
-	// 弾の終了処理
-	UninitBullet();
-
 	// 爆発の終了処理
 	UninitExplosion();
 
 	// エフェトの終了処理
 	UninitEffect();
-
-	// ライフの終了処理
-	UninitLife();
 
 	// タイマーの終了処理
 	UninitTimer();
@@ -220,17 +206,11 @@ void UpdateGame(void)
 
 	UpdateEnemy();
 
-	// 弾処理の更新
-	UpdateBullet();
-
 	// 爆発処理の更新
 	UpdateExplosion();
 
 	// エフェクト処理の更新
 	UpdateEffect();
-
-	// ライフ処理の更新
-	UpdateLife();
 
 	// タイマー処理の更新
 	UpdateTimer();
@@ -265,9 +245,6 @@ void DrawGame(void)
 
 	// アイテム処理の描画
 	DrawItem();
-
-	// 弾処理の描画
-	DrawBullet();
 
 	// エフェクト処理の描画
 	DrawEffect();

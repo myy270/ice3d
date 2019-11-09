@@ -12,7 +12,6 @@
 #include "camera.h"
 #include "input.h"
 #include "shadow.h"
-#include "bullet.h"
 #include "effect.h"
 #include "item.h"
 #include "score.h"
@@ -765,37 +764,6 @@ void UpdatePlayer(void)
 	}
 
 	}//switch end
-
-// 弾発射
-#ifdef _DEBUG
-	if (0)
-	{
-		if ((IsTimeEnd() == 0) && (g_player.state != FROZEN))
-		{
-			if (GetKeyboardTrigger(DIK_SPACE))
-			{
-				D3DXVECTOR3 pos;
-				D3DXVECTOR3 move;
-
-				//体を基準に
-				pos.x = g_player.part[0].srt.pos.x - sinf(g_player.part[0].srt.rot.y) * g_player.fRadius;//飛行機頭部の辺りに設定
-				pos.y = g_player.part[0].srt.pos.y;
-				pos.z = g_player.part[0].srt.pos.z - cosf(g_player.part[0].srt.rot.y) * g_player.fRadius;
-
-				//回転角度がプラスの時、時計回り
-				//sinf、cosfの符号がちょうど移動量の符号と相反する、だから-sinf、-cosf
-				move.x = -sinf(g_player.part[0].srt.rot.y) * VALUE_MOVE_BULLET;//体を基準に
-				move.y = 0.0f;
-				move.z = -cosf(g_player.part[0].srt.rot.y) * VALUE_MOVE_BULLET;
-
-				SetBullet(pos, move, 4.0f, 4.0f, 60 * 4);
-
-				// SE再生
-				PlaySound(SOUND_LABEL_SE_SHOT);
-			}
-		}
-	}
-#endif
 
 	// 影の位置設定
 	{//体を基準に
