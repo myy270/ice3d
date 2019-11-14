@@ -27,11 +27,11 @@ HRESULT InitLight(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	SetDirectionalLight(pDevice, g_aLight[0], 0, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f),	D3DXVECTOR3(0.20f, -0.60f, 0.80f));		//右下後に指す
+	SetDirectionalLight(pDevice, g_aLight[0], 0, D3DXCOLOR(0.60f, 0.60f, 0.60f, 1.0f),	D3DXVECTOR3(0.20f, -0.60f, 0.80f));		//右下後に指す
 
-	SetDirectionalLight(pDevice, g_aLight[1], 1, D3DXCOLOR(0.75f, 0.75f, 0.75f, 1.0f), D3DXVECTOR3(-0.20f, 1.00f, -0.50f));	//左上前に指す
+	SetDirectionalLight(pDevice, g_aLight[1], 1, D3DXCOLOR(0.75f, 0.75f, 0.75f, 1.0f), D3DXVECTOR3(-0.20f, 1.00f, -0.50f));		//左上前に指す
 
-	SetDirectionalLight(pDevice, g_aLight[2], 2, D3DXCOLOR(0.25f, 0.25f, 0.25f, 1.0f), D3DXVECTOR3(0.80f, 0.10f, 0.50f));	//右上後に指す
+	SetDirectionalLight(pDevice, g_aLight[2], 2, D3DXCOLOR(0.25f, 0.25f, 0.25f, 1.0f), D3DXVECTOR3(0.80f, 0.10f, 0.50f));		//右上後に指す
 
 	// ライティングモード
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);

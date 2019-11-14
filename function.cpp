@@ -6,6 +6,190 @@
 //=============================================================================
 #include "function.h"
 
+//*****************************************************************************
+// グローバル変数
+//*****************************************************************************
+
+//歩くモーションのデータ
+KEY g_motionWalk[] =
+{
+	{
+		15,
+		{
+			{// part 0
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
+			},
+
+			{// part 1
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,6.5000f,0.0000f),//T
+			},
+
+			{// part 2
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 3
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,3.1416f,0.0000f),//R
+				D3DXVECTOR3(-5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 4
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+			{// part 5
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(-3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+		}
+	},///////////////////////////////////////////////////////////////////////////////////
+
+	{
+		30,
+		{
+			{// part 0
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
+				D3DXVECTOR3(-0.0385f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
+			},
+
+			{// part 1
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,6.5000f,0.0000f),//T
+			},
+
+			{// part 2
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(1.4923f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 3
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.7069f,3.1416f,0.0000f),//R
+				D3DXVECTOR3(-5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 4
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(-1.0854f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+			{// part 5
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.9425f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(-3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+		}
+	},///////////////////////////////////////////////////////////////////////////////////
+
+	{
+		30,
+		{
+			{// part 0
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
+				D3DXVECTOR3(-0.0385f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
+			},
+
+			{// part 1
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,6.5000f,0.0000f),//T
+			},
+
+			{// part 2
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(-0.8639f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 3
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(-1.0996f,3.1416f,0.0000f),//R
+				D3DXVECTOR3(-5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 4
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.9425f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+			{// part 5
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(-1.0854f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(-3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+		}
+	},///////////////////////////////////////////////////////////////////////////////////
+
+	{
+		30,
+		{
+			{// part 0
+				D3DXVECTOR3(1.5000f,1.5000f,1.5000f),//S
+				D3DXVECTOR3(-0.0385f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,22.4000f,0.0000f),//T
+			},
+
+			{// part 1
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.0000f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(0.0000f,6.5000f,0.0000f),//T
+			},
+
+			{// part 2
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(1.4923f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 3
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.7069f,3.1416f,0.0000f),//R
+				D3DXVECTOR3(-5.0000f,5.0000f,0.0000f),//T
+			},
+
+			{// part 4
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(-1.0854f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+			{// part 5
+				D3DXVECTOR3(1.0000f,1.0000f,1.0000f),//S
+				D3DXVECTOR3(0.9425f,0.0000f,0.0000f),//R
+				D3DXVECTOR3(-3.0640f,-4.8730f,-0.4090f),//T
+			},
+
+		}
+	},///////////////////////////////////////////////////////////////////////////////////
+
+};
+
+
+//*****************************************************************************
+// プロトタイプ宣言
+//*****************************************************************************
+void Interpolation(int partNum, PART *part, const SRT *srt1, const SRT *srt2, float rate);
+void Interpolation(int partNum, PART *part, const SRT *srt2, float rate);
+
 //=============================================================================
 // 頂点の作成
 //=============================================================================
@@ -429,3 +613,236 @@ void DrawPolygonMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff,
 
 }
 
+//=============================================================================
+// 回転量の調整
+// 効果：回転量が（-Pi,Pi）の範囲になる
+// radian:ラジアン単位
+//=============================================================================
+void LimitRot(float& radian)
+{
+	while (1)
+	{
+		if (radian > D3DX_PI)
+		{
+			radian -= D3DX_PI * 2.0f;
+		}
+		else if (radian < -D3DX_PI)
+		{
+			radian += D3DX_PI * 2.0f;
+		}
+		else
+		{
+			break;
+		}
+	}
+}
+
+//=============================================================================
+// モーションデータをゲット
+//=============================================================================
+KEY* GetMotionWalk()
+{
+	return g_motionWalk;
+}
+
+//=============================================================================
+// モーションする処理
+// user:使用者
+// motion:MOTION構造体の情報
+//=============================================================================
+void Motion(PLAYER& user,MOTION& motion)
+{
+	int i = (int)motion.motionTime;  //現在のキーフレームナンバー
+
+	//loopできるように
+	if (i > motion.numKey - 2)//最大キーフレームナンバーを超えたら
+	{
+		motion.motionTime = 1.0f;
+		i = (int)motion.motionTime;	
+	}
+
+	float dt = 1.0f / motion.motionData[i].frame;//補間の間隔時間
+
+	motion.motionTime += dt;
+
+	if (motion.motionTime > motion.numKey - 1.0f)//最大時間を超えたら
+	{
+		motion.motionTime = motion.numKey - 1.0f;//最大時間にする
+	}
+
+	if (motion.motionTime - i > 1.0f) //誤差を修正　想定の1.0を超えたら
+	{
+		i++;//次のキーフレームに入る
+	}
+
+	if (motion.use == false)
+	{//モーションしていない場合、途中のモーションからデフォルト状態に戻る
+		motion.motionTime = 0.0f;	//リセット
+		i = (int)motion.motionTime;	//重要
+
+		if (user.state != FROZEN)
+		{
+			motion.cancelTime += dt;//0番キーフレームのtimeを使う
+		}
+
+		if (motion.cancelTime > 1.0f)//最大時間を超えたら
+		{
+			motion.cancelTime = 1.0f;//最大最大時間にする
+		}
+
+		Interpolation(PART_MAX_PLAYER - 1, &user.part[0], motion.motionData[i].srtWork, motion.cancelTime);
+
+	}
+	else
+	{//モーションしている場合
+		motion.cancelTime = 0.0f;	//リセット
+
+		Interpolation(PART_MAX_PLAYER - 1, &user.part[0], motion.motionData[i].srtWork, motion.motionData[i + 1].srtWork, motion.motionTime - i);
+
+	}
+
+}
+
+
+//=============================================================================
+// 補間処理
+// partNum:パーツの数
+// part:出力する先の0番目のパーツ
+// srt1:始点のsrt
+// srt2:終点のsrt
+// rate:始点から終点までの比率	(0～1.0)
+//=============================================================================
+void Interpolation(int partNum, PART *part, const SRT *srt1, const SRT *srt2, float rate)
+{
+	for (int j = 0; j < partNum; j++)//パーツ番号
+	{
+		//// Scale
+		//part[j].srt.scl.x = srt1[j].scl.x + (srt2[j].scl.x - srt1[j].scl.x) * rate;
+
+		//part[j].srt.scl.y = srt1[j].scl.y + (srt2[j].scl.y - srt1[j].scl.y) * rate;
+
+		//part[j].srt.scl.z = srt1[j].scl.z + (srt2[j].scl.z - srt1[j].scl.z) * rate;
+
+		// Rotation
+		part[j].srt.rot.x = srt1[j].rot.x + (srt2[j].rot.x - srt1[j].rot.x) * rate;
+
+		//part[j].srt.rot.y = srt1[j].rot.y + (srt2[j].rot.y - srt1[j].rot.y) * rate;							
+
+		//part[j].srt.rot.z = srt1[j].rot.z + (srt2[j].rot.z - srt1[j].rot.z) * rate;							
+
+		// Position
+		//part[j].srt.pos.x = srt1[j].pos.x + (srt2[j].pos.x - srt1[j].pos.x) * rate;							
+
+		//part[j].srt.pos.y = srt1[j].pos.y + (srt2[j].pos.y - srt1[j].pos.y) * rate;							
+
+		//part[j].srt.pos.z = srt1[j].pos.z + (srt2[j].pos.z - srt1[j].pos.z) * rate;							
+	}
+
+}
+
+
+//=============================================================================
+// 補間処理		(出力する先のデータを始点にする場合)
+// partNum:パーツの数
+// part:出力する先の0番目のパーツ
+// srt2:終点のsrt
+// rate:始点から終点までの比率	(0～1.0)
+//=============================================================================
+void Interpolation(int partNum, PART *part, const SRT *srt2, float rate)
+{
+	for (int j = 0; j < partNum; j++)//パーツ番号
+	{
+		// Scale
+		//part[j].srt.scl.x = part[j].srt.scl.x + (srt2[j].scl.x - part[j].srt.scl.x) * rate;
+
+		//part[j].srt.scl.y = part[j].srt.scl.y + (srt2[j].scl.y - part[j].srt.scl.y) * rate;
+
+		//part[j].srt.scl.z = part[j].srt.scl.z + (srt2[j].scl.z - part[j].srt.scl.z) * rate;
+
+		// Rotation
+		part[j].srt.rot.x = part[j].srt.rot.x + (srt2[j].rot.x - part[j].srt.rot.x) * rate;
+
+		//part[j].srt.rot.y = part[j].srt.rot.y + (srt2[j].rot.y - part[j].srt.rot.y) * rate;							
+
+		//part[j].srt.rot.z = part[j].srt.rot.z + (srt2[j].rot.z - part[j].srt.rot.z) * rate;							
+
+		// Position
+		//part[j].srt.pos.x = part[j].srt.pos.x + (srt2[j].pos.x - part[j].srt.pos.x) * rate;							
+
+		//part[j].srt.pos.y = part[j].srt.pos.y + (srt2[j].pos.y - part[j].srt.pos.y) * rate;							
+
+		//part[j].srt.pos.z = part[j].srt.pos.z + (srt2[j].pos.z - part[j].srt.pos.z) * rate;							
+	}
+}
+
+//=============================================================================
+// 親子関係を持つパーツの描画
+// player:対象
+// pD3DTexture:テクスチャ―
+// numPart:パーツ数
+//=============================================================================
+void DrawPart(LPDIRECT3DDEVICE9 pDevice,PLAYER& player, LPDIRECT3DTEXTURE9 pD3DTexture, int numPart)
+{
+	D3DXMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
+	D3DXMATERIAL *pD3DXMat;			// マテリアル情報に対するポインタ
+
+	D3DMATERIAL9 matDef;			// デフォルトのマテリアル
+	pDevice->GetMaterial(&matDef);	// デフォルトのマテリアルを取得
+
+	for (int i = 0; i < numPart; i++)//パーツ番号
+	{
+		if (player.part[i].use)
+		{
+			// ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&mtxWorld);
+
+			// スケールを反映
+			D3DXMatrixScaling(&mtxScl, player.part[i].srt.scl.x,
+				player.part[i].srt.scl.y,
+				player.part[i].srt.scl.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
+
+			// 回転を反映
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, player.part[i].srt.rot.y,
+				player.part[i].srt.rot.x,
+				player.part[i].srt.rot.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
+
+			// 移動を反映
+			D3DXMatrixTranslation(&mtxTranslate, player.part[i].srt.pos.x,
+				player.part[i].srt.pos.y,
+				player.part[i].srt.pos.z);
+			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
+
+			//親が存在する場合は親のワールドマトリクスを合成
+			if (player.part[i].parent)
+			{
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &player.part[i].parent->mtxWorld);
+			}
+
+			// ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
+
+			//ワールドマトリクスを保存
+			player.part[i].mtxWorld = mtxWorld;
+
+			// マテリアル情報に対するポインタを取得
+			pD3DXMat = (D3DXMATERIAL*)player.part[i].pMatBuff->GetBufferPointer();
+
+			for (int nCntMat = 0; nCntMat < (int)player.part[i].nNumMat; nCntMat++)
+			{
+				// マテリアルの設定
+				pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
+
+				// テクスチャの設定
+				pDevice->SetTexture(0, pD3DTexture);		//※テクスチャ―がなくても必要。そうしないと、この前のテクスチャ―が貼ってしまう
+
+				// 描画
+				player.part[i].pMesh->DrawSubset(nCntMat);
+			}
+		}
+	}
+
+	pDevice->SetMaterial(&matDef);// マテリアルをデフォルトに戻す
+
+}

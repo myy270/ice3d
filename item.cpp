@@ -417,7 +417,9 @@ HRESULT MakeVertexItemLogo(LPDIRECT3DDEVICE9 pDevice)
 	return S_OK;
 }
 
-
+//=============================================================================
+// “€Œ‹ƒAƒCƒeƒ€‚ðŽg‚¤‚Æ‚«‚Ìˆ—
+//=============================================================================
 void Freeze(OBJECT target)
 {
 	if (target == OBJECT_ENEMY)
@@ -427,11 +429,10 @@ void Freeze(OBJECT target)
 			if (GetEnemy()->state == NORMAL)
 			{
 				GetEnemy()->state = FROZEN;
-				GetEnemy()->stateTime = 180;//3•b
+				GetEnemy()->frozenTime = 180;		//3•b
 
 				GetPlayer()->holdItem = ITEMTYPE_COIN;
 			}
-
 		}
 	}
 	else if (target == OBJECT_PLAYER)
@@ -441,14 +442,12 @@ void Freeze(OBJECT target)
 			if (GetPlayer()->state == NORMAL)
 			{
 				GetPlayer()->state = FROZEN;
-				GetPlayer()->stateTime = 180;//3•b
+				GetPlayer()->frozenTime = 180;		//3•b
 
 				GetEnemy()->holdItem = ITEMTYPE_COIN;
 			}
-
 		}
-	}
-	
+	}	
 }
 
 void DropItem()

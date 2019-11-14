@@ -52,53 +52,14 @@
 
 #define SAFE_RELEASE(ptr)		{ if(ptr) { (ptr)->Release(); (ptr) = NULL; } }		//オブジェクトの解放
 
-#define PART_MAX		(7)		// プレイヤーパーツ数
-#define PART_MAX_ENEMY	(7)		// 敵パーツの数
+#define PART_MAX_PLAYER		(7)		// プレイヤーパーツの数(アイスブロックを含む)
+#define PART_MAX_ENEMY		(7)		// 敵パーツの数
+
+#define PART_MAX			(64)		// パーツの上限
 
 #define	FPS	(60)
 
 #define	FIRST_SCENE		(SCENE_GAME)		//最初の画面
-
-//*****************************************************************************
-// 列挙型定義
-//*****************************************************************************
-enum MAPPINGTYPE
-{
-	MAPPINGTYPE_ONE,			// テクスチャーを一枚に描画する
-	MAPPINGTYPE_ALL,			// テクスチャーを重複に描画する
-
-};
-
-//*****************************************************************************
-// プロトタイプ宣言
-//*****************************************************************************
-
-HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vec, float width, float height);
-
-HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numPlace,
-											D3DXVECTOR3 numPos, float numWidth, float numHeight, float numInterval,
-											D3DXVECTOR3 framePos, float frameWidth, float frameHeight,
-											D3DCOLOR diffuse = D3DCOLOR_RGBA(255, 255, 255, 255));
-
-HRESULT MakeVertexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numVertex,
-														int numBlockH, int numBlockV,
-														float blockSizeH, float blockSizeV, D3DCOLOR col, MAPPINGTYPE type);
-
-HRESULT MakeIndexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DINDEXBUFFER9& idxBuff, int numIndex, int numBlockX, int numBlockZ);
-
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index = 0);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index = 0);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height, int index = 0);
-
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
-
-void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
-void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
-
-void DrawPolygonMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DINDEXBUFFER9 idxBuff,
-														D3DXVECTOR3 pos, D3DXVECTOR3 rot, LPDIRECT3DTEXTURE9 tex,
-														int numVertex, int numPolygon);
 
 //*****************************************************************************
 // 列挙型定義
@@ -143,37 +104,27 @@ enum PLAY_MODE
 	PLAY_MODE_MAX
 };
 
-enum STATE
+enum STATE			//異常状態を記録
 {
-	NORMAL,
-	FROZEN,
+	NORMAL,			//異常状態無し
+	FROZEN,			//凍結状態
 	STATE_MAX
-};
-
-enum PART_ID
-{
-	BODY,
-	HEAD,
-	HAND,
-	LEG,
-	PART_ID_MAX
-};
-
-enum APPLIMODE
-{
-	MODE_PLAY,
-	MODE_EDIT,
-	APPLIMODE_MAX
 };
 
 enum ITEMTYPE
 {
-	ITEMTYPE_COIN,			// コイン
-	ITEMTYPE_ICEBLOCK,		// アイスブロック
+	ITEMTYPE_COIN,			// コイン	//他のアイテムを持っていない時のデフォルト値
+	ITEMTYPE_ICEBLOCK,		// 凍結アイテム(アイスブロック)
 
 	ITEMTYPE_MAX
 };
 
+enum MAPPINGTYPE
+{
+	MAPPINGTYPE_ONE,			// テクスチャーを一枚に描画する
+	MAPPINGTYPE_ALL,			// テクスチャーを重複に描画する
+
+};
 
 //*****************************************************************************
 // 構造体定義
@@ -204,42 +155,92 @@ struct SRT
 	D3DXVECTOR3 pos;		// 現在の位置
 };
 
-//キーフレームの定義
+//キーフレーム
 struct KEY
 {
-	int			frame;			//このキーフレームの総フレーム数
-	SRT			key[PART_MAX];	//キーフレームのデータ
+	int			frame;					//このキーフレームから次のキーフレームまでの総フレーム数
+	SRT			srtWork[PART_MAX];		//このキーフレームにおいての各パーツのSRT
 };
 
 struct PART
 {
-	char *partFile;							//xファイル情報
+	char *partFile;							// xファイル情報
 	LPD3DXBUFFER		pMatBuff;			// メッシュのマテリアル情報を格納
 	DWORD				nNumMat;			// マテリアル情報の総数
 	LPD3DXMESH			pMesh;				// ID3DXMeshインターフェイスへのポインタ
 
-	SRT			srt;						//Scaling Rotation Translation
+	SRT			srt;						// パーツのsrt
 	D3DXMATRIX	mtxWorld;
 	PART		*parent;
 	bool		use;
 };
 
+//モーション
+struct MOTION
+{
+	const KEY* motionData;		// モーションデータ
+	int numKey;					// モーションデータのキーフレームの数
+	bool use;					// モーションしているかどうか
+	float motionTime;			// モーションしてる時の全体時間
+	float cancelTime;			// モーションしてる途中で中止する時、最初状態に戻る時間
+};
+
 struct PLAYER
 {
+	PART part[PART_MAX_PLAYER];
 	D3DXVECTOR3 move;		// 移動量
 	D3DXVECTOR3 rotDest;	// 目的の向き
 	float fRadius;			// 半径
+
 	int nIdxShadow;			// 影ID
-	PART part[PART_MAX];
+	
+	ITEMTYPE holdItem;		//持っているアイテム
+	STATE state;			//異常状態の情報
+	int frozenTime;			//凍結状態の残り時間
 
-	ITEMTYPE holdItem;
-
-	STATE state;
-	int stateTime;
+	MOTION motion;			//歩くモーション
 };
 
+
+//*****************************************************************************
+// プロトタイプ宣言
+//*****************************************************************************
+
+HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vec, float width, float height);
+
+HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numPlace,
+	D3DXVECTOR3 numPos, float numWidth, float numHeight, float numInterval,
+	D3DXVECTOR3 framePos, float frameWidth, float frameHeight,
+	D3DCOLOR diffuse = D3DCOLOR_RGBA(255, 255, 255, 255));
+
+HRESULT MakeVertexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numVertex,
+	int numBlockH, int numBlockV,
+	float blockSizeH, float blockSizeV, D3DCOLOR col, MAPPINGTYPE type);
+
+HRESULT MakeIndexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DINDEXBUFFER9& idxBuff, int numIndex, int numBlockX, int numBlockZ);
+
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index = 0);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index = 0);
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height, int index = 0);
+
+void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
+
+void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
+void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
+
+void DrawPolygonMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DINDEXBUFFER9 idxBuff,
+	D3DXVECTOR3 pos, D3DXVECTOR3 rot, LPDIRECT3DTEXTURE9 tex,
+	int numVertex, int numPolygon);
+
+void LimitRot(float& radian);
+
+KEY* GetMotionWalk();
+
+void Motion(PLAYER& user, MOTION& motion);
+
+void DrawPart(LPDIRECT3DDEVICE9 pDevice, PLAYER& player, LPDIRECT3DTEXTURE9 pD3DTexture, int numPart);
+
 #endif
-
-
 
 

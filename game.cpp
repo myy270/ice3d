@@ -58,7 +58,7 @@ HRESULT InitGame(void)
 	InitEffect();
 
 	// タイマーの初期化
-	InitTimer(50);
+	InitTimer();		//デフォルト50
 
 	// スコアの初期化
 	InitScore();
@@ -77,7 +77,7 @@ HRESULT InitGame(void)
 	}
 
 	// BGM再生 ちゃんとloopできるにする!　元の罠
-	PlaySound(SOUND_LABEL_BGM000, XAUDIO2_LOOP_INFINITE);
+	//PlaySound(SOUND_LABEL_BGM000, XAUDIO2_LOOP_INFINITE);
 
 	return S_OK;
 }

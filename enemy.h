@@ -27,7 +27,7 @@ struct ENEMY
 	ITEMTYPE holdItem;
 
 	STATE state;
-	int stateTime;
+	int frozenTime;
 };
 
 

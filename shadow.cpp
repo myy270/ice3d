@@ -2,7 +2,7 @@
 //
 // 影処理 [shadow.cpp]
 // Author : 麦英泳
-//
+// ※影の大きさが変更できない
 //=============================================================================
 #include "shadow.h"
 
@@ -10,8 +10,8 @@
 // マクロ定義
 //*****************************************************************************
 #define	TEXTURE_SHADOW		"data/TEXTURE/shadow000.jpg"	// 読み込むテクスチャファイル名
-#define	SHADOW_SIZE_X		(50.0f)							// 弾の幅
-#define	SHADOW_SIZE_Z		(50.0f)							// 弾の高さ
+#define	SHADOW_SIZE_X		(50.0f)							// 影の幅
+#define	SHADOW_SIZE_Z		(50.0f)							// 影の高さ
 
 #define	MAX_SHADOW			(128)							// 影最大数
 

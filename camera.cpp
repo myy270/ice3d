@@ -258,6 +258,12 @@ void UpdateCamera(void)
 
 	PrintDebugProc("\n");
 
+	PrintDebugProc("[camera rotÅF(%f : %f : %f)]\n", g_rotCamera.x,
+		g_rotCamera.y,
+		g_rotCamera.z);
+	
+	PrintDebugProc("\n");
+
 	PrintDebugProc("chaseHightP:%f\n", g_chaseHightP);
 
 	PrintDebugProc("\n");

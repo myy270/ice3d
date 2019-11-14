@@ -2,7 +2,7 @@
 //
 // エネミー処理 [enemy.cpp]
 // Author : 麦英泳
-//
+// ※敵の動きが　カメラが回転すると変になる
 //=============================================================================
 #include "player.h"
 #include "enemy.h"
@@ -34,7 +34,6 @@
 #define	VALUE_ROTATE_ENEMY	(D3DX_PI * 0.025f)			// 回転速度 4.5度
 #define	RATE_ROTATE_ENEMY	(0.10f)						// 回転慣性係数
 
-#define	VALUE_MOVE_BULLET_ENEMY	(7.5f)						// 弾の移動速度
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -375,7 +374,7 @@ HRESULT InitEnemy(void)
 
 	g_enemy.holdItem = ITEMTYPE_COIN;
 	g_enemy.state = NORMAL;
-	g_enemy.stateTime = 0;
+	g_enemy.frozenTime = 0;
 
 #if 0
 	// テクスチャの読み込み
@@ -425,7 +424,7 @@ void UpdateEnemy(void)
 
 	if (g_ai)
 	{
-		AI3();
+		//AI3();
 	}
 	
 
@@ -515,6 +514,8 @@ void UpdateEnemy(void)
 			}
 
 		}
+
+		LimitRot(g_enemy.rotDest.y);	//実際はなくてもいいが、数字がめちゃくちゃになる
 
 		AnimeWalk();
 
@@ -661,7 +662,7 @@ void UpdateEnemy(void)
 							ChangeScore(OBJECT_ENEMY, 100);
 
 							// SE再生
-							PlaySound(SOUND_LABEL_SE_COIN);
+							//PlaySound(SOUND_LABEL_SE_COIN);
 						}
 
 						// アイテム消去
@@ -695,14 +696,14 @@ void UpdateEnemy(void)
 	//凍結状態
 	if (g_enemy.state == FROZEN)
 	{
-		if (g_enemy.stateTime == 0)
+		if (g_enemy.frozenTime == 0)
 		{
 			g_enemy.state = NORMAL;
 			g_enemy.part[6].use = false;
 		}
 		else
 		{
-			g_enemy.stateTime--;
+			g_enemy.frozenTime--;
 			g_enemy.part[6].use = true;
 
 		}
@@ -888,41 +889,41 @@ void AnimeWalk()
 		{//最初状態に戻る
 			// Scale
 			g_enemy.part[j].srt.scl.x = g_enemy.part[j].srt.scl.x +		
-				(g_anime[0].key[j].scl.x - g_enemy.part[j].srt.scl.x)	
+				(g_anime[0].srtWork[j].scl.x - g_enemy.part[j].srt.scl.x)	
 				* g_cancelTime;											
 
 			g_enemy.part[j].srt.scl.y =g_enemy.part[j].srt.scl.y +		
-				(g_anime[0].key[j].scl.y -g_enemy.part[j].srt.scl.y)	
+				(g_anime[0].srtWork[j].scl.y -g_enemy.part[j].srt.scl.y)	
 				* g_cancelTime;											
 
 			g_enemy.part[j].srt.scl.z =g_enemy.part[j].srt.scl.z +		
-				(g_anime[0].key[j].scl.z -g_enemy.part[j].srt.scl.z)	
+				(g_anime[0].srtWork[j].scl.z -g_enemy.part[j].srt.scl.z)	
 				* g_cancelTime;											
 
 			// Rotation
 			g_enemy.part[j].srt.rot.x =g_enemy.part[j].srt.rot.x +		
-				(g_anime[0].key[j].rot.x -g_enemy.part[j].srt.rot.x)	
+				(g_anime[0].srtWork[j].rot.x -g_enemy.part[j].srt.rot.x)	
 				* g_cancelTime;											
 
 			//g_enemy.part[j].srt.rot.y =g_enemy.part[j].srt.rot.y +	
-			//	(g_anime[0].key[j].rot.y -g_enemy.part[j].srt.rot.y)	
+			//	(g_anime[0].srtWork[j].rot.y -g_enemy.part[j].srt.rot.y)	
 			//	* g_cancelTime;											
 
 			g_enemy.part[j].srt.rot.z =g_enemy.part[j].srt.rot.z +		
-				(g_anime[0].key[j].rot.z -g_enemy.part[j].srt.rot.z)	
+				(g_anime[0].srtWork[j].rot.z -g_enemy.part[j].srt.rot.z)	
 				* g_cancelTime;											
 
 			// Position
 			//g_enemy.part[j].srt.pos.x =g_enemy.part[j].srt.pos.x +	
-			//	(g_anime[0].key[j].pos.x -g_enemy.part[j].srt.pos.x)	
+			//	(g_anime[0].srtWork[j].pos.x -g_enemy.part[j].srt.pos.x)	
 			//	* g_cancelTime;											
 
 			//g_enemy.part[j].srt.pos.y =g_enemy.part[j].srt.pos.y +	
-			//	(g_anime[0].key[j].pos.y -g_enemy.part[j].srt.pos.y)	
+			//	(g_anime[0].srtWork[j].pos.y -g_enemy.part[j].srt.pos.y)	
 			//	* g_cancelTime;											
 
 			//g_enemy.part[j].srt.pos.z =g_enemy.part[j].srt.pos.z +	
-			//	(g_anime[0].key[j].pos.z -g_enemy.part[j].srt.pos.z)	
+			//	(g_anime[0].srtWork[j].pos.z -g_enemy.part[j].srt.pos.z)	
 			//	* g_cancelTime;											
 		}
 
@@ -935,42 +936,42 @@ void AnimeWalk()
 		for (int j = 0; j < 6; j++)//パーツ番号
 		{
 			// Scale
-			g_enemy.part[j].srt.scl.x = g_anime[i].key[j].scl.x +				// 前のキーフレーム位置
-				(g_anime[i + 1].key[j].scl.x - g_anime[i].key[j].scl.x)			// 前のキーフレームと次のキーフレームの差分
+			g_enemy.part[j].srt.scl.x = g_anime[i].srtWork[j].scl.x +				// 前のキーフレーム位置
+				(g_anime[i + 1].srtWork[j].scl.x - g_anime[i].srtWork[j].scl.x)			// 前のキーフレームと次のキーフレームの差分
 				* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
-			g_enemy.part[j].srt.scl.y = g_anime[i].key[j].scl.y +				// 前のキーフレーム位置
-				(g_anime[i + 1].key[j].scl.y - g_anime[i].key[j].scl.y)			// 前のキーフレームと次のキーフレームの差分
+			g_enemy.part[j].srt.scl.y = g_anime[i].srtWork[j].scl.y +				// 前のキーフレーム位置
+				(g_anime[i + 1].srtWork[j].scl.y - g_anime[i].srtWork[j].scl.y)			// 前のキーフレームと次のキーフレームの差分
 				* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
-			g_enemy.part[j].srt.scl.z = g_anime[i].key[j].scl.z +				// 前のキーフレーム位置
-				(g_anime[i + 1].key[j].scl.z - g_anime[i].key[j].scl.z)			// 前のキーフレームと次のキーフレームの差分
+			g_enemy.part[j].srt.scl.z = g_anime[i].srtWork[j].scl.z +				// 前のキーフレーム位置
+				(g_anime[i + 1].srtWork[j].scl.z - g_anime[i].srtWork[j].scl.z)			// 前のキーフレームと次のキーフレームの差分
 				* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
 			// Rotation
-			g_enemy.part[j].srt.rot.x = g_anime[i].key[j].rot.x +				// 前のキーフレーム位置
-				(g_anime[i + 1].key[j].rot.x - g_anime[i].key[j].rot.x)			// 前のキーフレームと次のキーフレームの差分
+			g_enemy.part[j].srt.rot.x = g_anime[i].srtWork[j].rot.x +				// 前のキーフレーム位置
+				(g_anime[i + 1].srtWork[j].rot.x - g_anime[i].srtWork[j].rot.x)			// 前のキーフレームと次のキーフレームの差分
 				* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
-			//g_enemy.part[j].srt.rot.y = g_anime[i].key[j].rot.y +				// 前のキーフレーム位置
-			//	(g_anime[i + 1].key[j].rot.y - g_anime[i].key[j].rot.y)			// 前のキーフレームと次のキーフレームの差分
+			//g_enemy.part[j].srt.rot.y = g_anime[i].srtWork[j].rot.y +				// 前のキーフレーム位置
+			//	(g_anime[i + 1].srtWork[j].rot.y - g_anime[i].srtWork[j].rot.y)			// 前のキーフレームと次のキーフレームの差分
 			//	* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
-			g_enemy.part[j].srt.rot.z = g_anime[i].key[j].rot.z +				// 前のキーフレーム位置
-				(g_anime[i + 1].key[j].rot.z - g_anime[i].key[j].rot.z)			// 前のキーフレームと次のキーフレームの差分
+			g_enemy.part[j].srt.rot.z = g_anime[i].srtWork[j].rot.z +				// 前のキーフレーム位置
+				(g_anime[i + 1].srtWork[j].rot.z - g_anime[i].srtWork[j].rot.z)			// 前のキーフレームと次のキーフレームの差分
 				* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
 			// Position
-			//g_enemy.part[j].srt.pos.x = g_anime[i].key[j].pos.x +				// 前のキーフレーム位置
-			//	(g_anime[i + 1].key[j].pos.x - g_anime[i].key[j].pos.x)			// 前のキーフレームと次のキーフレームの差分
+			//g_enemy.part[j].srt.pos.x = g_anime[i].srtWork[j].pos.x +				// 前のキーフレーム位置
+			//	(g_anime[i + 1].srtWork[j].pos.x - g_anime[i].srtWork[j].pos.x)			// 前のキーフレームと次のキーフレームの差分
 			//	* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
-			//g_enemy.part[j].srt.pos.y = g_anime[i].key[j].pos.y +				// 前のキーフレーム位置
-			//	(g_anime[i + 1].key[j].pos.y - g_anime[i].key[j].pos.y)			// 前のキーフレームと次のキーフレームの差分
+			//g_enemy.part[j].srt.pos.y = g_anime[i].srtWork[j].pos.y +				// 前のキーフレーム位置
+			//	(g_anime[i + 1].srtWork[j].pos.y - g_anime[i].srtWork[j].pos.y)			// 前のキーフレームと次のキーフレームの差分
 			//	* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 
-			//g_enemy.part[j].srt.pos.z = g_anime[i].key[j].pos.z +				// 前のキーフレーム位置
-			//	(g_anime[i + 1].key[j].pos.z - g_anime[i].key[j].pos.z)			// 前のキーフレームと次のキーフレームの差分
+			//g_enemy.part[j].srt.pos.z = g_anime[i].srtWork[j].pos.z +				// 前のキーフレーム位置
+			//	(g_anime[i + 1].srtWork[j].pos.z - g_anime[i].srtWork[j].pos.z)			// 前のキーフレームと次のキーフレームの差分
 			//	* (g_motionTime - i);											// に　全体アニメ時間の小数点以下の割合をかける
 		}
 
