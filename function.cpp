@@ -198,8 +198,8 @@ KEY g_motionWalk[] =
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-void Interpolation(int partNum, PART *part, const SRT *srt1, const SRT *srt2, float rate);
-void Interpolation(int partNum, PART *part, const SRT *srt2, float rate);
+void Interpolation(int partNum, XMODEL *part, const SRT *srt1, const SRT *srt2, float rate);
+void Interpolation(int partNum, XMODEL *part, const SRT *srt2, float rate);
 
 //=============================================================================
 // 頂点の作成
@@ -446,8 +446,6 @@ void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, f
 	vtxBuff->Unlock();
 }
 
-
-
 //=============================================================================
 // 頂点のRHWをセット
 // 	index:矩形ポリゴンの番号
@@ -538,7 +536,6 @@ void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff,int numSet, int numPlace)
 	}
 
 }
-
 
 
 //=============================================================================
@@ -722,7 +719,7 @@ void Motion(Character& user,MOTION& motion)
 // srt2:終点のsrt
 // rate:始点から終点までの比率	(0～1.0)
 //=============================================================================
-void Interpolation(int partNum, PART *part, const SRT *srt1, const SRT *srt2, float rate)
+void Interpolation(int partNum, XMODEL *part, const SRT *srt1, const SRT *srt2, float rate)
 {
 	for (int j = 0; j < partNum; j++)//パーツ番号
 	{
@@ -757,7 +754,7 @@ void Interpolation(int partNum, PART *part, const SRT *srt1, const SRT *srt2, fl
 // srt2:終点のsrt
 // rate:始点から終点までの比率	(0～1.0)
 //=============================================================================
-void Interpolation(int partNum, PART *part, const SRT *srt2, float rate)
+void Interpolation(int partNum, XMODEL *part, const SRT *srt2, float rate)
 {
 	for (int j = 0; j < partNum; j++)//パーツ番号
 	{
@@ -785,11 +782,11 @@ void Interpolation(int partNum, PART *part, const SRT *srt2, float rate)
 }
 
 //=============================================================================
-// 親子関係を持つパーツの描画
-// player:対象
-// numPart:パーツ数
+// Xファイルのモデルの描画（親子関係を持つパーツの描画もできる）
+// model:対象モデルのポインタ
+// numPart:モデルの数
 //=============================================================================
-void DrawPart(LPDIRECT3DDEVICE9 pDevice, Character& player, int numPart)
+void DrawXMODEL(LPDIRECT3DDEVICE9 pDevice, XMODEL* model, int numPart)
 {
 	D3DXMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 	D3DXMATERIAL *pD3DXMat;			// マテリアル情報に対するポインタ
@@ -799,45 +796,45 @@ void DrawPart(LPDIRECT3DDEVICE9 pDevice, Character& player, int numPart)
 
 	for (int i = 0; i < numPart; i++)//パーツ番号
 	{
-		if (player.part[i].use)
+		if (model[i].use)
 		{
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&mtxWorld);
 
 			// スケールを反映
-			D3DXMatrixScaling(&mtxScl, player.part[i].srt.scl.x,
-				player.part[i].srt.scl.y,
-				player.part[i].srt.scl.z);
+			D3DXMatrixScaling(&mtxScl, model[i].srt.scl.x,
+				model[i].srt.scl.y,
+				model[i].srt.scl.z);
 			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxScl);
 
 			// 回転を反映
-			D3DXMatrixRotationYawPitchRoll(&mtxRot, player.part[i].srt.rot.y,
-				player.part[i].srt.rot.x,
-				player.part[i].srt.rot.z);
+			D3DXMatrixRotationYawPitchRoll(&mtxRot, model[i].srt.rot.y,
+				model[i].srt.rot.x,
+				model[i].srt.rot.z);
 			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxRot);
 
 			// 移動を反映
-			D3DXMatrixTranslation(&mtxTranslate, player.part[i].srt.pos.x,
-				player.part[i].srt.pos.y,
-				player.part[i].srt.pos.z);
+			D3DXMatrixTranslation(&mtxTranslate, model[i].srt.pos.x,
+				model[i].srt.pos.y,
+				model[i].srt.pos.z);
 			D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &mtxTranslate);
 
 			//親が存在する場合は親のワールドマトリクスを合成
-			if (player.part[i].parent)
+			if (model[i].parent)
 			{
-				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &player.part[i].parent->mtxWorld);
+				D3DXMatrixMultiply(&mtxWorld, &mtxWorld, &model[i].parent->mtxWorld);
 			}
 
 			// ワールドマトリックスの設定
 			pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
 			//ワールドマトリクスを保存
-			player.part[i].mtxWorld = mtxWorld;
+			model[i].mtxWorld = mtxWorld;
 
 			// マテリアル情報に対するポインタを取得
-			pD3DXMat = (D3DXMATERIAL*)player.part[i].pMatBuff->GetBufferPointer();
+			pD3DXMat = (D3DXMATERIAL*)model[i].pMatBuff->GetBufferPointer();
 
-			for (int nCntMat = 0; nCntMat < (int)player.part[i].nNumMat; nCntMat++)
+			for (int nCntMat = 0; nCntMat < (int)model[i].nNumMat; nCntMat++)
 			{
 				// マテリアルの設定
 				pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
@@ -846,7 +843,7 @@ void DrawPart(LPDIRECT3DDEVICE9 pDevice, Character& player, int numPart)
 				pDevice->SetTexture(0, NULL);		//※テクスチャ―がなくても必要。そうしないと、この前のテクスチャ―が貼ってしまう
 
 				// 描画
-				player.part[i].pMesh->DrawSubset(nCntMat);
+				model[i].pMesh->DrawSubset(nCntMat);
 			}
 		}
 	}
@@ -1070,10 +1067,10 @@ int Character::AI(int type)
 	{
 		if (type == 0)
 		{//一番近いコインの番号を取得する仕様
-			if ((item->bUse) && (item->nType == ITEMTYPE_COIN))
+			if ((item->use) && (item->nType == ITEMTYPE_COIN))
 			{
 				//アイテムとのベクトルを求める
-				vec = item->pos - part[0].srt.pos;
+				vec = item->srt.pos - part[0].srt.pos;
 
 				//アイテムとの距離を求める
 				dis = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
@@ -1087,10 +1084,10 @@ int Character::AI(int type)
 		}
 		else
 		{//一番近いアイテムの番号を取得する仕様
-			if ((item->bUse))
+			if ((item->use))
 			{
 				//アイテムとのベクトルを求める
-				vec = item->pos - part[0].srt.pos;
+				vec = item->srt.pos - part[0].srt.pos;
 
 				//アイテムとの距離を求める
 				dis = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
@@ -1116,7 +1113,7 @@ int Character::AI(int type)
 	{
 		item = GetItem();		//ポインタをリセット
 
-		vec = (item + tagetNo)->pos - part[0].srt.pos;	//今の位置からアイテム位置までのベクトル
+		vec = (item + tagetNo)->srt.pos - part[0].srt.pos;	//今の位置からアイテム位置までのベクトル
 
 		//左右を判断
 		if (vec.x < 0)
@@ -1374,18 +1371,18 @@ void Character::Drag()
 }
 
 //=============================================================================
-// 影の位置、大きさ、透明度の更新
+// 影の位置を更新、位置の高さにより、大きさと透明度を変化する
 //=============================================================================
-void Character::Shadow()
+void Shadow(int nIdxShadow, D3DXVECTOR3 pos)
 {//体(part[0])を基準に
 
 	//影の位置を更新
-	SetPositionShadow(nIdxShadow, D3DXVECTOR3(part[0].srt.pos.x, 0.1f, part[0].srt.pos.z));
+	SetPositionShadow(nIdxShadow, D3DXVECTOR3(pos.x, 0.1f, pos.z));
 
 	//高さにより、影の大きさが変化する	//高ければ高いほど大きい
-	float fSize = 20.0f + (part[0].srt.pos.y - HEIGHT_FROMLAND) * 0.05f;
+	float fSize = 20.0f + (pos.y - HEIGHT_FROMLAND) * 0.05f;
 
-	if (part[0].srt.pos.y < 0.0f)
+	if (pos.y < 0.0f)
 	{//地面以下に行くとき
 		fSize = 0.0f;
 	}
@@ -1394,13 +1391,13 @@ void Character::Shadow()
 	SetVertexShadow(nIdxShadow, fSize, fSize);	
 
 	//高さにより、影の透明度が変化する	//高ければ高いほど透明的
-	float colA = 0.5f - (part[0].srt.pos.y - HEIGHT_FROMLAND) / 400.0f;
+	float colA = 0.5f - (pos.y - HEIGHT_FROMLAND) / 400.0f;
 
 	if (colA < 0.0f)
 	{
 		colA = 0.0f;
 	}
-	if (part[0].srt.pos.y < 0.0f)
+	if (pos.y < 0.0f)
 	{//地面以下に行くとき
 		colA = 0.0f;
 	}
@@ -1462,14 +1459,14 @@ void Character::ItemCollision()
 
 	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, pItem++)
 	{
-		if (pItem->bUse == true)
+		if (pItem->use == true)
 		{
 			float fLength;		//自身とアイテムの距離
 
 			//バウンディングサークルBC //体(part[0])を基準に
-			fLength = (part[0].srt.pos.x - pItem->pos.x) * (part[0].srt.pos.x - pItem->pos.x)
-				+ (part[0].srt.pos.y - pItem->pos.y) * (part[0].srt.pos.y - pItem->pos.y)
-				+ (part[0].srt.pos.z - pItem->pos.z) * (part[0].srt.pos.z - pItem->pos.z);
+			fLength = (part[0].srt.pos.x - pItem->srt.pos.x) * (part[0].srt.pos.x - pItem->srt.pos.x)
+				+ (part[0].srt.pos.y - pItem->srt.pos.y) * (part[0].srt.pos.y - pItem->srt.pos.y)
+				+ (part[0].srt.pos.z - pItem->srt.pos.z) * (part[0].srt.pos.z - pItem->srt.pos.z);
 
 			if (fLength < (fRadius + pItem->fRadius) * (fRadius + pItem->fRadius))
 			{//取得できる範囲内であれば

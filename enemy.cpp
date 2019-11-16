@@ -57,7 +57,7 @@ void UpdateEnemy(void)
 
 	g_enemy.Drag();
 
-	g_enemy.Shadow();
+	Shadow(g_enemy.nIdxShadow, g_enemy.part[0].srt.pos);
 
 	g_enemy.Jet();
 	
@@ -81,7 +81,7 @@ void DrawEnemy(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	DrawPart(pDevice, g_enemy, PART_MAX);
+	DrawXMODEL(pDevice, g_enemy.part, PART_MAX);
 
 }
 

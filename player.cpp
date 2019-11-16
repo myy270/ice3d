@@ -57,7 +57,7 @@ void UpdatePlayer(void)
 
 	g_player.Drag();
 
-	g_player.Shadow();
+	Shadow(g_player.nIdxShadow, g_player.part[0].srt.pos);
 
 	g_player.Jet();
 	
@@ -80,7 +80,7 @@ void DrawPlayer(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	DrawPart(pDevice, g_player, PART_MAX);
+	DrawXMODEL(pDevice, g_player.part, PART_MAX);
 
 }
 

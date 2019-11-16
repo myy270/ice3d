@@ -70,7 +70,7 @@
 #define	HAND_ENEMY		"data/MODEL/bearHandPink.x"		// 読み込むモデル名
 #define	LEG_ENEMY		"data/MODEL/bearLegPink.x"		// 読み込むモデル名
 
-#define	RADIUS_BEAR			(15.0f)						// 熊モデルの半径	//煙のエフェクトの位置や、アイテムとの当たる距離 と関係ある
+#define	RADIUS_BEAR			(15.0f)						// 熊モデルの半径	//影の大きさ、煙のエフェクトの位置や、アイテムとの当たる距離 と関係ある
 
 #define	VALUE_MOVE			(0.195f)					// 移動量
 #define	RATE_MOVE_PLAYER	(0.025f)					// 移動抵抗力の係数		※小さければ小さいほど、滑りやすい
@@ -81,6 +81,8 @@
 #define	HEIGHT_FROMLAND		(22.4f)						// 体パーツの地面からの高さ(srt.pos.y)
 
 #define	MAX_ITEM			(128)						// アイテムの最大数
+
+
 
 //*****************************************************************************
 // 列挙型定義
@@ -183,16 +185,17 @@ struct KEY
 	SRT			srtWork[PART_MAX];		//このキーフレームにおいての各パーツのSRT
 };
 
-struct PART
+//Xファイルのモデル
+struct XMODEL
 {
 	char *partFile;							// xファイル情報
 	LPD3DXBUFFER		pMatBuff;			// メッシュのマテリアル情報を格納
 	DWORD				nNumMat;			// マテリアル情報の総数
 	LPD3DXMESH			pMesh;				// ID3DXMeshインターフェイスへのポインタ
 
-	SRT			srt;						// パーツのsrt
+	SRT			srt;						// モデルのsrt
 	D3DXMATRIX	mtxWorld;
-	PART		*parent;
+	XMODEL		*parent;
 	bool		use;
 };
 
@@ -206,27 +209,11 @@ struct MOTION
 	float cancelTime;			// モーションしてる途中で中止する時、最初状態に戻る時間
 };
 
-struct PLAYER
-{
-	PART part[PART_MAX];
-	D3DXVECTOR3 move;		// 移動量
-	D3DXVECTOR3 rotDest;	// 目的の向き
-	float fRadius;			// 半径
-
-	int nIdxShadow;			// 影ID
-	
-	ITEMTYPE holdItem;		//持っているアイテム
-	STATE state;			//異常状態の情報
-	int frozenTime;			//凍結状態の残り時間
-
-	MOTION motion;			//歩くモーション
-};
-
 //プレイヤーとエネミーのクラス
 class Character
 {
 public: 
-	PART part[PART_MAX];
+	XMODEL part[PART_MAX];
 	D3DXVECTOR3 move;		// 移動量
 	D3DXVECTOR3 rotDest;	// 目的の向き
 	float fRadius;			// 半径
@@ -256,7 +243,7 @@ public:
 	void Movement();
 	void AreaCollision();
 	void Drag();
-	void Shadow();
+
 	void Jet();
 	void ItemCollision();
 	void UseIceblock();
@@ -266,7 +253,13 @@ public:
 
 };
 
-
+//アイテム
+struct ITEM : public XMODEL
+{
+	float		fRadius;		// 半径
+	int			nIdxShadow;		// 影ID
+	ITEMTYPE	nType;			// アイテム種類
+};
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -305,7 +298,9 @@ KEY* GetMotionWalk();
 
 void Motion(Character& user, MOTION& motion);
 
-void DrawPart(LPDIRECT3DDEVICE9 pDevice, Character& player, int numPart);
+void DrawXMODEL(LPDIRECT3DDEVICE9 pDevice, XMODEL* model, int numPart);
+
+void Shadow(int nIdxShadow, D3DXVECTOR3 pos);
 
 #endif
 

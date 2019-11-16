@@ -65,16 +65,6 @@ HRESULT InitGame(void)
 
 	// アイテムの初期化
 	InitItem();
-	for(int nCntCoin = 0; nCntCoin < 99; nCntCoin++)
-	{
-		float fPosX, fPosY, fPosZ;
-
-		fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
-		//fPosY = (float)(rand() % 1400) / 10.0f + 10.0f;//10.0f~150.0f
-		fPosY = 15.0f;
-		fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
-		SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ),  D3DXVECTOR3(0.0f, 0.0f, 0.0f), ITEMTYPE_COIN, true);
-	}
 
 	// BGM再生 ちゃんとloopできるにする!　元の罠
 	//PlaySound(SOUND_LABEL_BGM000, XAUDIO2_LOOP_INFINITE);
