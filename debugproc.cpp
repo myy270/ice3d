@@ -7,10 +7,8 @@
 #define _CRT_SECURE_NO_WARNINGS			// stdio.hとセットで先に書く、書かないとエラー
 #include <stdio.h>						// 標準入出力関連のライブラリー
 
-
 #include "debugproc.h"
 #include "input.h"
-
 
 //*****************************************************************************
 // マクロ定義

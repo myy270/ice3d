@@ -105,7 +105,7 @@ void UpdateTimer(void)
 {
 
 #ifdef _DEBUG
-	if (GetKeyboardTrigger(DIK_SUBTRACT))		//テンキーのマイナス
+	if (GetKeyboardTrigger(DIK_SUBTRACT))		//テンキーのマイナス-
 	{
 		g_nTimerCount = 5 * FPS;	//開発者機能、タイマーの時間を5秒にする
 	}

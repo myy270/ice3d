@@ -52,14 +52,35 @@
 
 #define SAFE_RELEASE(ptr)		{ if(ptr) { (ptr)->Release(); (ptr) = NULL; } }		//オブジェクトの解放
 
-#define PART_MAX_PLAYER		(7)		// プレイヤーパーツの数(アイスブロックを含む)
-#define PART_MAX_ENEMY		(7)		// 敵パーツの数
 
-#define PART_MAX			(64)		// パーツの上限
+#define PART_MAX			(7)		// パーツの数(アイスブロックを含む)
 
 #define	FPS	(60)
 
 #define	FIRST_SCENE		(SCENE_GAME)		//最初の画面
+
+#define	BODY_PLAYER		"data/MODEL/bearBody.x"			// 読み込むモデル名
+#define	HEAD_PLAYER		"data/MODEL/bearHead.x"			// 読み込むモデル名
+#define	HAND_PLAYER		"data/MODEL/bearHand.x"			// 読み込むモデル名
+#define	LEG_PLAYER		"data/MODEL/bearLeg.x"			// 読み込むモデル名
+#define	ICE_BLOCK		"data/MODEL/iceBlock.x"			// 読み込むモデル名
+
+#define	BODY_ENEMY		"data/MODEL/bearBodyPink.x"		// 読み込むモデル名
+#define	HEAD_ENEMY		"data/MODEL/bearHeadPink.x"		// 読み込むモデル名
+#define	HAND_ENEMY		"data/MODEL/bearHandPink.x"		// 読み込むモデル名
+#define	LEG_ENEMY		"data/MODEL/bearLegPink.x"		// 読み込むモデル名
+
+#define	RADIUS_BEAR			(15.0f)						// 熊モデルの半径	//煙のエフェクトの位置や、アイテムとの当たる距離 と関係ある
+
+#define	VALUE_MOVE			(0.195f)					// 移動量
+#define	RATE_MOVE_PLAYER	(0.025f)					// 移動抵抗力の係数		※小さければ小さいほど、滑りやすい
+
+#define	VALUE_ROTATE		(D3DX_PI * 0.025f)			// 回転量	4.5度相当
+#define	RATE_ROTATE			(0.10f)						// 回転速度係数
+
+#define	HEIGHT_FROMLAND		(22.4f)						// 体パーツの地面からの高さ(srt.pos.y)
+
+#define	MAX_ITEM			(128)						// アイテムの最大数
 
 //*****************************************************************************
 // 列挙型定義
@@ -83,7 +104,7 @@ enum SCENE
 	SCENE_MAX				// デフォルト値(なにもない状態、SetScene()を使わないとダメ)
 };
 
-enum OBJECT		//
+enum OBJECT
 {
 	OBJECT_PLAYER,
 	OBJECT_ENEMY,
@@ -187,7 +208,7 @@ struct MOTION
 
 struct PLAYER
 {
-	PART part[PART_MAX_PLAYER];
+	PART part[PART_MAX];
 	D3DXVECTOR3 move;		// 移動量
 	D3DXVECTOR3 rotDest;	// 目的の向き
 	float fRadius;			// 半径
@@ -200,6 +221,51 @@ struct PLAYER
 
 	MOTION motion;			//歩くモーション
 };
+
+//プレイヤーとエネミーのクラス
+class Character
+{
+public: 
+	PART part[PART_MAX];
+	D3DXVECTOR3 move;		// 移動量
+	D3DXVECTOR3 rotDest;	// 目的の向き
+	float fRadius;			// 半径
+
+	int nIdxShadow;			// 影ID
+
+	ITEMTYPE holdItem;		//持っているアイテム
+	STATE state;			//異常状態の情報
+	int frozenTime;			//凍結状態の残り時間
+
+	MOTION motion;			//歩くモーション
+
+	OBJECT objectType;		//プレイヤーかエネミーか
+
+	bool upAI;				//AI行動 上
+	bool downAI;			//AI行動 下
+	bool leftAI;			//AI行動 左
+	bool rightAI;			//AI行動 右
+
+	bool useAI;				//AIモードかどうか
+
+	//メンバー関数==========================
+
+	HRESULT Init(OBJECT object);
+	void AIControl();
+	int  AI(int type = 1);
+	void Movement();
+	void AreaCollision();
+	void Drag();
+	void Shadow();
+	void Jet();
+	void ItemCollision();
+	void UseIceblock();
+	void Freeze(Character* target);
+	void Frozen();
+
+
+};
+
 
 
 //*****************************************************************************
@@ -237,9 +303,9 @@ void LimitRot(float& radian);
 
 KEY* GetMotionWalk();
 
-void Motion(PLAYER& user, MOTION& motion);
+void Motion(Character& user, MOTION& motion);
 
-void DrawPart(LPDIRECT3DDEVICE9 pDevice, PLAYER& player, LPDIRECT3DTEXTURE9 pD3DTexture, int numPart);
+void DrawPart(LPDIRECT3DDEVICE9 pDevice, Character& player, int numPart);
 
 #endif
 

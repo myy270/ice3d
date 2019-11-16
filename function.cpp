@@ -6,6 +6,17 @@
 //=============================================================================
 #include "function.h"
 
+#include "shadow.h"
+#include "camera.h"
+#include "input.h"
+#include "timer.h"
+#include "item.h"
+#include "debugproc.h"
+#include "effect.h"
+#include "score.h"
+#include "player.h"
+#include "enemy.h"
+#include "sound.h"
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
@@ -650,7 +661,7 @@ KEY* GetMotionWalk()
 // user:使用者
 // motion:MOTION構造体の情報
 //=============================================================================
-void Motion(PLAYER& user,MOTION& motion)
+void Motion(Character& user,MOTION& motion)
 {
 	int i = (int)motion.motionTime;  //現在のキーフレームナンバー
 
@@ -690,19 +701,18 @@ void Motion(PLAYER& user,MOTION& motion)
 			motion.cancelTime = 1.0f;//最大最大時間にする
 		}
 
-		Interpolation(PART_MAX_PLAYER - 1, &user.part[0], motion.motionData[i].srtWork, motion.cancelTime);
+		Interpolation(PART_MAX - 1, &user.part[0], motion.motionData[i].srtWork, motion.cancelTime);
 
 	}
 	else
 	{//モーションしている場合
 		motion.cancelTime = 0.0f;	//リセット
 
-		Interpolation(PART_MAX_PLAYER - 1, &user.part[0], motion.motionData[i].srtWork, motion.motionData[i + 1].srtWork, motion.motionTime - i);
+		Interpolation(PART_MAX - 1, &user.part[0], motion.motionData[i].srtWork, motion.motionData[i + 1].srtWork, motion.motionTime - i);
 
 	}
 
 }
-
 
 //=============================================================================
 // 補間処理
@@ -739,7 +749,6 @@ void Interpolation(int partNum, PART *part, const SRT *srt1, const SRT *srt2, fl
 	}
 
 }
-
 
 //=============================================================================
 // 補間処理		(出力する先のデータを始点にする場合)
@@ -778,10 +787,9 @@ void Interpolation(int partNum, PART *part, const SRT *srt2, float rate)
 //=============================================================================
 // 親子関係を持つパーツの描画
 // player:対象
-// pD3DTexture:テクスチャ―
 // numPart:パーツ数
 //=============================================================================
-void DrawPart(LPDIRECT3DDEVICE9 pDevice,PLAYER& player, LPDIRECT3DTEXTURE9 pD3DTexture, int numPart)
+void DrawPart(LPDIRECT3DDEVICE9 pDevice, Character& player, int numPart)
 {
 	D3DXMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
 	D3DXMATERIAL *pD3DXMat;			// マテリアル情報に対するポインタ
@@ -835,7 +843,7 @@ void DrawPart(LPDIRECT3DDEVICE9 pDevice,PLAYER& player, LPDIRECT3DTEXTURE9 pD3DT
 				pDevice->SetMaterial(&pD3DXMat[nCntMat].MatD3D);
 
 				// テクスチャの設定
-				pDevice->SetTexture(0, pD3DTexture);		//※テクスチャ―がなくても必要。そうしないと、この前のテクスチャ―が貼ってしまう
+				pDevice->SetTexture(0, NULL);		//※テクスチャ―がなくても必要。そうしないと、この前のテクスチャ―が貼ってしまう
 
 				// 描画
 				player.part[i].pMesh->DrawSubset(nCntMat);
@@ -846,3 +854,718 @@ void DrawPart(LPDIRECT3DDEVICE9 pDevice,PLAYER& player, LPDIRECT3DTEXTURE9 pD3DT
 	pDevice->SetMaterial(&matDef);// マテリアルをデフォルトに戻す
 
 }
+
+
+
+//=============================================================================
+//メンバー変数に値を代入する処理 
+//=============================================================================
+HRESULT Character::Init(OBJECT object)
+{
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	motion.motionData = GetMotionWalk();
+	motion.numKey = 4;
+	motion.use = false;
+	motion.motionTime = 0.0f;
+	motion.cancelTime = 0.0f;
+
+	if (object == OBJECT_PLAYER)
+	{
+		part[0].partFile = (char *)BODY_PLAYER;		//体　//根である親は一番先にしなければならない
+		part[1].partFile = (char *)HEAD_PLAYER;		//頭
+		part[2].partFile = (char *)HAND_PLAYER;		//左手
+		part[3].partFile = (char *)HAND_PLAYER;		//右手
+		part[4].partFile = (char *)LEG_PLAYER;		//左足
+		part[5].partFile = (char *)LEG_PLAYER;		//右足
+	}
+	else if (object == OBJECT_ENEMY)
+	{
+		part[0].partFile = (char *)BODY_ENEMY;
+		part[1].partFile = (char *)HEAD_ENEMY;
+		part[2].partFile = (char *)HAND_ENEMY;
+		part[3].partFile = (char *)HAND_ENEMY;
+		part[4].partFile = (char *)LEG_ENEMY;
+		part[5].partFile = (char *)LEG_ENEMY;
+	}
+
+	part[6].partFile = (char *)ICE_BLOCK;			//アイスブロック
+
+	//パーツの情報の設定
+	for (int i = 0; i < PART_MAX; i++)				//パーツ番号
+	{
+		// Xファイルの読み込み
+		if (FAILED(D3DXLoadMeshFromX(part[i].partFile,
+			D3DXMESH_SYSTEMMEM,
+			pDevice,
+			NULL,
+			&part[i].pMatBuff,
+			NULL,
+			&part[i].nNumMat,
+			&part[i].pMesh)))
+		{
+			return E_FAIL;
+		}
+
+		switch (i)
+		{
+		case 0:
+		{//体
+			part[i].srt.scl = D3DXVECTOR3(1.5f, 1.5f, 1.5f);			//スケールのxyz必ず同じように
+			part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(0.0f, 22.4f, 0.0f);			//足が地面に触れるように調整する
+
+			if (object == OBJECT_ENEMY)
+			{
+				part[i].srt.pos.x = 90.0f;
+			}
+
+			part[i].parent = NULL;										//体の親はNULLにする
+			break;
+		}
+		case 1:
+		{//頭
+			part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(0.0f, 6.5f, 0.0f);			//関節の位置に移動する
+
+			part[i].parent = &part[0];									//体を親にする
+			break;
+		}
+		case 2:
+		{//左手
+			part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(5.0f, 5.0f, 0.0f);			//関節の位置に移動する
+
+			part[i].parent = &part[0];									//体を親にする
+			break;
+		}
+		case 3:
+		{//右手
+			part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			part[i].srt.rot = D3DXVECTOR3(0.0f, D3DX_PI, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(-5.0f, 5.0f, 0.0f);			//関節の位置に移動する
+
+			part[i].parent = &part[0];									//体を親にする
+			break;
+		}
+		case 4:
+		{//左足
+			part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(3.064f, -4.873f, -0.409f);	//関節の位置に移動する
+
+			part[i].parent = &part[0];									//体を親にする
+			break;
+		}
+		case 5:
+		{//右足
+			part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(-3.064f, -4.873f, -0.409f);	//関節の位置に移動する
+
+			part[i].parent = &part[0];									//体を親にする
+			break;
+		}
+		default:
+		{//アイスブロック
+			part[i].srt.scl = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
+			part[i].srt.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			part[i].srt.pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+			part[i].parent = &part[0];									//体を親にする
+			break;
+		}
+
+		}//switch end
+
+		if (i == 6)
+		{//アイスブロックは最初表示しない
+			part[i].use = false;
+		}
+		else
+		{
+			part[i].use = true;
+		}
+	}
+
+	move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	fRadius = RADIUS_BEAR;
+
+	// 影を設定 ※体(part[0])を基準に
+	nIdxShadow = SetShadow(part[0].srt.pos, fRadius * 2.0f, fRadius * 2.0f);	//BUG影の大きさは変わらない
+
+	holdItem = ITEMTYPE_COIN;
+	state = NORMAL;
+	frozenTime = 0;
+
+	if ((object == OBJECT_ENEMY) && (GetPlayMode() == PLAY_MODE_SINGLE))
+	{
+		useAI = true;
+	}
+	else
+	{
+		useAI = false;
+	}
+
+	upAI	= false;
+	downAI	= false;
+	leftAI	= false;
+	rightAI = false;
+
+	objectType = object;
+
+	return S_OK;
+}
+
+//=============================================================================
+//AI関連の制御処理
+//=============================================================================
+void Character::AIControl()
+{
+	if (objectType == OBJECT_ENEMY)
+	{
+#ifdef _DEBUG
+		//開発者機能
+		if (GetKeyboardTrigger(DIK_ADD))		//テンキーのプラス+
+		{//AIモードの切替　即ち、シングルモードとダブルモードの切替
+			useAI = !useAI;									//AIモードの切替
+
+			upAI = downAI = leftAI = rightAI = false;		//リセット
+
+			SetPlayMode((PLAY_MODE)!GetPlayMode());			//シングルモードとダブルモードの切替
+
+			if (GetPlayMode() == PLAY_MODE_DOUBLE)
+			{
+				SetCameraMode(CAMERA_MODE_FAR);				//カメラモードの調整
+			}
+		}
+#endif
+	}
+
+	if (useAI)
+	{
+		AI(1);
+	}
+
+}
+
+//=============================================================================
+//type = 0:一番近いコインに向かって移動するAIの処理
+//type = 1など:一番近いアイテム(コインを含む)に向かって移動するAIの処理
+//=============================================================================
+int Character::AI(int type)
+{
+	ITEM *item = GetItem();
+
+	D3DXVECTOR3 vec;				//作業用
+	float dis = 0.0f;				//アイテムとの距離
+	float disNear = 99999999.0f;	//一番近い距離
+	int tagetNo = -1;				//距離が一番近いアイテムの番号
+
+	//一番近いアイテムの番号を検索する
+	for (int i = 0; i < MAX_ITEM; i++, item++)
+	{
+		if (type == 0)
+		{//一番近いコインの番号を取得する仕様
+			if ((item->bUse) && (item->nType == ITEMTYPE_COIN))
+			{
+				//アイテムとのベクトルを求める
+				vec = item->pos - part[0].srt.pos;
+
+				//アイテムとの距離を求める
+				dis = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+
+				if (dis < disNear)
+				{//この距離が今まで一番小さい場合、記録する
+					disNear = dis;
+					tagetNo = i;
+				}
+			}
+		}
+		else
+		{//一番近いアイテムの番号を取得する仕様
+			if ((item->bUse))
+			{
+				//アイテムとのベクトルを求める
+				vec = item->pos - part[0].srt.pos;
+
+				//アイテムとの距離を求める
+				dis = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+
+				if (dis < disNear)
+				{//この距離が今まで一番小さい場合
+					if ((item->nType == ITEMTYPE_ICEBLOCK) && (holdItem == ITEMTYPE_ICEBLOCK))
+					{//このアイテムが凍結アイテム、且つ、すでに凍結アイテムを持っている場合、無視する
+
+					}
+					else
+					{//記録する
+						disNear = dis;
+						tagetNo = i;
+					}
+				}
+			}
+		}
+	}
+
+	//一番近いアイテムに向かうように、移動方向を更新
+	if (tagetNo != -1)
+	{
+		item = GetItem();		//ポインタをリセット
+
+		vec = (item + tagetNo)->pos - part[0].srt.pos;	//今の位置からアイテム位置までのベクトル
+
+		//左右を判断
+		if (vec.x < 0)
+		{//左方向へ
+			leftAI = 1;
+			rightAI = 0;
+		}
+		else if (vec.x == 0)
+		{//右方向へ
+			leftAI = 0;
+			rightAI = 0;
+		}
+		else if (vec.x > 0)
+		{//左右方向なし
+			leftAI = 0;
+			rightAI = 1;
+		}
+
+		//上下を判断
+		if (vec.z < 0)
+		{//上方向へ
+			upAI = 0;
+			downAI = 1;
+		}
+		else if (vec.z == 0)
+		{//下方向へ
+			upAI = 0;
+			downAI = 0;
+		}
+		else if (vec.z > 0)
+		{//上下方向なし
+			upAI = 1;
+			downAI = 0;
+		}
+
+	}
+	else
+	{//コインがない場合
+		leftAI = rightAI = upAI = downAI = 0;//止まる
+	}
+
+	PrintDebugProc("AI(type %d)の一番近いアイテムの番号 ：%d \n\n", type, tagetNo);
+
+	return tagetNo;
+
+}
+
+//=============================================================================
+//位置と向きの更新処理
+//=============================================================================
+void Character::Movement()
+{
+	int upKey;					//キーボードのコントロールキー
+	int downKey;
+	int leftKey;
+	int rightKey;	
+	int padNo;					//コントローラー番号
+
+	D3DXVECTOR3 rotCamera;		//カメラの向き
+	float fDiffRotY;			//目的の角度までの差分
+
+	if (objectType == OBJECT_PLAYER)
+	{
+		upKey = DIK_W;
+		downKey = DIK_S;
+		leftKey = DIK_A;
+		rightKey = DIK_D;
+
+		padNo = 0;
+	}
+	else if (objectType == OBJECT_ENEMY)
+	{
+		upKey = DIK_UP;
+		downKey = DIK_DOWN;
+		leftKey = DIK_LEFT;
+		rightKey = DIK_RIGHT;
+
+		padNo = 1;
+	}
+
+	// カメラの向き取得
+	rotCamera = GetRotCamera();
+	if (objectType == OBJECT_ENEMY)
+	{
+		rotCamera = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	//エネミーの向きはカメラの回転と無関係である
+	}
+
+	//モーション状態をリセット
+	motion.use = false;
+
+	//時間が終わっていない、かつ凍結状態ではない場合、移動できる状態になる
+	if ((IsTimeEnd() == false) && (state != FROZEN))
+	{//移動			※前フレームの運動量が残っているから、慣性ある
+		if (useAI ? leftAI : GetKeyboardPress(leftKey) || IsButtonPress(padNo, BUTTON_LEFT) || IsButtonPress(padNo, BUTTON_LSTICK_LEFT))
+		{
+			motion.use = true;//モーション状態にする
+
+			if (useAI ? upAI : GetKeyboardPress(upKey) || IsButtonPress(padNo, BUTTON_UP) || IsButtonPress(padNo, BUTTON_LSTICK_UP))
+			{// 左前移動
+				move.x -= sinf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE;
+				move.z -= cosf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE;
+
+				rotDest.y = rotCamera.y + D3DX_PI * 0.75f;
+			}
+			else if (useAI ? downAI : GetKeyboardPress(downKey) || IsButtonPress(padNo, BUTTON_DOWN) || IsButtonPress(padNo, BUTTON_LSTICK_DOWN))
+			{// 左後移動
+				move.x -= sinf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE;
+				move.z -= cosf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE;
+
+				rotDest.y = rotCamera.y + D3DX_PI * 0.25f;
+			}
+			else
+			{// 左移動
+				move.x -= sinf(rotCamera.y + D3DX_PI * 0.50f) * VALUE_MOVE;
+				move.z -= cosf(rotCamera.y + D3DX_PI * 0.50f) * VALUE_MOVE;
+
+				rotDest.y = rotCamera.y + D3DX_PI * 0.50f;
+			}
+		}
+		else if (useAI ? rightAI : GetKeyboardPress(rightKey) || IsButtonPress(padNo, BUTTON_RIGHT) || IsButtonPress(padNo, BUTTON_LSTICK_RIGHT))
+		{
+			motion.use = true;//モーション状態にする
+
+			if (useAI ? upAI : GetKeyboardPress(upKey) || IsButtonPress(padNo, BUTTON_UP) || IsButtonPress(padNo, BUTTON_LSTICK_UP))
+			{// 右前移動
+				move.x -= sinf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE;
+				move.z -= cosf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE;
+
+				rotDest.y = rotCamera.y - D3DX_PI * 0.75f;
+			}
+			else if (useAI ? downAI : GetKeyboardPress(downKey) || IsButtonPress(padNo, BUTTON_DOWN) || IsButtonPress(padNo, BUTTON_LSTICK_DOWN))
+			{// 右後移動
+				move.x -= sinf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE;
+				move.z -= cosf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE;
+
+				rotDest.y = rotCamera.y - D3DX_PI * 0.25f;
+			}
+			else
+			{// 右移動
+				move.x -= sinf(rotCamera.y - D3DX_PI * 0.50f) * VALUE_MOVE;
+				move.z -= cosf(rotCamera.y - D3DX_PI * 0.50f) * VALUE_MOVE;
+
+				rotDest.y = rotCamera.y - D3DX_PI * 0.50f;
+			}
+		}
+		else if (useAI ? upAI : GetKeyboardPress(upKey) || IsButtonPress(padNo, BUTTON_UP) || IsButtonPress(padNo, BUTTON_LSTICK_UP))
+		{
+			motion.use = true;//モーション状態にする
+
+			// 前移動
+			move.x -= sinf(D3DX_PI + rotCamera.y) * VALUE_MOVE;
+			move.z -= cosf(D3DX_PI + rotCamera.y) * VALUE_MOVE;
+
+			rotDest.y = rotCamera.y + D3DX_PI;		// - D3DX_PIになると、逆の方向に回転する
+		}
+		else if (useAI ? downAI : GetKeyboardPress(downKey) || IsButtonPress(padNo, BUTTON_DOWN) || IsButtonPress(padNo, BUTTON_LSTICK_DOWN))
+		{
+			motion.use = true;//モーション状態にする
+
+			// 後移動
+			move.x -= sinf(rotCamera.y) * VALUE_MOVE;
+			move.z -= cosf(rotCamera.y) * VALUE_MOVE;
+
+			rotDest.y = rotCamera.y;
+		}
+	}
+
+	if (objectType == OBJECT_PLAYER)
+	{
+#ifdef _DEBUG		
+		//開発者機能
+		if (GetKeyboardPress(DIK_T))
+		{// 上昇
+			move.y += VALUE_MOVE;
+		}
+		else if (GetKeyboardPress(DIK_Y))
+		{// 下降
+			move.y -= VALUE_MOVE;
+		}
+
+		if (GetKeyboardPress(DIK_U))
+		{// 左回転
+			rotDest.y -= VALUE_ROTATE;
+		}
+		else if (GetKeyboardPress(DIK_I))
+		{// 右回転
+			rotDest.y += VALUE_ROTATE;
+		}
+#endif
+	}
+
+	LimitRot(rotDest.y);									//実際はなくてもいいが、数字がめちゃくちゃになる
+
+	// 目的の角度までの差分
+	fDiffRotY = rotDest.y - part[0].srt.rot.y;				//体(part[0])を基準に
+
+	LimitRot(fDiffRotY);									// 重要! 近い方向に回転できるように
+
+	// 回転量を体(part[0])に反映
+	part[0].srt.rot.y += fDiffRotY * RATE_ROTATE;			// 目的の角度まで慣性をかける　段々目的の角度に変化する
+
+	LimitRot(part[0].srt.rot.y);							//実際はなくてもいいが、数字がめちゃくちゃになる
+
+	/// 移動量を体(part[0])に反映
+	part[0].srt.pos.x += move.x;
+	part[0].srt.pos.y += move.y;
+	part[0].srt.pos.z += move.z;
+
+}
+
+//=============================================================================
+// エリアコリジョン処理
+//=============================================================================
+void Character::AreaCollision()
+{
+	//移動範囲を設定する　※体(part[0])を基準に
+	if (part[0].srt.pos.x < -630.0f)
+	{
+		part[0].srt.pos.x = -630.0f;
+	}
+	if (part[0].srt.pos.x > 630.0f)
+	{
+		part[0].srt.pos.x = 630.0f;
+	}
+	//if (part[0].srt.pos.y < HEIGHT_FROMLAND)
+	//{
+	//	part[0].srt.pos.y = HEIGHT_FROMLAND;
+	//}
+	//if (part[0].srt.pos.y > 150.0f)
+	//{
+	//	part[0].srt.pos.y = 150.0f;
+	//}
+	if (part[0].srt.pos.z > 630.0f)
+	{
+		part[0].srt.pos.z = 630.0f;
+	}
+	if (part[0].srt.pos.z < -630.0f)
+	{
+		part[0].srt.pos.z = -630.0f;
+	}
+
+}
+
+//=============================================================================
+// 移動抵抗力の処理
+//=============================================================================
+void Character::Drag()
+{
+	// 運動エネルギーを一部損して（抵抗力のため）保存する、次のフレームに使う(慣性の仕組み)
+	//※損の部分イコール次のフレームに獲得の運動エネルギーの場合、速度が最大(7.8f)になって、等速直線運動になる
+	move.x = move.x * (1 - RATE_MOVE_PLAYER);
+	move.y = move.y * (1 - RATE_MOVE_PLAYER);
+	move.z = move.z * (1 - RATE_MOVE_PLAYER);
+
+}
+
+//=============================================================================
+// 影の位置、大きさ、透明度の更新
+//=============================================================================
+void Character::Shadow()
+{//体(part[0])を基準に
+
+	//影の位置を更新
+	SetPositionShadow(nIdxShadow, D3DXVECTOR3(part[0].srt.pos.x, 0.1f, part[0].srt.pos.z));
+
+	//高さにより、影の大きさが変化する	//高ければ高いほど大きい
+	float fSize = 20.0f + (part[0].srt.pos.y - HEIGHT_FROMLAND) * 0.05f;
+
+	if (part[0].srt.pos.y < 0.0f)
+	{//地面以下に行くとき
+		fSize = 0.0f;
+	}
+
+	//影の大きさを更新
+	SetVertexShadow(nIdxShadow, fSize, fSize);	
+
+	//高さにより、影の透明度が変化する	//高ければ高いほど透明的
+	float colA = 0.5f - (part[0].srt.pos.y - HEIGHT_FROMLAND) / 400.0f;
+
+	if (colA < 0.0f)
+	{
+		colA = 0.0f;
+	}
+	if (part[0].srt.pos.y < 0.0f)
+	{//地面以下に行くとき
+		colA = 0.0f;
+	}
+
+	////影の透明度を更新
+	SetColorShadow(nIdxShadow, D3DXCOLOR(1.0f, 1.0f, 1.0f, colA));
+
+}
+
+//=============================================================================
+// 煙のエフェクト
+//=============================================================================
+void Character::Jet()
+{
+	D3DXVECTOR3 pos;		//作業用
+
+	//移動距離が1より大きい場合、煙のエフェクトが出る
+	if ((move.x * move.x
+		+ move.y * move.y
+		+ move.z * move.z) > 1.0f)
+	{		
+		//体(part[0])を基準に
+		pos.x = part[0].srt.pos.x + sinf(part[0].srt.rot.y) * fRadius;	//尾部の辺りに設定
+		pos.y = part[0].srt.pos.y - 19.4f;								//足元のところに設定
+		pos.z = part[0].srt.pos.z + cosf(part[0].srt.rot.y) * fRadius;	//尾部の辺りに設定
+
+		// エフェクトの設定
+		if (objectType == OBJECT_PLAYER)
+		{
+			SetEffect(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				D3DXCOLOR(0.85f, 0.15f, 0.0f, 0.50f), 14.0f, 14.0f, 20);	//赤
+			SetEffect(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				D3DXCOLOR(0.15f, 0.75f, 0.0f, 0.30f), 10.0f, 10.0f, 20);	//緑
+			SetEffect(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				D3DXCOLOR(0.0f, 0.10f, 0.0f, 0.15f), 5.0f, 5.0f, 20);		//緑
+		}
+		if (objectType == OBJECT_ENEMY)
+		{
+			SetEffect(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				D3DXCOLOR(0.85f, 0.05f, 0.65f, 0.50f), 14.0f, 14.0f, 20);	//紫
+			SetEffect(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				D3DXCOLOR(0.65f, 0.85f, 0.05f, 0.30f), 10.0f, 10.0f, 20);	//黄
+			SetEffect(pos, D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+				D3DXCOLOR(0.45f, 0.45f, 0.05f, 0.15f), 5.0f, 5.0f, 20);		//黄
+		}
+	}
+
+}
+
+//=============================================================================
+// アイテムとの当たり判定
+//=============================================================================
+void Character::ItemCollision()
+{
+	ITEM *pItem;
+
+	// アイテムを取得
+	pItem = GetItem();
+
+	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, pItem++)
+	{
+		if (pItem->bUse == true)
+		{
+			float fLength;		//自身とアイテムの距離
+
+			//バウンディングサークルBC //体(part[0])を基準に
+			fLength = (part[0].srt.pos.x - pItem->pos.x) * (part[0].srt.pos.x - pItem->pos.x)
+				+ (part[0].srt.pos.y - pItem->pos.y) * (part[0].srt.pos.y - pItem->pos.y)
+				+ (part[0].srt.pos.z - pItem->pos.z) * (part[0].srt.pos.z - pItem->pos.z);
+
+			if (fLength < (fRadius + pItem->fRadius) * (fRadius + pItem->fRadius))
+			{//取得できる範囲内であれば
+				if ((holdItem == ITEMTYPE_ICEBLOCK) && (pItem->nType == ITEMTYPE_ICEBLOCK))
+				{//アイスブロックを持っている場合、他のアイスブロックは取得できない
+
+				}
+				else
+				{
+					if (pItem->nType == ITEMTYPE_ICEBLOCK)
+					{
+						holdItem = ITEMTYPE_ICEBLOCK;
+					}
+					else if (pItem->nType == ITEMTYPE_COIN)
+					{
+						// スコア加算
+						ChangeScore(objectType, 100);
+
+						// コインを拾う効果音
+						//PlaySound(SOUND_LABEL_SE_COIN);
+					}
+
+					// アイテム消去
+					DeleteItem(nCntItem);
+				}
+			}
+		}
+	}
+
+}
+
+//=============================================================================
+//凍結アイテムを使う
+//=============================================================================
+void Character::UseIceblock()
+{
+	int key;					//キーボードのコントロールキー
+	int padNo;					//コントローラー番号
+	Character* target;			//狙う目標
+
+	if (objectType == OBJECT_PLAYER)
+	{
+		key = DIK_SPACE;
+		padNo = 0;
+		target = GetEnemy();		//後で作る
+	}
+	else
+	{
+		key = DIK_NUMPAD1;
+		padNo = 1;
+		target = GetPlayer();
+	}
+
+	//時間が終わっていない、且つ凍結状態ではない、且つ凍結アイテムを持っている場合、凍結アイテムを使用可能になる
+	if ((IsTimeEnd() == false) && (state != FROZEN) && (holdItem == ITEMTYPE_ICEBLOCK))
+	{
+		if ((useAI) || (GetKeyboardTrigger(key) || IsButtonTrigger(padNo, BUTTON_CIRCLE)))
+		{//AIモードでは凍結アイテムを拾ったら、直ぐ使う	
+			Freeze(target);
+		}
+	}
+
+}
+
+//=============================================================================
+// 凍結アイテムの効果
+//=============================================================================
+void Character::Freeze(Character* target)
+{
+	if (target->state != FROZEN)		//相手が凍結状態ではない場合
+	{
+		target->state = FROZEN;			//相手を凍結状態にさせる
+		target->frozenTime = 180;		//3秒間
+		holdItem = ITEMTYPE_COIN;		//自分の凍結アイテムが消耗される
+	}
+}
+
+//=============================================================================
+//凍結状態になった時の処理
+//=============================================================================
+void Character::Frozen()
+{
+	if (state == FROZEN)
+	{
+		if (frozenTime > 0)
+		{
+			frozenTime--;			//凍結状態の残り時間をカウントダウン
+			part[6].use = true;		//身に纏うアイスブロックを表示する
+		}
+		else
+		{
+			state = NORMAL;			//凍結状態を解除
+			part[6].use = false;	//身に纏うアイスブロックを消える
+		}
+	}
+}
+
+
+

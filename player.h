@@ -17,8 +17,7 @@ void UninitPlayer(void);
 void UpdatePlayer(void);
 void DrawPlayer(void);
 
-PLAYER *GetPlayer(void);
-
+Character *GetPlayer(void);
 D3DXVECTOR3 GetPositionPlayer(void);
 
 #endif
