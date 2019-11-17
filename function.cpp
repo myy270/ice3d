@@ -203,6 +203,7 @@ void Interpolation(int partNum, XMODEL *part, const SRT *srt2, float rate);
 
 //=============================================================================
 // 頂点の作成
+// FVF_VERTEX_3Dの時、引数のvtxは何の役割もない
 // num:矩形の数
 //=============================================================================
 HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, DWORD FVF, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vtx, float width, float height, 
@@ -658,20 +659,29 @@ void SetVtxDataTexNum(LPDIRECT3DVERTEXBUFFER9 vtxBuff,int numSet, int numPlace)
 
 //=============================================================================
 //　ポリゴンを描画する処理
+// index:描画開始のインデックス
 //=============================================================================
-void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex)
+void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, DWORD FVF, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int index)
 {
-	// 頂点バッファをデバイスのデータストリームにバインド
-	pDevice->SetStreamSource(0, vtxBuff, 0, sizeof(VERTEX_2D));
+	if (FVF == FVF_VERTEX_2D)
+	{
+		// 頂点バッファをデバイスのデータストリームにバインド
+		pDevice->SetStreamSource(0, vtxBuff, 0, sizeof(VERTEX_2D));
+	}
+	else if (FVF == FVF_VERTEX_3D)
+	{
+		// 頂点バッファをデバイスのデータストリームにバインド
+		pDevice->SetStreamSource(0, vtxBuff, 0, sizeof(VERTEX_3D));
+	}
 
 	// 頂点フォーマットの設定
-	pDevice->SetFVF(FVF_VERTEX_2D);
+	pDevice->SetFVF(FVF);
 
 	// テクスチャの設定
 	pDevice->SetTexture(0, tex);
 
 	// ポリゴンの描画
-	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, NUM_POLYGON);
+	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, (index * NUM_VERTEX), NUM_POLYGON);
 }
 
 //=============================================================================
@@ -1032,7 +1042,7 @@ void Character::AIControl()
 
 	if (useAI)
 	{
-		AI(1);
+		AI(0);
 	}
 
 }
@@ -1201,22 +1211,22 @@ void Character::Movement()
 
 			if (useAI ? upAI : GetKeyboardPress(upKey) || IsButtonPress(padNo, BUTTON_UP) || IsButtonPress(padNo, BUTTON_LSTICK_UP))
 			{// 左前移動
-				move.x -= sinf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE;
-				move.z -= cosf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE;
+				move.x -= sinf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_BEAR;
+				move.z -= cosf(rotCamera.y + D3DX_PI * 0.75f) * VALUE_MOVE_BEAR;
 
 				rotDest.y = rotCamera.y + D3DX_PI * 0.75f;
 			}
 			else if (useAI ? downAI : GetKeyboardPress(downKey) || IsButtonPress(padNo, BUTTON_DOWN) || IsButtonPress(padNo, BUTTON_LSTICK_DOWN))
 			{// 左後移動
-				move.x -= sinf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE;
-				move.z -= cosf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE;
+				move.x -= sinf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_BEAR;
+				move.z -= cosf(rotCamera.y + D3DX_PI * 0.25f) * VALUE_MOVE_BEAR;
 
 				rotDest.y = rotCamera.y + D3DX_PI * 0.25f;
 			}
 			else
 			{// 左移動
-				move.x -= sinf(rotCamera.y + D3DX_PI * 0.50f) * VALUE_MOVE;
-				move.z -= cosf(rotCamera.y + D3DX_PI * 0.50f) * VALUE_MOVE;
+				move.x -= sinf(rotCamera.y + D3DX_PI * 0.50f) * VALUE_MOVE_BEAR;
+				move.z -= cosf(rotCamera.y + D3DX_PI * 0.50f) * VALUE_MOVE_BEAR;
 
 				rotDest.y = rotCamera.y + D3DX_PI * 0.50f;
 			}
@@ -1227,22 +1237,22 @@ void Character::Movement()
 
 			if (useAI ? upAI : GetKeyboardPress(upKey) || IsButtonPress(padNo, BUTTON_UP) || IsButtonPress(padNo, BUTTON_LSTICK_UP))
 			{// 右前移動
-				move.x -= sinf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE;
-				move.z -= cosf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE;
+				move.x -= sinf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_BEAR;
+				move.z -= cosf(rotCamera.y - D3DX_PI * 0.75f) * VALUE_MOVE_BEAR;
 
 				rotDest.y = rotCamera.y - D3DX_PI * 0.75f;
 			}
 			else if (useAI ? downAI : GetKeyboardPress(downKey) || IsButtonPress(padNo, BUTTON_DOWN) || IsButtonPress(padNo, BUTTON_LSTICK_DOWN))
 			{// 右後移動
-				move.x -= sinf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE;
-				move.z -= cosf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE;
+				move.x -= sinf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_BEAR;
+				move.z -= cosf(rotCamera.y - D3DX_PI * 0.25f) * VALUE_MOVE_BEAR;
 
 				rotDest.y = rotCamera.y - D3DX_PI * 0.25f;
 			}
 			else
 			{// 右移動
-				move.x -= sinf(rotCamera.y - D3DX_PI * 0.50f) * VALUE_MOVE;
-				move.z -= cosf(rotCamera.y - D3DX_PI * 0.50f) * VALUE_MOVE;
+				move.x -= sinf(rotCamera.y - D3DX_PI * 0.50f) * VALUE_MOVE_BEAR;
+				move.z -= cosf(rotCamera.y - D3DX_PI * 0.50f) * VALUE_MOVE_BEAR;
 
 				rotDest.y = rotCamera.y - D3DX_PI * 0.50f;
 			}
@@ -1252,8 +1262,8 @@ void Character::Movement()
 			motion.use = true;//モーション状態にする
 
 			// 前移動
-			move.x -= sinf(D3DX_PI + rotCamera.y) * VALUE_MOVE;
-			move.z -= cosf(D3DX_PI + rotCamera.y) * VALUE_MOVE;
+			move.x -= sinf(D3DX_PI + rotCamera.y) * VALUE_MOVE_BEAR;
+			move.z -= cosf(D3DX_PI + rotCamera.y) * VALUE_MOVE_BEAR;
 
 			rotDest.y = rotCamera.y + D3DX_PI;		// - D3DX_PIになると、逆の方向に回転する
 		}
@@ -1262,8 +1272,8 @@ void Character::Movement()
 			motion.use = true;//モーション状態にする
 
 			// 後移動
-			move.x -= sinf(rotCamera.y) * VALUE_MOVE;
-			move.z -= cosf(rotCamera.y) * VALUE_MOVE;
+			move.x -= sinf(rotCamera.y) * VALUE_MOVE_BEAR;
+			move.z -= cosf(rotCamera.y) * VALUE_MOVE_BEAR;
 
 			rotDest.y = rotCamera.y;
 		}
@@ -1275,20 +1285,20 @@ void Character::Movement()
 		//開発者機能
 		if (GetKeyboardPress(DIK_T))
 		{// 上昇
-			move.y += VALUE_MOVE;
+			move.y += VALUE_MOVE_BEAR;
 		}
 		else if (GetKeyboardPress(DIK_Y))
 		{// 下降
-			move.y -= VALUE_MOVE;
+			move.y -= VALUE_MOVE_BEAR;
 		}
 
 		if (GetKeyboardPress(DIK_U))
 		{// 左回転
-			rotDest.y -= VALUE_ROTATE;
+			rotDest.y -= VALUE_ROTATE_BEAR;
 		}
 		else if (GetKeyboardPress(DIK_I))
 		{// 右回転
-			rotDest.y += VALUE_ROTATE;
+			rotDest.y += VALUE_ROTATE_BEAR;
 		}
 #endif
 	}
@@ -1301,7 +1311,7 @@ void Character::Movement()
 	LimitRot(fDiffRotY);									// 重要! 近い方向に回転できるように
 
 	// 回転量を体(part[0])に反映
-	part[0].srt.rot.y += fDiffRotY * RATE_ROTATE;			// 目的の角度まで慣性をかける　段々目的の角度に変化する
+	part[0].srt.rot.y += fDiffRotY * RATE_ROTATE_BEAR;			// 目的の角度まで慣性をかける　段々目的の角度に変化する
 
 	LimitRot(part[0].srt.rot.y);							//実際はなくてもいいが、数字がめちゃくちゃになる
 
@@ -1453,9 +1463,9 @@ void Character::AreaCollision()
 	{
 		part[0].srt.pos.x = 630.0f;
 	}
-	//if (part[0].srt.pos.y < HEIGHT_FROMLAND)
+	//if (part[0].srt.pos.y < HEIGHT_FROMLAND_BEAR)
 	//{
-	//	part[0].srt.pos.y = HEIGHT_FROMLAND;
+	//	part[0].srt.pos.y = HEIGHT_FROMLAND_BEAR;
 	//}
 	//if (part[0].srt.pos.y > 150.0f)
 	//{
@@ -1479,9 +1489,9 @@ void Character::Drag()
 {
 	// 運動エネルギーを一部損して（抵抗力のため）保存する、次のフレームに使う(慣性の仕組み)
 	//※損の部分イコール次のフレームに獲得の運動エネルギーの場合、速度が最大(7.8f)になって、等速直線運動になる
-	move.x = move.x * (1 - RATE_MOVE);
-	move.y = move.y * (1 - RATE_MOVE);
-	move.z = move.z * (1 - RATE_MOVE);
+	move.x = move.x * (1 - RATE_MOVE_BEAR);
+	move.y = move.y * (1 - RATE_MOVE_BEAR);
+	move.z = move.z * (1 - RATE_MOVE_BEAR);
 
 }
 
@@ -1658,7 +1668,7 @@ void Character::UpdateCharacter()
 
 	Drag();
 
-	UpdateShadow(nIdxShadow, part[0].srt.pos, HEIGHT_FROMLAND);
+	UpdateShadow(nIdxShadow, part[0].srt.pos, HEIGHT_FROMLAND_BEAR);
 
 	Jet();
 

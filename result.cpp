@@ -115,10 +115,10 @@ void DrawResult(void)
 
 	if ((GetPlayMode() == PLAY_MODE_SINGLE) && (GetWinner() != OBJECT_PLAYER))
 	{//1pモードでプレイヤー負ける場合
-		DrawPolygon(pDevice, g_pD3DVtxBuffResultLogo, g_pD3DTextureResultLogo2);
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffResultLogo, g_pD3DTextureResultLogo2);
 	}
 	else
 	{
-		DrawPolygon(pDevice, g_pD3DVtxBuffResultLogo, g_pD3DTextureResultLogo);
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffResultLogo, g_pD3DTextureResultLogo);
 	}
 }

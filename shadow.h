@@ -19,5 +19,4 @@ void DrawShadow(void);
 int SetShadow(D3DXVECTOR3 pos, float fSize);
 void DeleteShadow(int nIdxShadow);
 
-
 #endif

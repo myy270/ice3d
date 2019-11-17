@@ -23,9 +23,11 @@
 
 #define	ITEMUI_POS_X2			SCREEN_WIDTH - ITEMUI_POS_X - ITEMUI_WIDTH	// 右のアイテムUIの表示基準位置Ｘ座標
 
-#define	DROP_TIME				(420)										// アイテムの落下間隔時間　単位：フレーム
+#define	DROP_TIME				(FPS * 7)									// アイテムの落下間隔時間　単位はフレーム
 #define	DROP_HIGHT				(1800.0f)									// 落下アイテムの初期高さ
 #define	DROP_SPEED				(15.0f)										// 落下アイテムの落下速度
+
+#define	VALUE_ROTATE_ITEM		(D3DX_PI * 0.025f)							// 回転量	4.5度相当
 
 #define	HEIGHT_FROMLAND_ITEM	(15.0f)										// アイテムの滞空高さ
 #define	NUM_COIN				(99)										// コインの数
@@ -165,7 +167,7 @@ void UpdateItem(void)
 	{
 		if(g_aItem[nCntItem].use)
 		{
-			g_aItem[nCntItem].srt.rot.y += VALUE_ROTATE;	//毎フレーム自回転
+			g_aItem[nCntItem].srt.rot.y += VALUE_ROTATE_ITEM;	//毎フレーム自回転
 
 			LimitRot(g_aItem[nCntItem].srt.rot.y);
 
@@ -183,22 +185,34 @@ void DrawItem(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	//アイテムの描画
+	//アイスブロックがコインを遮らないように、先にコインを描画
 	for (int i = 0; i < MAX_ITEM; i++)//パーツ番号
 	{
-		DrawXMODEL(pDevice, g_aItem + i, 1);
+		if (g_aItem[i].nType == ITEMTYPE_COIN)
+		{
+			DrawXMODEL(pDevice, g_aItem + i, 1);
+		}		
+	}
+
+	//後にアイスブロックを描画
+	for (int i = 0; i < MAX_ITEM; i++)//パーツ番号
+	{
+		if (g_aItem[i].nType == ITEMTYPE_ICEBLOCK)
+		{
+			DrawXMODEL(pDevice, g_aItem + i, 1);
+		}
 	}
 
 	//凍結アイテムUIの描画	
 	//左の方
 	if (GetPlayer()->holdItem == ITEMTYPE_ICEBLOCK)
 	{
-		DrawPolygon(pDevice, g_pD3DVtxBuffItemUI, NULL);			
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI, NULL);
 	}
 	//右の方
 	if (GetEnemy()->holdItem == ITEMTYPE_ICEBLOCK)
 	{
-		DrawPolygon(pDevice, g_pD3DVtxBuffItemUI2, NULL);
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI2, NULL);
 	}
 			
 }

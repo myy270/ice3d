@@ -163,11 +163,11 @@ void DrawGame(void)
 
 	DrawEnemy();
 
-	// アイテム処理の描画
-	DrawItem();
-
 	// エフェクト処理の描画
 	DrawEffect();
+
+	// アイテム処理の描画
+	DrawItem();
 
 	// 壁処理の描画
 	DrawMeshWall();

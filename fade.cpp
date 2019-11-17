@@ -110,7 +110,7 @@ void DrawFade(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	DrawPolygon(pDevice, g_pD3DVtxBuffFade, g_pD3DTextureFade);
+	DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffFade, g_pD3DTextureFade);
 }
 
 //=============================================================================

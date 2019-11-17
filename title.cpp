@@ -162,17 +162,17 @@ void DrawTitle(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	//タイトル画面の背景を描画
-	DrawPolygon(pDevice, g_pD3DVtxBuffTitleBG, g_pD3DTextureTitleBG);
+	DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffTitleBG, g_pD3DTextureTitleBG);
 
 	if (!g_bDispMenu1P2P)
 	{
 		//タイトルロゴを描画
-		DrawPolygon(pDevice, g_pD3DVtxBuffTitleLogo, g_pD3DTextureTitleLogo);
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffTitleLogo, g_pD3DTextureTitleLogo);
 
 		if (g_bDispStart == true)
 		{
 			//「PRESS START」ロゴを描画
-			DrawPolygon(pDevice, g_pD3DVtxBuffStart, g_pD3DTextureStart);
+			DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffStart, g_pD3DTextureStart);
 		}
 	}
 	else
@@ -185,7 +185,7 @@ void DrawTitle(void)
 			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(0.0f, 0.0f), 1.0f, 0.5f);
 
 			//1p項目を描画
-			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
+			DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
 
 			//頂点バッファの内容を再設定する
 			SetVtxDataVtx(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR3(MENU_1P2P_POS_X + MENU_1P2P_WIDTH * CURSOR_RATE, MENU_1P2P_POS_Y + MENU_1P2P_HEIGHT / 2, 0.0f), MENU_1P2P_WIDTH * (1 - CURSOR_RATE), MENU_1P2P_HEIGHT / 2);
@@ -193,7 +193,7 @@ void DrawTitle(void)
 			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(CURSOR_RATE, 0.5f), (1.0f - CURSOR_RATE), 0.5f);
 
 			//2p項目を描画
-			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);			
+			DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
 		}
 		else if (g_nCursorIdx == 1)
 		{//カーソルが2P項目を指しているとき
@@ -203,7 +203,7 @@ void DrawTitle(void)
 			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(CURSOR_RATE, 0.0f), (1.0f - CURSOR_RATE), 0.5f);
 
 			//1p項目を描画
-			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
+			DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
 
 			//頂点バッファの内容を再設定する
 			SetVtxDataVtx(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y + MENU_1P2P_HEIGHT / 2, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT / 2);
@@ -211,7 +211,7 @@ void DrawTitle(void)
 			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(0.0f, 0.5f), 1.0f, 0.5f);
 
 			//2p項目を描画
-			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
+			DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
 		}
 	}
 }

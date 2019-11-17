@@ -70,17 +70,17 @@
 #define	HAND_ENEMY		"data/MODEL/bearHandPink.x"		// 読み込むモデル名
 #define	LEG_ENEMY		"data/MODEL/bearLegPink.x"		// 読み込むモデル名
 
-#define	RADIUS_BEAR			(15.0f)						// 熊モデルの半径	//影の大きさ、煙のエフェクトの位置や、アイテムとの当たる距離 と関係ある
+#define	RADIUS_BEAR				(15.0f)					// 熊モデルの半径	//影の大きさ、煙のエフェクトの位置や、アイテムとの当たる距離 と関係ある
 
-#define	VALUE_MOVE			(0.195f)					// 移動量
-#define	RATE_MOVE			(0.025f)					// 移動抵抗力の係数		※小さければ小さいほど、滑りやすい
+#define	VALUE_MOVE_BEAR			(0.195f)				// 移動量
+#define	RATE_MOVE_BEAR			(0.025f)				// 移動抵抗力の係数		※小さければ小さいほど、滑りやすい
 
-#define	VALUE_ROTATE		(D3DX_PI * 0.025f)			// 回転量	4.5度相当
-#define	RATE_ROTATE			(0.10f)						// 回転速度係数
+#define	VALUE_ROTATE_BEAR		(D3DX_PI * 0.025f)		// 回転量	4.5度相当
+#define	RATE_ROTATE_BEAR		(0.10f)					// 回転速度係数
 
-#define	HEIGHT_FROMLAND		(22.4f)						// 体パーツの地面からの高さ(srt.pos.y)
+#define	HEIGHT_FROMLAND_BEAR	(22.4f)					// 体パーツの地面からの高さ(part[0].srt.pos.yのデフォルト値)
 
-#define	MAX_ITEM			(128)						// アイテムの最大数
+#define	MAX_ITEM				(128)					// アイテムの最大数
 
 
 
@@ -149,6 +149,18 @@ enum MAPPINGTYPE
 
 };
 
+struct EFFECT
+{
+	D3DXVECTOR3 pos;		// 位置
+	D3DXVECTOR3 rot;		// 回転
+	D3DXVECTOR3 move;		// 移動量
+	D3DXCOLOR col;			// 色
+	float fSizeX;			// 幅
+	float fSizeY;			// 高さ
+	int nTimer;				// タイマー
+	float nDecAlpha;		// アルファ値の減衰値
+	bool bUse;				// 使用しているかどうか
+};
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
@@ -299,7 +311,7 @@ void SetVtxDataTex(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DXVECTOR2 tex, 
 
 void SetVtxDataTexNum(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
 
-void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
+void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, DWORD FVF, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int index = 0);
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
 
 void DrawPolygonMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DINDEXBUFFER9 idxBuff,
