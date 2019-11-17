@@ -131,7 +131,7 @@ void UpdateTimer(void)
 	int count = g_nTimerCount + 59;			//残り0.5秒としても、画面上には1秒として表示するための役割
 	count = count / FPS;					//フレーム単位から秒単位に転化する
 
-	SetVtxData(g_pD3DVtxBuffTimer, count, NUM_PLACE);
+	SetVtxDataTexNum(g_pD3DVtxBuffTimer, count, NUM_PLACE);
 }
 
 //=============================================================================

@@ -41,8 +41,8 @@ HRESULT InitFade(void)
 	g_colorFade = FADE_COLOR;
 
 	// 頂点情報の作成
-	MakeVertex(pDevice, g_pD3DVtxBuffFade, D3DXVECTOR3(0.0f, 0.0f, 0.0f), SCREEN_WIDTH, SCREEN_HEIGHT);
-	SetVtxData(g_pD3DVtxBuffFade, g_colorFade);		// 色を再設定
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffFade, D3DXVECTOR3(0.0f, 0.0f, 0.0f), SCREEN_WIDTH, SCREEN_HEIGHT);
+	SetVtxDataCor(g_pD3DVtxBuffFade, FVF_VERTEX_2D, g_colorFade);		// 色を再設定
 
 	return S_OK;
 }
@@ -99,7 +99,7 @@ void UpdateFade(void)
 			}
 		}
 			
-		SetVtxData(g_pD3DVtxBuffFade, g_colorFade);			// 色を再設定
+		SetVtxDataCor(g_pD3DVtxBuffFade, FVF_VERTEX_2D, g_colorFade);			// 色を再設定
 	}
 }
 

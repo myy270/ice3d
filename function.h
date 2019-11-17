@@ -31,8 +31,8 @@
 // ３Ｄポリゴン頂点フォーマット( 頂点座標[3D] / 法線 / 反射光 / テクスチャ座標 )
 #define	FVF_VERTEX_3D	(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
-#define SCREEN_WIDTH	(1280)				// 実際のウインドウの幅(int型必須)
-#define SCREEN_HEIGHT	(720)				// 実際のウインドウの高さ(int型必須)
+#define SCREEN_WIDTH	(1280)						// 実際のウインドウの幅(int型必須)
+#define SCREEN_HEIGHT	(720)						// 実際のウインドウの高さ(int型必須)
 
 #define DESIGN_SCREEN_WIDTH		(1280.0f)			// 設計するときのウインドウの幅(小数点必須)
 #define DESIGN_SCREEN_HEIGHT	(720.0f)			// 設計するときのウインドウの高さ(小数点必須)
@@ -40,8 +40,8 @@
 #define TEXTURE_AUTOFIT_WIDTH			(SCREEN_WIDTH  / DESIGN_SCREEN_WIDTH)			// 画面サイズに応じての幅の調整比率
 #define TEXTURE_AUTOFIT_HEIGHT			(SCREEN_HEIGHT / DESIGN_SCREEN_HEIGHT)			// 画面サイズに応じての高さの調整比率
 
-#define FIT_WIDTH(width)		((width) * TEXTURE_AUTOFIT_WIDTH)		// 調整後の幅の計算式  (width:リソースの幅)
-#define FIT_HEIGHT(height)		((height) * TEXTURE_AUTOFIT_HEIGHT)		// 調整後の高さの計算式  (height:リソースの高さ)
+#define FIT_WIDTH(width)		((width) * TEXTURE_AUTOFIT_WIDTH)						// 調整後の幅の計算式  (width:リソースの幅)
+#define FIT_HEIGHT(height)		((height) * TEXTURE_AUTOFIT_HEIGHT)						// 調整後の高さの計算式  (height:リソースの高さ)
 
 #define TEXTURE_CENTER_X(width)			((SCREEN_WIDTH - (width)) / 2.0f)				// 画面の横方向の真中におくようにポリゴンの左上頂点のX座標	(width:テクスチャの調整後の幅)
 #define TEXTURE_CENTER_Y(height)		((SCREEN_HEIGHT - (height)) / 2.0f)				// 画面の縦方向の真中におくようにポリゴンの左上頂点のY座標	(height:テクスチャの調整後の高さ)
@@ -53,11 +53,11 @@
 #define SAFE_RELEASE(ptr)		{ if(ptr) { (ptr)->Release(); (ptr) = NULL; } }		//オブジェクトの解放
 
 
-#define PART_MAX			(7)		// パーツの数(アイスブロックを含む)
+#define PART_MAX			(7)														// パーツの数(アイスブロックを含む)
 
 #define	FPS	(60)
 
-#define	FIRST_SCENE		(SCENE_GAME)		//最初の画面
+#define	FIRST_SCENE		(SCENE_GAME)												//最初の画面
 
 #define	BODY_PLAYER		"data/MODEL/bearBody.x"			// 読み込むモデル名
 #define	HEAD_PLAYER		"data/MODEL/bearHead.x"			// 読み込むモデル名
@@ -73,7 +73,7 @@
 #define	RADIUS_BEAR			(15.0f)						// 熊モデルの半径	//影の大きさ、煙のエフェクトの位置や、アイテムとの当たる距離 と関係ある
 
 #define	VALUE_MOVE			(0.195f)					// 移動量
-#define	RATE_MOVE_PLAYER	(0.025f)					// 移動抵抗力の係数		※小さければ小さいほど、滑りやすい
+#define	RATE_MOVE			(0.025f)					// 移動抵抗力の係数		※小さければ小さいほど、滑りやすい
 
 #define	VALUE_ROTATE		(D3DX_PI * 0.025f)			// 回転量	4.5度相当
 #define	RATE_ROTATE			(0.10f)						// 回転速度係数
@@ -238,19 +238,23 @@ public:
 	//メンバー関数==========================
 
 	HRESULT Init(OBJECT object);
+
 	void AIControl();
 	int  AI(int type = 1);
+
 	void Movement();
+	void Motion(MOTION& motion);
 	void AreaCollision();
 	void Drag();
-
 	void Jet();
 	void ItemCollision();
+
 	void UseIceblock();
 	void Freeze(Character* target);
+
 	void Frozen();
 
-
+	void UpdateCharacter();
 };
 
 //アイテム
@@ -261,11 +265,20 @@ struct ITEM : public XMODEL
 	ITEMTYPE	nType;			// アイテム種類
 };
 
+//シャドー
+struct SHADOW
+{
+	float size;				// 影の矩形の辺の長さ
+	D3DXVECTOR3 pos;		// 位置
+	bool bUse;				// 使用しているかどうか
+};
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
 
-HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vec, float width, float height);
+HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, DWORD FVF, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vtx, float width, float height, 
+																	D3DCOLOR diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), int num = 1);
 
 HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, int numPlace,
 	D3DXVECTOR3 numPos, float numWidth, float numHeight, float numInterval,
@@ -278,12 +291,13 @@ HRESULT MakeVertexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBu
 
 HRESULT MakeIndexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DINDEXBUFFER9& idxBuff, int numIndex, int numBlockX, int numBlockZ);
 
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index = 0);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index = 0);
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height, int index = 0);
+void SetVtxDataVtx(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DXVECTOR3 vtx, float width, float height, int index = 0);
+void SetVtxDataRHW(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index = 0);
+void SetVtxDataNor(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 nor, int index = 0);
+void SetVtxDataCor(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DCOLOR diffuse, int index = 0);
+void SetVtxDataTex(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DXVECTOR2 tex, float width, float height, int index = 0);
 
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
+void SetVtxDataTexNum(LPDIRECT3DVERTEXBUFFER9 vtxBuff, int numSet, int numPlace);
 
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex);
 void DrawPolygon(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9 vtxBuff, LPDIRECT3DTEXTURE9 tex, int indexStart, int indexEnd);
@@ -296,11 +310,9 @@ void LimitRot(float& radian);
 
 KEY* GetMotionWalk();
 
-void Motion(Character& user, MOTION& motion);
+
 
 void DrawXMODEL(LPDIRECT3DDEVICE9 pDevice, XMODEL* model, int numPart);
-
-void Shadow(int nIdxShadow, D3DXVECTOR3 pos);
 
 #endif
 

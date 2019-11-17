@@ -2,7 +2,7 @@
 //
 // 影処理 [shadow.cpp]
 // Author : 麦英泳
-// ※影の大きさが変更できない
+// 
 //=============================================================================
 #include "shadow.h"
 
@@ -10,25 +10,15 @@
 // マクロ定義
 //*****************************************************************************
 #define	TEXTURE_SHADOW		"data/TEXTURE/shadow000.jpg"	// 読み込むテクスチャファイル名
-#define	SHADOW_SIZE_X		(50.0f)							// 影の幅
-#define	SHADOW_SIZE_Z		(50.0f)							// 影の高さ
 
 #define	MAX_SHADOW			(128)							// 影最大数
-
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
-typedef struct
-{
-	D3DXVECTOR3 pos;		// 位置
-	D3DXVECTOR3 rot;		// 回転
-	bool bUse;				// 使用しているかどうか
-} SHADOW;
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexShadow(LPDIRECT3DDEVICE9 pDevice);
 
 //*****************************************************************************
 // グローバル変数
@@ -36,10 +26,7 @@ HRESULT MakeVertexShadow(LPDIRECT3DDEVICE9 pDevice);
 LPDIRECT3DTEXTURE9		g_pD3DTextureShadow = NULL;		// テクスチャへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffShadow = NULL;		// 頂点バッファインターフェースへのポインタ
 
-D3DXMATRIX				g_mtxWorldShadow;				// ワールドマトリックス
-
 SHADOW					g_aShadow[MAX_SHADOW];			// 影ワーク
-
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -47,8 +34,8 @@ HRESULT InitShadow(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
-	// 頂点情報の作成
-	MakeVertexShadow(pDevice);
+	MakeVertex(pDevice, FVF_VERTEX_3D, g_pD3DVtxBuffShadow, D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 
+																			D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), MAX_SHADOW);
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
@@ -57,8 +44,8 @@ HRESULT InitShadow(void)
 
 	for(int nCntShadow = 0; nCntShadow < MAX_SHADOW; nCntShadow++)
 	{//デフォルト値
+		g_aShadow[nCntShadow].size = 0.0f;
 		g_aShadow[nCntShadow].pos = D3DXVECTOR3(0.0f, 0.1f, 0.0f);
-		g_aShadow[nCntShadow].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 		g_aShadow[nCntShadow].bUse = false;
 	}
 
@@ -76,10 +63,43 @@ void UninitShadow(void)
 }
 
 //=============================================================================
-// 更新処理
+// 影の位置を更新、位置の高さにより、大きさと透明度を変化する
+// size:影の四辺の長さ つまり、モデルの直径
+// farFromLand:モデルの正常時の滞空高さ
 //=============================================================================
-void UpdateShadow(void)
+void UpdateShadow(int nIdxShadow, D3DXVECTOR3 pos, float farFromLand)
 {
+	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
+	{
+		g_aShadow[nIdxShadow].pos = D3DXVECTOR3(pos.x, 0.1f, pos.z);
+	}
+
+	//高さにより、影の大きさが変化する	//高ければ高いほど大きい
+	float fSize = g_aShadow[nIdxShadow].size + (pos.y - farFromLand) * 0.05f;
+
+	if (pos.y < 0.0f)
+	{//地面以下に行くとき
+		fSize = 0.0f;
+	}
+
+	//影の大きさを更新
+	SetVtxDataVtx(g_pD3DVtxBuffShadow, FVF_VERTEX_3D, D3DXVECTOR3(0.0f, 0.0f, 0.0f), fSize, fSize , nIdxShadow);
+
+	//高さにより、影の透明度が変化する	//高ければ高いほど透明的
+	float colA = 0.5f - (pos.y - farFromLand) / 400.0f;
+
+	if (colA < 0.0f)
+	{
+		colA = 0.0f;
+	}
+	if (pos.y < 0.0f)
+	{//地面以下に行くとき
+		colA = 0.0f;
+	}
+
+	////影の透明度を更新
+	SetVtxDataCor(g_pD3DVtxBuffShadow, FVF_VERTEX_3D, D3DXCOLOR(1.0f, 1.0f, 1.0f, colA), nIdxShadow);
+
 }
 
 //=============================================================================
@@ -88,13 +108,8 @@ void UpdateShadow(void)
 void DrawShadow(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
-	D3DXMATRIX mtxTranslate;
-#if 1
-	D3DXMATRIX mtxRot;
-	D3DXQUATERNION quat;
-	D3DXVECTOR3 vecUpObj, vecUpField, outVec;
-	float fDotProduct,fRot;
-#endif
+			
+	D3DXMATRIX mtxTranslate, g_mtxWorldShadow;				// ワールドマトリックス
 
 	// 減算合成
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);		// 結果 = 転送先(DEST) - 転送元(SRC)
@@ -113,27 +128,6 @@ void DrawShadow(void)
 		{
 			// ワールドマトリックスの初期化
 			D3DXMatrixIdentity(&g_mtxWorldShadow);
-
-#if 1//影を地面の地形により回転する
-			// 回転を反映
-			D3DXQuaternionIdentity(&quat);
-
-			vecUpObj = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// オブジェクト(影)の上方向
-			vecUpField = D3DXVECTOR3(0.0f, 1.0f, 0.0f);		// 地面の法線
-
-			// オブジェクトの上方向と地面の法線の外積から回転軸を求める
-			D3DXVec3Cross(&outVec, &vecUpObj, &vecUpField);
-
-			// オブジェクトの上方向と地面の法線のなす角を求める
-			fDotProduct = D3DXVec3Dot(&vecUpObj, &vecUpField);
-			fRot = acosf(fDotProduct / (sqrtf(vecUpObj.x * vecUpObj.x + vecUpObj.y * vecUpObj.y + vecUpObj.z * vecUpObj.z)
-														* sqrtf(vecUpField.x * vecUpField.x + vecUpField.y * vecUpField.y + vecUpField.z * vecUpField.z)));
-
-			// 回転軸となす角からクォータニオンを求め、回転マトリックスを算出
-			D3DXQuaternionRotationAxis(&quat, &outVec, fRot);
-			D3DXMatrixRotationQuaternion(&mtxRot, &quat);
-			D3DXMatrixMultiply(&g_mtxWorldShadow, &g_mtxWorldShadow, &mtxRot);
-#endif
 
 			// 移動を反映
 			D3DXMatrixTranslation(&mtxTranslate, g_aShadow[nCntShadow].pos.x, g_aShadow[nCntShadow].pos.y, g_aShadow[nCntShadow].pos.z);
@@ -169,117 +163,9 @@ void DrawShadow(void)
 }
 
 //=============================================================================
-// 頂点情報の作成
-//=============================================================================
-HRESULT MakeVertexShadow(LPDIRECT3DDEVICE9 pDevice)
-{
-	// オブジェクトの頂点バッファを生成
-    if( FAILED( pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX * MAX_SHADOW,	// 頂点データ用に確保するバッファサイズ(バイト単位)
-												D3DUSAGE_WRITEONLY,							// 頂点バッファの使用法　
-												FVF_VERTEX_3D,								// 使用する頂点フォーマット
-												D3DPOOL_MANAGED,							// リソースのバッファを保持するメモリクラスを指定
-												&g_pD3DVtxBuffShadow,						// 頂点バッファインターフェースへのポインタ
-												NULL)))										// NULLに設定
-	{
-        return E_FAIL;
-	}
-
-	{//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
-
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		g_pD3DVtxBuffShadow->Lock(0, 0, (void**)&pVtx, 0);
-
-		for(int nCntShadow = 0; nCntShadow < MAX_SHADOW; nCntShadow++, pVtx += 4)
-		{
-			// 頂点座標の設定
-			pVtx[0].vtx = D3DXVECTOR3(-SHADOW_SIZE_X / 2, 0.0f, SHADOW_SIZE_Z / 2);
-			pVtx[1].vtx = D3DXVECTOR3(SHADOW_SIZE_X / 2, 0.0f, SHADOW_SIZE_Z / 2);
-			pVtx[2].vtx = D3DXVECTOR3(-SHADOW_SIZE_X / 2, 0.0f, -SHADOW_SIZE_Z / 2);
-			pVtx[3].vtx = D3DXVECTOR3(SHADOW_SIZE_X / 2, 0.0f, -SHADOW_SIZE_Z / 2);
-
-			// 法線の設定
-			pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-			pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-			pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-			pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-
-			// 反射光の設定
-			pVtx[0].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);//テクスチャーを半透明にする
-			pVtx[1].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
-			pVtx[2].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
-			pVtx[3].diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f);
-
-			// テクスチャ座標の設定
-			pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-			pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-			pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-			pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-		}
-
-		// 頂点データをアンロックする
-		g_pD3DVtxBuffShadow->Unlock();
-	}
-
-	return S_OK;
-}
-
-//=============================================================================
-// 頂点座標の設定
-//=============================================================================
-void SetVertexShadow(int nIdxShadow, float fSizeX, float fSizeZ)
-{
-	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
-	{
-		//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
-
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		g_pD3DVtxBuffShadow->Lock(0, 0, (void**)&pVtx, 0);
-
-		pVtx += (nIdxShadow * 4);
-
-		// 頂点座標の設定
-		pVtx[0].vtx = D3DXVECTOR3(-fSizeX / 2, 0.0f, fSizeZ / 2);
-		pVtx[1].vtx = D3DXVECTOR3(fSizeX / 2, 0.0f, fSizeZ / 2);
-		pVtx[2].vtx = D3DXVECTOR3(-fSizeX / 2, 0.0f, -fSizeZ / 2);
-		pVtx[3].vtx = D3DXVECTOR3(fSizeX / 2, 0.0f, -fSizeZ / 2);
-
-		// 頂点データをアンロックする
-		g_pD3DVtxBuffShadow->Unlock();
-	}
-}
-
-//=============================================================================
-// 頂点カラーの設定
-//=============================================================================
-void SetColorShadow(int nIdxShadow, D3DXCOLOR col)
-{
-	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
-	{
-		//頂点バッファの中身を埋める
-		VERTEX_3D *pVtx;
-
-		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-		g_pD3DVtxBuffShadow->Lock(0, 0, (void**)&pVtx, 0);
-
-		pVtx += (nIdxShadow * 4);
-
-		// 頂点座標の設定
-		pVtx[0].diffuse =
-		pVtx[1].diffuse =
-		pVtx[2].diffuse =
-		pVtx[3].diffuse = col;
-
-		// 頂点データをアンロックする
-		g_pD3DVtxBuffShadow->Unlock();
-	}
-}
-
-//=============================================================================
 // 影の設定
 //=============================================================================
-int SetShadow(D3DXVECTOR3 pos, float fSizeX, float fSizeZ)
+int SetShadow(D3DXVECTOR3 pos, float fSize)
 {
 	int nIdxShadow = -1;
 
@@ -287,29 +173,20 @@ int SetShadow(D3DXVECTOR3 pos, float fSizeX, float fSizeZ)
 	{
 		if(!g_aShadow[nCntShadow].bUse)
 		{
+			g_aShadow[nCntShadow].size = fSize;
 			g_aShadow[nCntShadow].pos = pos;
-			g_aShadow[nCntShadow].rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 			g_aShadow[nCntShadow].bUse = true;
 
-			SetVertexShadow(nCntShadow, fSizeX, fSizeZ);
+			//大きさを反映する
+			SetVtxDataVtx(g_pD3DVtxBuffShadow, FVF_VERTEX_3D, D3DXVECTOR3(0.0f, 0.0f, 0.0f), fSize, fSize, nCntShadow);
 
 			nIdxShadow = nCntShadow;
+
 			break;
 		}
 	}
 
 	return nIdxShadow;
-}
-
-//=============================================================================
-// 位置の設定
-//=============================================================================
-void SetPositionShadow(int nIdxShadow, D3DXVECTOR3 pos)
-{
-	if (nIdxShadow >= 0 && nIdxShadow < MAX_SHADOW)
-	{
-		g_aShadow[nIdxShadow].pos = pos;
-	}
 }
 
 //=============================================================================

@@ -49,7 +49,7 @@ HRESULT InitResult(void)
 	g_fAlphaResult = 0.0f;
 
 	// 頂点情報の作成
-	MakeVertex(pDevice, g_pD3DVtxBuffResultLogo, D3DXVECTOR3(RESULT_LOGO_POS_X, RESULT_LOGO_POS_Y, 0.0f), RESULT_LOGO_WIDTH, RESULT_LOGO_HEIGHT);
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffResultLogo, D3DXVECTOR3(RESULT_LOGO_POS_X, RESULT_LOGO_POS_Y, 0.0f), RESULT_LOGO_WIDTH, RESULT_LOGO_HEIGHT);
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
@@ -97,7 +97,7 @@ void UpdateResult(void)
 	}
 
 	// アルファ値の更新
-	SetVtxData(g_pD3DVtxBuffResultLogo, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaResult));
+	SetVtxDataCor(g_pD3DVtxBuffResultLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaResult));
 
 	// Enterを押したら、フェードアウトしてシーンを切り替える
 	if(GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))

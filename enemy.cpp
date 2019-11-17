@@ -5,6 +5,7 @@
 //
 //=============================================================================
 #include "enemy.h"
+#include "shadow.h"
 #include "debugproc.h"
 
 //*****************************************************************************
@@ -46,26 +47,7 @@ void UninitEnemy(void)
 //=============================================================================
 void UpdateEnemy(void)
 {
-	g_enemy.AIControl();
-
-	g_enemy.Movement();
-
-	//歩くモーション処理
-	Motion(g_enemy, g_enemy.motion);
-
-	g_enemy.AreaCollision();
-
-	g_enemy.Drag();
-
-	Shadow(g_enemy.nIdxShadow, g_enemy.part[0].srt.pos);
-
-	g_enemy.Jet();
-	
-	g_enemy.ItemCollision();
-
-	g_enemy.UseIceblock();
-
-	g_enemy.Frozen();
+	g_enemy.UpdateCharacter();
 
 	//PrintDebugProc("AIのup ：%d \n", g_up);
 	//PrintDebugProc("AIのdown ：%d \n", g_down);

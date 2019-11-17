@@ -71,11 +71,11 @@ HRESULT InitItem(void)
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 
 	//UIの頂点を作成
-	MakeVertex(pDevice, g_pD3DVtxBuffItemUI, D3DXVECTOR3(ITEMUI_POS_X, ITEMUI_POS_Y, 0.0f), ITEMUI_WIDTH, ITEMUI_HEIGHT);
-	SetVtxData(g_pD3DVtxBuffItemUI, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));		//シアン色にする
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI, D3DXVECTOR3(ITEMUI_POS_X, ITEMUI_POS_Y, 0.0f), ITEMUI_WIDTH, ITEMUI_HEIGHT);
+	SetVtxDataCor(g_pD3DVtxBuffItemUI, FVF_VERTEX_2D, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));		//シアン色にする
 
-	MakeVertex(pDevice, g_pD3DVtxBuffItemUI2, D3DXVECTOR3(ITEMUI_POS_X2, ITEMUI_POS_Y, 0.0f), ITEMUI_WIDTH, ITEMUI_HEIGHT);
-	SetVtxData(g_pD3DVtxBuffItemUI2, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));	//シアン色にする
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI2, D3DXVECTOR3(ITEMUI_POS_X2, ITEMUI_POS_Y, 0.0f), ITEMUI_WIDTH, ITEMUI_HEIGHT);
+	SetVtxDataCor(g_pD3DVtxBuffItemUI2, FVF_VERTEX_2D, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));	//シアン色にする
 
 	// Xファイルの読み込み
 	for(int nCntItemType = 0; nCntItemType < ITEMTYPE_MAX; nCntItemType++)
@@ -170,8 +170,7 @@ void UpdateItem(void)
 			LimitRot(g_aItem[nCntItem].srt.rot.y);
 
 			//影を更新
-			Shadow(g_aItem[nCntItem].nIdxShadow, g_aItem[nCntItem].srt.pos);
-
+			UpdateShadow(g_aItem[nCntItem].nIdxShadow, g_aItem[nCntItem].srt.pos, HEIGHT_FROMLAND_ITEM);
 		}
 	}
 
@@ -226,7 +225,7 @@ int SetItem(D3DXVECTOR3 pos, ITEMTYPE nType, bool shadowUsable)
 			if (shadowUsable)
 			{
 				// 影の設定
-				g_aItem[nCntItem].nIdxShadow = SetShadow(g_aItem[nCntItem].srt.pos, g_aItem[nCntItem].fRadius * 2.0f, g_aItem[nCntItem].fRadius * 2.0f);
+				g_aItem[nCntItem].nIdxShadow = SetShadow(g_aItem[nCntItem].srt.pos, g_aItem[nCntItem].fRadius * 2.0f);
 			}
 		
 			itemIndex = nCntItem;

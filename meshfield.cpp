@@ -9,7 +9,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_FILENAME	"data/TEXTURE/ice.bmp"											// 読み込むテクスチャファイル名
+#define	TEXTURE_FILENAME	"data/TEXTURE/ice.bm"											// 読み込むテクスチャファイル名
 
 #define	POS_FIELD			(D3DXVECTOR3(0.0f, 0.0f, 0.0f))									// メッシュフィールドの中心座標
 #define	ROT_FIELD			(D3DXVECTOR3(0.0f, 0.0f, 0.0f))									// メッシュフィールドの回転量

@@ -91,18 +91,18 @@ HRESULT InitTitle(void)
 
 	// 頂点情報の作成
 	// タイトル画面の背景
-	MakeVertex(pDevice, g_pD3DVtxBuffTitleBG, D3DXVECTOR3(0.0f,0.0f,0.0f), SCREEN_WIDTH, SCREEN_HEIGHT);
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffTitleBG, D3DXVECTOR3(0.0f,0.0f,0.0f), SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	// タイトルロゴ
-	MakeVertex(pDevice, g_pD3DVtxBuffTitleLogo, D3DXVECTOR3(TITLE_LOGO_POS_X, TITLE_LOGO_POS_Y, 0.0f), TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffTitleLogo, D3DXVECTOR3(TITLE_LOGO_POS_X, TITLE_LOGO_POS_Y, 0.0f), TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
 	// タイトルロゴのアルファ値を0にする
-	SetVtxData(g_pD3DVtxBuffTitleLogo, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+	SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 
 	// タイトル画面の「PRESS START」ロゴ
-	MakeVertex(pDevice, g_pD3DVtxBuffStart, D3DXVECTOR3(PRESS_START_POS_X, PRESS_START_POS_Y, 0.0f), PRESS_START_WIDTH, PRESS_START_HEIGHT);
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffStart, D3DXVECTOR3(PRESS_START_POS_X, PRESS_START_POS_Y, 0.0f), PRESS_START_WIDTH, PRESS_START_HEIGHT);
 
 	// 1p2p選択メニュー
-	MakeVertex(pDevice, g_pD3DVtxBuffMenu1P2P, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT);
+	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffMenu1P2P, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT);
 
 
 	// テクスチャの読み込み
@@ -180,17 +180,17 @@ void DrawTitle(void)
 		if (g_nCursorIdx == 0)
 		{//カーソルが1P項目を指しているとき
 			//頂点バッファの内容を再設定する
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT / 2);
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR2(0.0f, 0.0f), 1.0f, 0.5f);
+			SetVtxDataVtx(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT / 2);
+			SetVtxDataCor(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(0.0f, 0.0f), 1.0f, 0.5f);
 
 			//1p項目を描画
 			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
 
 			//頂点バッファの内容を再設定する
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR3(MENU_1P2P_POS_X + MENU_1P2P_WIDTH * CURSOR_RATE, MENU_1P2P_POS_Y + MENU_1P2P_HEIGHT / 2, 0.0f), MENU_1P2P_WIDTH * (1 - CURSOR_RATE), MENU_1P2P_HEIGHT / 2);
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR2(CURSOR_RATE, 0.5f), (1.0f - CURSOR_RATE), 0.5f);
+			SetVtxDataVtx(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR3(MENU_1P2P_POS_X + MENU_1P2P_WIDTH * CURSOR_RATE, MENU_1P2P_POS_Y + MENU_1P2P_HEIGHT / 2, 0.0f), MENU_1P2P_WIDTH * (1 - CURSOR_RATE), MENU_1P2P_HEIGHT / 2);
+			SetVtxDataCor(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(CURSOR_RATE, 0.5f), (1.0f - CURSOR_RATE), 0.5f);
 
 			//2p項目を描画
 			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);			
@@ -198,17 +198,17 @@ void DrawTitle(void)
 		else if (g_nCursorIdx == 1)
 		{//カーソルが2P項目を指しているとき
 			//頂点バッファの内容を再設定する
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR3(MENU_1P2P_POS_X + MENU_1P2P_WIDTH * CURSOR_RATE, MENU_1P2P_POS_Y, 0.0f), MENU_1P2P_WIDTH * (1 - CURSOR_RATE), MENU_1P2P_HEIGHT / 2);
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR2(CURSOR_RATE, 0.0f), (1.0f - CURSOR_RATE), 0.5f);
+			SetVtxDataVtx(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR3(MENU_1P2P_POS_X + MENU_1P2P_WIDTH * CURSOR_RATE, MENU_1P2P_POS_Y, 0.0f), MENU_1P2P_WIDTH * (1 - CURSOR_RATE), MENU_1P2P_HEIGHT / 2);
+			SetVtxDataCor(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(CURSOR_RATE, 0.0f), (1.0f - CURSOR_RATE), 0.5f);
 
 			//1p項目を描画
 			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
 
 			//頂点バッファの内容を再設定する
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y + MENU_1P2P_HEIGHT / 2, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT / 2);
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-			SetVtxData(g_pD3DVtxBuffMenu1P2P, D3DXVECTOR2(0.0f, 0.5f), 1.0f, 0.5f);
+			SetVtxDataVtx(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR3(MENU_1P2P_POS_X, MENU_1P2P_POS_Y + MENU_1P2P_HEIGHT / 2, 0.0f), MENU_1P2P_WIDTH, MENU_1P2P_HEIGHT / 2);
+			SetVtxDataCor(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+			SetVtxDataTex(g_pD3DVtxBuffMenu1P2P, FVF_VERTEX_2D, D3DXVECTOR2(0.0f, 0.5f), 1.0f, 0.5f);
 
 			//2p項目を描画
 			DrawPolygon(pDevice, g_pD3DVtxBuffMenu1P2P, g_pD3DTextureMenu1P2P);
@@ -230,7 +230,7 @@ void TitleEffect(void)
 			g_fAlphaTitleLogo = 1.0f;
 		}
 
-		SetVtxData(g_pD3DVtxBuffTitleLogo, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
+		SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
 	}
 	else
 	{//フェードイン完成した後
@@ -260,7 +260,7 @@ void TitleEffect(void)
 		{//タイトルロゴがフェードインしている時
 			g_fAlphaTitleLogo = 1.0f;						// フェードインを完成状態にさせる
 
-			SetVtxData(g_pD3DVtxBuffTitleLogo, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
+			SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
 
 			g_nCountAppearStart = COUNT_APPEAR_START;	//「PRESS START」ロゴを点滅状態にさせる
 		}

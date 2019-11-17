@@ -5,6 +5,7 @@
 //
 //=============================================================================
 #include "player.h"
+#include "shadow.h"
 #include "debugproc.h"
 
 //*****************************************************************************
@@ -46,26 +47,7 @@ void UninitPlayer(void)
 //=============================================================================
 void UpdatePlayer(void)
 {
-	g_player.AIControl();
-
-	g_player.Movement();
-
-	//歩くモーション処理
-	Motion(g_player, g_player.motion);
-
-	g_player.AreaCollision();
-
-	g_player.Drag();
-
-	Shadow(g_player.nIdxShadow, g_player.part[0].srt.pos);
-
-	g_player.Jet();
-	
-	g_player.ItemCollision();
-
-	g_player.UseIceblock();
-
-	g_player.Frozen();
+	g_player.UpdateCharacter();
 
 	PrintDebugProc("目的向き：%f \n\n", g_player.rotDest.y);
 	PrintDebugProc("現在の向き：%f \n\n", g_player.part[0].srt.rot.y);

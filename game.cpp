@@ -124,9 +124,6 @@ void UpdateGame(void)
 	// 壁処理の更新
 	UpdateMeshWall();
 
-	// 影処理の更新
-	UpdateShadow();
-
 	// プレイヤー処理の更新
 	UpdatePlayer();
 

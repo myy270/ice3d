@@ -203,33 +203,60 @@ void Interpolation(int partNum, XMODEL *part, const SRT *srt2, float rate);
 
 //=============================================================================
 // 頂点の作成
+// num:矩形の数
 //=============================================================================
-HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vtx, float width, float height)
+HRESULT MakeVertex(LPDIRECT3DDEVICE9 pDevice, DWORD FVF, LPDIRECT3DVERTEXBUFFER9& vtxBuff, D3DXVECTOR3 vtx, float width, float height, 
+																											D3DCOLOR diffuse, int num)
 {
-	// オブジェクトの頂点バッファを生成
-	if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * NUM_VERTEX,	// 頂点データ用に確保するバッファサイズ(バイト単位)
-											D3DUSAGE_WRITEONLY,				// 頂点バッファの使用法　
-											FVF_VERTEX_2D,					// 使用する頂点フォーマット
-											D3DPOOL_MANAGED,				// リソースのバッファを保持するメモリクラスを指定
-											&vtxBuff,						// 頂点バッファインターフェースへのポインタ
-											NULL)))							// NULLに設定
+	if (FVF == FVF_VERTEX_2D)
 	{
-		return E_FAIL;
+		// オブジェクトの頂点バッファを生成
+		if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * NUM_VERTEX * num,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+			D3DUSAGE_WRITEONLY,				// 頂点バッファの使用法　
+			FVF_VERTEX_2D,					// 使用する頂点フォーマット
+			D3DPOOL_MANAGED,				// リソースのバッファを保持するメモリクラスを指定
+			&vtxBuff,						// 頂点バッファインターフェースへのポインタ
+			NULL)))							// NULLに設定
+		{
+			return E_FAIL;
+		}
+	}
+	else if (FVF == FVF_VERTEX_3D)
+	{
+		// オブジェクトの頂点バッファを生成
+		if (FAILED(pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VERTEX * num,	// 頂点データ用に確保するバッファサイズ(バイト単位)
+			D3DUSAGE_WRITEONLY,				// 頂点バッファの使用法　
+			FVF_VERTEX_3D,					// 使用する頂点フォーマット
+			D3DPOOL_MANAGED,				// リソースのバッファを保持するメモリクラスを指定
+			&vtxBuff,						// 頂点バッファインターフェースへのポインタ
+			NULL)))							// NULLに設定
+		{
+			return E_FAIL;
+		}
 	}
 
-	{//頂点バッファの中身を埋める
-
+	//頂点バッファの中身を埋める
+	for (int i = 0; i < num; i++)
+	{
 		// 頂点座標の設定
-		SetVtxData(vtxBuff, D3DXVECTOR3(vtx.x, vtx.y, vtx.z), width, height);
+		SetVtxDataVtx(vtxBuff, FVF, vtx, width, height, i);
 
-		// RHW用
-		SetVtxData(vtxBuff, 1.0f);
+		if (FVF == FVF_VERTEX_2D)
+		{
+			// RHWの設定
+			SetVtxDataRHW(vtxBuff, 1.0f, i);
+		}
+		else if (FVF == FVF_VERTEX_3D)
+		{
+			// ノーマルの設定
+			SetVtxDataNor(vtxBuff, D3DXVECTOR3(0.0f, 1.0f, 0.0f), i);
+		}
 
 		// 反射光の設定
-		SetVtxData(vtxBuff, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		SetVtxDataCor(vtxBuff, FVF, diffuse, i);
 
 		// テクスチャ座標の設定
-		SetVtxData(vtxBuff, D3DXVECTOR2(0.0f, 0.0f),1.0f,1.0f);
+		SetVtxDataTex(vtxBuff, FVF, D3DXVECTOR2(0.0f, 0.0f),1.0f,1.0f, i);
 
 	}
 
@@ -266,26 +293,26 @@ HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& v
 			{//	スコアの数字
 
 				// 頂点座標の設定
-				SetVtxData(vtxBuff, D3DXVECTOR3(numPos.x + nCntPlace * (numWidth + numInterval), numPos.y, 0.0f), numWidth, numHeight, nCntPlace);
+				SetVtxDataVtx(vtxBuff, FVF_VERTEX_2D, D3DXVECTOR3(numPos.x + nCntPlace * (numWidth + numInterval), numPos.y, 0.0f), numWidth, numHeight, nCntPlace);
 
 				//テクスチャ―座標の設定	初期値、あとで変更する
-				SetVtxData(vtxBuff, D3DXVECTOR2(0.0f, 0.0f), 0.1f, 1.0f, nCntPlace);
+				SetVtxDataTex(vtxBuff, FVF_VERTEX_2D, D3DXVECTOR2(0.0f, 0.0f), 0.1f, 1.0f, nCntPlace);
 			}
 			else
 			{//スコアのフレーム
 
 				// 頂点座標の設定
-				SetVtxData(vtxBuff, framePos, frameWidth, frameHeight, nCntPlace);
+				SetVtxDataVtx(vtxBuff, FVF_VERTEX_2D, framePos, frameWidth, frameHeight, nCntPlace);
 
 				//テクスチャ―座標の設定
-				SetVtxData(vtxBuff, D3DXVECTOR2(0.0f, 0.0f), 1.0f, 1.0f, nCntPlace);
+				SetVtxDataTex(vtxBuff, FVF_VERTEX_2D, D3DXVECTOR2(0.0f, 0.0f), 1.0f, 1.0f, nCntPlace);
 			}
 
 			// rhwの設定
-			SetVtxData(vtxBuff, 1.0f, nCntPlace);
+			SetVtxDataRHW(vtxBuff, 1.0f, nCntPlace);
 
 			// 反射光の設定
-			SetVtxData(vtxBuff, diffuse, nCntPlace);
+			SetVtxDataCor(vtxBuff, FVF_VERTEX_2D, diffuse, nCntPlace);
 
 		}
 	}
@@ -427,30 +454,52 @@ HRESULT MakeIndexMesh(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DINDEXBUFFER9& idxBuff
 // 頂点の座標をセット
 // vtx:左上頂点の座標　width,height:範囲	index:矩形ポリゴンの番号
 //=============================================================================
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 vtx, float width, float height, int index)
+void SetVtxDataVtx(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DXVECTOR3 vtx, float width, float height, int index)
 {
-	VERTEX_2D *pVtx;
+	if (FVF == FVF_VERTEX_2D)
+	{
+		VERTEX_2D *pVtx;
 
-	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-	vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	pVtx = pVtx + index * NUM_VERTEX;
+		pVtx = pVtx + index * NUM_VERTEX;
 
-	// 頂点座標の設定
-	pVtx[0].vtx = D3DXVECTOR3(vtx.x, vtx.y, vtx.z);
-	pVtx[1].vtx = D3DXVECTOR3(vtx.x + width, vtx.y, vtx.z);
-	pVtx[2].vtx = D3DXVECTOR3(vtx.x, vtx.y + height, vtx.z);
-	pVtx[3].vtx = D3DXVECTOR3(vtx.x + width, vtx.y + height, vtx.z);
+		// 頂点座標の設定
+		pVtx[0].vtx = D3DXVECTOR3(vtx.x, vtx.y, vtx.z);
+		pVtx[1].vtx = D3DXVECTOR3(vtx.x + width, vtx.y, vtx.z);
+		pVtx[2].vtx = D3DXVECTOR3(vtx.x, vtx.y + height, vtx.z);
+		pVtx[3].vtx = D3DXVECTOR3(vtx.x + width, vtx.y + height, vtx.z);
 
-	// 頂点データをアンロックする
-	vtxBuff->Unlock();
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+	}
+	else if (FVF == FVF_VERTEX_3D)
+	{
+		VERTEX_3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		pVtx = pVtx + index * NUM_VERTEX;
+
+		// 頂点座標の設定
+		pVtx[0].vtx = D3DXVECTOR3(-width / 2, 0.0f, height / 2);
+		pVtx[1].vtx = D3DXVECTOR3(width / 2, 0.0f, height / 2);
+		pVtx[2].vtx = D3DXVECTOR3(-width / 2, 0.0f, -height / 2);
+		pVtx[3].vtx = D3DXVECTOR3(width / 2, 0.0f, -height / 2);
+
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+	}
+
 }
 
 //=============================================================================
 // 頂点のRHWをセット
 // 	index:矩形ポリゴンの番号
 //=============================================================================
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index)
+void SetVtxDataRHW(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index)
 {
 	VERTEX_2D *pVtx;
 
@@ -470,12 +519,12 @@ void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, float rhw, int index)
 }
 
 //=============================================================================
-// 頂点の色をセット
-// diffuse:頂点の色	index:矩形ポリゴンの番号
+// 頂点のノーマルをセット
+// index:矩形ポリゴンの番号
 //=============================================================================
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index)
+void SetVtxDataNor(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR3 nor, int index)
 {
-	VERTEX_2D *pVtx;
+	VERTEX_3D *pVtx;
 
 	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
 	vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -483,43 +532,112 @@ void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DCOLOR diffuse, int index)
 	pVtx = pVtx + index * NUM_VERTEX;
 
 	// 反射光の設定
-	pVtx[0].diffuse =
-	pVtx[1].diffuse =
-	pVtx[2].diffuse =
-	pVtx[3].diffuse = diffuse;
+	pVtx[0].nor =
+	pVtx[1].nor =
+	pVtx[2].nor =
+	pVtx[3].nor = nor;
 
 	// 頂点データをアンロックする
 	vtxBuff->Unlock();
+}
+
+//=============================================================================
+// 頂点の色をセット
+// diffuse:頂点の色	index:矩形ポリゴンの番号
+//=============================================================================
+void SetVtxDataCor(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DCOLOR diffuse, int index)
+{
+	if (FVF == FVF_VERTEX_2D)
+	{
+		VERTEX_2D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		pVtx = pVtx + index * NUM_VERTEX;
+
+		// 反射光の設定
+		pVtx[0].diffuse =
+		pVtx[1].diffuse =
+		pVtx[2].diffuse =
+		pVtx[3].diffuse = diffuse;
+
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+
+	}
+	else if(FVF == FVF_VERTEX_3D)
+	{
+		VERTEX_3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		pVtx = pVtx + index * NUM_VERTEX;
+
+		// 反射光の設定
+		pVtx[0].diffuse =
+		pVtx[1].diffuse =
+		pVtx[2].diffuse =
+		pVtx[3].diffuse = diffuse;
+
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+	}
+
 }
 
 //=============================================================================
 // 頂点のテクスチャ座標をセット
 // tex:左上頂点のテクスチャ座標　width,height:範囲	index:矩形ポリゴンの番号
 //=============================================================================
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff, D3DXVECTOR2 tex, float width, float height, int index)
+void SetVtxDataTex(LPDIRECT3DVERTEXBUFFER9 vtxBuff, DWORD FVF, D3DXVECTOR2 tex, float width, float height, int index)
 {
-	VERTEX_2D *pVtx;
+	if (FVF == FVF_VERTEX_2D)
+	{
+		VERTEX_2D *pVtx;
 
-	// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
-	vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	pVtx = pVtx + index * NUM_VERTEX;
+		pVtx = pVtx + index * NUM_VERTEX;
 
-	// テクスチャ座標の設定
-	pVtx[0].tex = D3DXVECTOR2(tex.x, tex.y);
-	pVtx[1].tex = D3DXVECTOR2(tex.x + width, tex.y);
-	pVtx[2].tex = D3DXVECTOR2(tex.x, tex.y + height);
-	pVtx[3].tex = D3DXVECTOR2(tex.x + width, tex.y + height);
+		// テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(tex.x, tex.y);
+		pVtx[1].tex = D3DXVECTOR2(tex.x + width, tex.y);
+		pVtx[2].tex = D3DXVECTOR2(tex.x, tex.y + height);
+		pVtx[3].tex = D3DXVECTOR2(tex.x + width, tex.y + height);
 
-	// 頂点データをアンロックする
-	vtxBuff->Unlock();
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+
+	}
+	else if (FVF == FVF_VERTEX_3D)
+	{
+		VERTEX_3D *pVtx;
+
+		// 頂点データの範囲をロックし、頂点バッファへのポインタを取得
+		vtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		pVtx = pVtx + index * NUM_VERTEX;
+
+		// テクスチャ座標の設定
+		pVtx[0].tex = D3DXVECTOR2(tex.x, tex.y);
+		pVtx[1].tex = D3DXVECTOR2(tex.x + width, tex.y);
+		pVtx[2].tex = D3DXVECTOR2(tex.x, tex.y + height);
+		pVtx[3].tex = D3DXVECTOR2(tex.x + width, tex.y + height);
+
+		// 頂点データをアンロックする
+		vtxBuff->Unlock();
+	}
+
 }
 
 //=============================================================================
 // 頂点のテクスチャ座標をセット(連続数字の場合)
 // numSet:一連の数字　numPlace:その数字の桁数
 //=============================================================================
-void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff,int numSet, int numPlace)
+void SetVtxDataTexNum(LPDIRECT3DVERTEXBUFFER9 vtxBuff,int numSet, int numPlace)
 {
 	//タイマーの各桁の数字を求める
 	for(int i = 0; i < numPlace; i++)			//iは数字の左から始まる添え字
@@ -532,7 +650,7 @@ void SetVtxData(LPDIRECT3DVERTEXBUFFER9 vtxBuff,int numSet, int numPlace)
 																			//結果num = 2,つまり添え字1の指している桁の数字が求められる
 
 		//その桁の数字に対応するテクスチャをセット(テクスチャ―座標の変更により)
-		SetVtxData(vtxBuff, D3DXVECTOR2(num * 0.1f, 0.0f), 0.1f, 1.0f, i);
+		SetVtxDataTex(vtxBuff, FVF_VERTEX_2D, D3DXVECTOR2(num * 0.1f, 0.0f), 0.1f, 1.0f, i);
 	}
 
 }
@@ -654,134 +772,6 @@ KEY* GetMotionWalk()
 }
 
 //=============================================================================
-// モーションする処理
-// user:使用者
-// motion:MOTION構造体の情報
-//=============================================================================
-void Motion(Character& user,MOTION& motion)
-{
-	int i = (int)motion.motionTime;  //現在のキーフレームナンバー
-
-	//loopできるように
-	if (i > motion.numKey - 2)//最大キーフレームナンバーを超えたら
-	{
-		motion.motionTime = 1.0f;
-		i = (int)motion.motionTime;	
-	}
-
-	float dt = 1.0f / motion.motionData[i].frame;//補間の間隔時間
-
-	motion.motionTime += dt;
-
-	if (motion.motionTime > motion.numKey - 1.0f)//最大時間を超えたら
-	{
-		motion.motionTime = motion.numKey - 1.0f;//最大時間にする
-	}
-
-	if (motion.motionTime - i > 1.0f) //誤差を修正　想定の1.0を超えたら
-	{
-		i++;//次のキーフレームに入る
-	}
-
-	if (motion.use == false)
-	{//モーションしていない場合、途中のモーションからデフォルト状態に戻る
-		motion.motionTime = 0.0f;	//リセット
-		i = (int)motion.motionTime;	//重要
-
-		if (user.state != FROZEN)
-		{
-			motion.cancelTime += dt;//0番キーフレームのtimeを使う
-		}
-
-		if (motion.cancelTime > 1.0f)//最大時間を超えたら
-		{
-			motion.cancelTime = 1.0f;//最大最大時間にする
-		}
-
-		Interpolation(PART_MAX - 1, &user.part[0], motion.motionData[i].srtWork, motion.cancelTime);
-
-	}
-	else
-	{//モーションしている場合
-		motion.cancelTime = 0.0f;	//リセット
-
-		Interpolation(PART_MAX - 1, &user.part[0], motion.motionData[i].srtWork, motion.motionData[i + 1].srtWork, motion.motionTime - i);
-
-	}
-
-}
-
-//=============================================================================
-// 補間処理
-// partNum:パーツの数
-// part:出力する先の0番目のパーツ
-// srt1:始点のsrt
-// srt2:終点のsrt
-// rate:始点から終点までの比率	(0～1.0)
-//=============================================================================
-void Interpolation(int partNum, XMODEL *part, const SRT *srt1, const SRT *srt2, float rate)
-{
-	for (int j = 0; j < partNum; j++)//パーツ番号
-	{
-		//// Scale
-		//part[j].srt.scl.x = srt1[j].scl.x + (srt2[j].scl.x - srt1[j].scl.x) * rate;
-
-		//part[j].srt.scl.y = srt1[j].scl.y + (srt2[j].scl.y - srt1[j].scl.y) * rate;
-
-		//part[j].srt.scl.z = srt1[j].scl.z + (srt2[j].scl.z - srt1[j].scl.z) * rate;
-
-		// Rotation
-		part[j].srt.rot.x = srt1[j].rot.x + (srt2[j].rot.x - srt1[j].rot.x) * rate;
-
-		//part[j].srt.rot.y = srt1[j].rot.y + (srt2[j].rot.y - srt1[j].rot.y) * rate;							
-
-		//part[j].srt.rot.z = srt1[j].rot.z + (srt2[j].rot.z - srt1[j].rot.z) * rate;							
-
-		// Position
-		//part[j].srt.pos.x = srt1[j].pos.x + (srt2[j].pos.x - srt1[j].pos.x) * rate;							
-
-		//part[j].srt.pos.y = srt1[j].pos.y + (srt2[j].pos.y - srt1[j].pos.y) * rate;							
-
-		//part[j].srt.pos.z = srt1[j].pos.z + (srt2[j].pos.z - srt1[j].pos.z) * rate;							
-	}
-
-}
-
-//=============================================================================
-// 補間処理		(出力する先のデータを始点にする場合)
-// partNum:パーツの数
-// part:出力する先の0番目のパーツ
-// srt2:終点のsrt
-// rate:始点から終点までの比率	(0～1.0)
-//=============================================================================
-void Interpolation(int partNum, XMODEL *part, const SRT *srt2, float rate)
-{
-	for (int j = 0; j < partNum; j++)//パーツ番号
-	{
-		// Scale
-		//part[j].srt.scl.x = part[j].srt.scl.x + (srt2[j].scl.x - part[j].srt.scl.x) * rate;
-
-		//part[j].srt.scl.y = part[j].srt.scl.y + (srt2[j].scl.y - part[j].srt.scl.y) * rate;
-
-		//part[j].srt.scl.z = part[j].srt.scl.z + (srt2[j].scl.z - part[j].srt.scl.z) * rate;
-
-		// Rotation
-		part[j].srt.rot.x = part[j].srt.rot.x + (srt2[j].rot.x - part[j].srt.rot.x) * rate;
-
-		//part[j].srt.rot.y = part[j].srt.rot.y + (srt2[j].rot.y - part[j].srt.rot.y) * rate;							
-
-		//part[j].srt.rot.z = part[j].srt.rot.z + (srt2[j].rot.z - part[j].srt.rot.z) * rate;							
-
-		// Position
-		//part[j].srt.pos.x = part[j].srt.pos.x + (srt2[j].pos.x - part[j].srt.pos.x) * rate;							
-
-		//part[j].srt.pos.y = part[j].srt.pos.y + (srt2[j].pos.y - part[j].srt.pos.y) * rate;							
-
-		//part[j].srt.pos.z = part[j].srt.pos.z + (srt2[j].pos.z - part[j].srt.pos.z) * rate;							
-	}
-}
-
-//=============================================================================
 // Xファイルのモデルの描画（親子関係を持つパーツの描画もできる）
 // model:対象モデルのポインタ
 // numPart:モデルの数
@@ -851,8 +841,6 @@ void DrawXMODEL(LPDIRECT3DDEVICE9 pDevice, XMODEL* model, int numPart)
 	pDevice->SetMaterial(&matDef);// マテリアルをデフォルトに戻す
 
 }
-
-
 
 //=============================================================================
 //メンバー変数に値を代入する処理 
@@ -992,7 +980,7 @@ HRESULT Character::Init(OBJECT object)
 	fRadius = RADIUS_BEAR;
 
 	// 影を設定 ※体(part[0])を基準に
-	nIdxShadow = SetShadow(part[0].srt.pos, fRadius * 2.0f, fRadius * 2.0f);	//BUG影の大きさは変わらない
+	nIdxShadow = SetShadow(part[0].srt.pos, fRadius * 2.0f);	//BUG影の大きさは変わらない
 
 	holdItem = ITEMTYPE_COIN;
 	state = NORMAL;
@@ -1325,6 +1313,133 @@ void Character::Movement()
 }
 
 //=============================================================================
+// モーションする処理
+// motion:MOTION構造体の情報
+//=============================================================================
+void Character::Motion(MOTION& motion)
+{
+	int i = (int)motion.motionTime;  //現在のキーフレームナンバー
+
+	//loopできるように
+	if (i > motion.numKey - 2)//最大キーフレームナンバーを超えたら
+	{
+		motion.motionTime = 1.0f;
+		i = (int)motion.motionTime;
+	}
+
+	float dt = 1.0f / motion.motionData[i].frame;//補間の間隔時間
+
+	motion.motionTime += dt;
+
+	if (motion.motionTime > motion.numKey - 1.0f)//最大時間を超えたら
+	{
+		motion.motionTime = motion.numKey - 1.0f;//最大時間にする
+	}
+
+	if (motion.motionTime - i > 1.0f) //誤差を修正　想定の1.0を超えたら
+	{
+		i++;//次のキーフレームに入る
+	}
+
+	if (motion.use == false)
+	{//モーションしていない場合、途中のモーションからデフォルト状態に戻る
+		motion.motionTime = 0.0f;	//リセット
+		i = (int)motion.motionTime;	//重要
+
+		if (state != FROZEN)
+		{
+			motion.cancelTime += dt;//0番キーフレームのtimeを使う
+		}
+
+		if (motion.cancelTime > 1.0f)//最大時間を超えたら
+		{
+			motion.cancelTime = 1.0f;//最大最大時間にする
+		}
+
+		Interpolation(PART_MAX - 1, &part[0], motion.motionData[i].srtWork, motion.cancelTime);
+
+	}
+	else
+	{//モーションしている場合
+		motion.cancelTime = 0.0f;	//リセット
+
+		Interpolation(PART_MAX - 1, &part[0], motion.motionData[i].srtWork, motion.motionData[i + 1].srtWork, motion.motionTime - i);
+
+	}
+
+}
+
+//=============================================================================
+// 補間処理
+// partNum:パーツの数
+// part:出力する先の0番目のパーツ
+// srt1:始点のsrt
+// srt2:終点のsrt
+// rate:始点から終点までの比率	(0～1.0)
+//=============================================================================
+void Interpolation(int partNum, XMODEL *part, const SRT *srt1, const SRT *srt2, float rate)
+{
+	for (int j = 0; j < partNum; j++)//パーツ番号
+	{
+		//// Scale
+		//part[j].srt.scl.x = srt1[j].scl.x + (srt2[j].scl.x - srt1[j].scl.x) * rate;
+
+		//part[j].srt.scl.y = srt1[j].scl.y + (srt2[j].scl.y - srt1[j].scl.y) * rate;
+
+		//part[j].srt.scl.z = srt1[j].scl.z + (srt2[j].scl.z - srt1[j].scl.z) * rate;
+
+		// Rotation
+		part[j].srt.rot.x = srt1[j].rot.x + (srt2[j].rot.x - srt1[j].rot.x) * rate;
+
+		//part[j].srt.rot.y = srt1[j].rot.y + (srt2[j].rot.y - srt1[j].rot.y) * rate;							
+
+		//part[j].srt.rot.z = srt1[j].rot.z + (srt2[j].rot.z - srt1[j].rot.z) * rate;							
+
+		// Position
+		//part[j].srt.pos.x = srt1[j].pos.x + (srt2[j].pos.x - srt1[j].pos.x) * rate;							
+
+		//part[j].srt.pos.y = srt1[j].pos.y + (srt2[j].pos.y - srt1[j].pos.y) * rate;							
+
+		//part[j].srt.pos.z = srt1[j].pos.z + (srt2[j].pos.z - srt1[j].pos.z) * rate;							
+	}
+
+}
+
+//=============================================================================
+// 補間処理		(出力する先のデータを始点にする場合)
+// partNum:パーツの数
+// part:出力する先の0番目のパーツ
+// srt2:終点のsrt
+// rate:始点から終点までの比率	(0～1.0)
+//=============================================================================
+void Interpolation(int partNum, XMODEL *part, const SRT *srt2, float rate)
+{
+	for (int j = 0; j < partNum; j++)//パーツ番号
+	{
+		// Scale
+		//part[j].srt.scl.x = part[j].srt.scl.x + (srt2[j].scl.x - part[j].srt.scl.x) * rate;
+
+		//part[j].srt.scl.y = part[j].srt.scl.y + (srt2[j].scl.y - part[j].srt.scl.y) * rate;
+
+		//part[j].srt.scl.z = part[j].srt.scl.z + (srt2[j].scl.z - part[j].srt.scl.z) * rate;
+
+		// Rotation
+		part[j].srt.rot.x = part[j].srt.rot.x + (srt2[j].rot.x - part[j].srt.rot.x) * rate;
+
+		//part[j].srt.rot.y = part[j].srt.rot.y + (srt2[j].rot.y - part[j].srt.rot.y) * rate;							
+
+		//part[j].srt.rot.z = part[j].srt.rot.z + (srt2[j].rot.z - part[j].srt.rot.z) * rate;							
+
+		// Position
+		//part[j].srt.pos.x = part[j].srt.pos.x + (srt2[j].pos.x - part[j].srt.pos.x) * rate;							
+
+		//part[j].srt.pos.y = part[j].srt.pos.y + (srt2[j].pos.y - part[j].srt.pos.y) * rate;							
+
+		//part[j].srt.pos.z = part[j].srt.pos.z + (srt2[j].pos.z - part[j].srt.pos.z) * rate;							
+	}
+}
+
+//=============================================================================
 // エリアコリジョン処理
 //=============================================================================
 void Character::AreaCollision()
@@ -1364,46 +1479,9 @@ void Character::Drag()
 {
 	// 運動エネルギーを一部損して（抵抗力のため）保存する、次のフレームに使う(慣性の仕組み)
 	//※損の部分イコール次のフレームに獲得の運動エネルギーの場合、速度が最大(7.8f)になって、等速直線運動になる
-	move.x = move.x * (1 - RATE_MOVE_PLAYER);
-	move.y = move.y * (1 - RATE_MOVE_PLAYER);
-	move.z = move.z * (1 - RATE_MOVE_PLAYER);
-
-}
-
-//=============================================================================
-// 影の位置を更新、位置の高さにより、大きさと透明度を変化する
-//=============================================================================
-void Shadow(int nIdxShadow, D3DXVECTOR3 pos)
-{//体(part[0])を基準に
-
-	//影の位置を更新
-	SetPositionShadow(nIdxShadow, D3DXVECTOR3(pos.x, 0.1f, pos.z));
-
-	//高さにより、影の大きさが変化する	//高ければ高いほど大きい
-	float fSize = 20.0f + (pos.y - HEIGHT_FROMLAND) * 0.05f;
-
-	if (pos.y < 0.0f)
-	{//地面以下に行くとき
-		fSize = 0.0f;
-	}
-
-	//影の大きさを更新
-	SetVertexShadow(nIdxShadow, fSize, fSize);	
-
-	//高さにより、影の透明度が変化する	//高ければ高いほど透明的
-	float colA = 0.5f - (pos.y - HEIGHT_FROMLAND) / 400.0f;
-
-	if (colA < 0.0f)
-	{
-		colA = 0.0f;
-	}
-	if (pos.y < 0.0f)
-	{//地面以下に行くとき
-		colA = 0.0f;
-	}
-
-	////影の透明度を更新
-	SetColorShadow(nIdxShadow, D3DXCOLOR(1.0f, 1.0f, 1.0f, colA));
+	move.x = move.x * (1 - RATE_MOVE);
+	move.y = move.y * (1 - RATE_MOVE);
+	move.z = move.z * (1 - RATE_MOVE);
 
 }
 
@@ -1562,6 +1640,34 @@ void Character::Frozen()
 			part[6].use = false;	//身に纏うアイスブロックを消える
 		}
 	}
+}
+
+//=============================================================================
+//プレイヤー、エネミーの更新処理のまとめ
+//=============================================================================
+void Character::UpdateCharacter()
+{
+	AIControl();
+
+	Movement();
+
+	//歩くモーション処理
+	Motion(motion);
+
+	AreaCollision();
+
+	Drag();
+
+	UpdateShadow(nIdxShadow, part[0].srt.pos, HEIGHT_FROMLAND);
+
+	Jet();
+
+	ItemCollision();
+
+	UseIceblock();
+
+	Frozen();
+
 }
 
 

@@ -115,8 +115,8 @@ void UninitScore(void)
 void UpdateScore(void)
 {
 	//数字のテクスチャ―を更新
-	SetVtxData(g_pD3DVtxBuffScore, g_score, NUM_PLACE);
-	SetVtxData(g_pD3DVtxBuffScore2, g_score2, NUM_PLACE);
+	SetVtxDataTexNum(g_pD3DVtxBuffScore, g_score, NUM_PLACE);
+	SetVtxDataTexNum(g_pD3DVtxBuffScore2, g_score2, NUM_PLACE);
 
 }
 
