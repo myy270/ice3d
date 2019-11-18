@@ -17,6 +17,6 @@ void UninitTitle(void);
 void UpdateTitle(void);
 void DrawTitle(void);
 
-//1p2p‚Ì‘I‘ð“š‚¦‚ðƒQƒbƒg
-int GetCursorIdx(void);
+PLAY_MODE GetPlayMode();
+
 #endif

@@ -36,7 +36,7 @@
 // プロトタイプ宣言
 //*****************************************************************************
 
-int SetItem(D3DXVECTOR3 pos, ITEMTYPE nType = ITEMTYPE_COIN, bool shadowUsable = true);
+int SetItem(D3DXVECTOR3 pos, ITEMTYPE nType, bool shadowUsable = true);
 void DropItem();
 
 //*****************************************************************************
@@ -106,7 +106,7 @@ HRESULT InitItem(void)
 
 		g_aItem[nCntItem].fRadius = ITEM_RADIUS;
 		g_aItem[nCntItem].nIdxShadow = -1;
-		g_aItem[nCntItem].nType = ITEMTYPE_COIN;
+		g_aItem[nCntItem].nType = ITEMTYPE_NULL;
 	}
 
 	//コインの設置

@@ -18,7 +18,9 @@ void UpdateScore(void);
 void DrawScore(void);
 
 void ChangeScore(OBJECT obj, int value);
+
 void CompareScore();
+
 OBJECT GetWinner();
 
 #endif

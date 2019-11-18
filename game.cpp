@@ -30,7 +30,6 @@
 // グローバル変数
 //*****************************************************************************
 
-
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -58,7 +57,7 @@ HRESULT InitGame(void)
 	InitEffect();
 
 	// タイマーの初期化
-	InitTimer();		//デフォルト50
+	InitTimer();		//正常時の設定値は50
 
 	// スコアの初期化
 	InitScore();
@@ -66,7 +65,7 @@ HRESULT InitGame(void)
 	// アイテムの初期化
 	InitItem();
 
-	// BGM再生 ちゃんとloopできるにする!　元の罠
+	// BGM再生 ちゃんとloopするように
 	//PlaySound(SOUND_LABEL_BGM000, XAUDIO2_LOOP_INFINITE);
 
 	return S_OK;
@@ -77,9 +76,6 @@ HRESULT InitGame(void)
 //=============================================================================
 void UninitGame(void)
 {
-	// カメラの終了処理
-	UninitCamera();
-
 	// 地面の終了処理
 	UninitMeshField();
 
@@ -106,7 +102,7 @@ void UninitGame(void)
 	// アイテムの終了処理
 	UninitItem();
 
-	// BGM停止 !!元の罠
+	// BGM停止
 	StopSound(SOUND_LABEL_BGM000);
 }
 
@@ -127,6 +123,7 @@ void UpdateGame(void)
 	// プレイヤー処理の更新
 	UpdatePlayer();
 
+	// エネミー処理の更新
 	UpdateEnemy();
 
 	// エフェクト処理の更新
@@ -152,30 +149,31 @@ void DrawGame(void)
 	// カメラの設定
 	SetCamera();
 
-	// 地面処理の描画
+	// 地面の描画
 	DrawMeshField();
 
-	// 影処理の描画
+	// 影の描画
 	DrawShadow();
 
-	// プレイヤー処理の描画
-	DrawPlayer();
-
-	DrawEnemy();
-
-	// エフェクト処理の描画
+	// エフェクトの描画
 	DrawEffect();
 
-	// アイテム処理の描画
+	// アイテムの描画
 	DrawItem();
 
-	// 壁処理の描画
+	// プレイヤーの描画
+	DrawPlayer();
+
+	// エネミーの描画
+	DrawEnemy();
+
+	// 壁の描画
 	DrawMeshWall();
 
-	// タイマー処理の描画
+	// タイマーの描画
 	DrawTimer();
 
-	// スコア処理の描画
+	// スコアの描画
 	DrawScore();
 }
 

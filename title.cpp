@@ -72,7 +72,7 @@ bool					g_bDispMenu1P2P;					//1p2p選択メニューを表示するかどうか
 int						g_nCursorIdx;						//カーソルインデクス(1p2p選択の答えを記録するため)
 bool					g_bChosedMenu1P2P;					//1p2p選択メニューを選択したかどうか
 
-
+PLAY_MODE				g_playMode;							//一人プレイか二人プレイか
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -88,6 +88,8 @@ HRESULT InitTitle(void)
 	g_bDispMenu1P2P = false;
 	g_nCursorIdx = 0;
 	g_bChosedMenu1P2P = false;
+
+	g_playMode = PLAY_MODE_NULL;
 
 	// 頂点情報の作成
 	// タイトル画面の背景
@@ -298,6 +300,17 @@ void Menu1P2P(void)
 
 			if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTrigger(0, BUTTON_CIRCLE))
 			{//メニューの項目を選択
+				//選択項目に応じて、プレイモードを設定
+				if (g_nCursorIdx == 0)
+				{
+					g_playMode = PLAY_MODE_SINGLE;
+
+				}
+				else if (g_nCursorIdx == 1)
+				{
+					g_playMode = PLAY_MODE_DOUBLE;
+				}
+
 				SetFade(FADE_OUT);
 				g_bChosedMenu1P2P = true;
 			}
@@ -306,9 +319,9 @@ void Menu1P2P(void)
 }
 
 //=============================================================================
-// 1p2p選択の答えをゲット
+// プレイモードをゲット
 //=============================================================================
-int GetCursorIdx(void)
+PLAY_MODE GetPlayMode()
 {
-	return g_nCursorIdx;
+	return g_playMode;
 }

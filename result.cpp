@@ -8,7 +8,7 @@
 #include "input.h"
 #include "fade.h"
 #include "score.h"
-#include "camera.h"
+#include "title.h"
 
 //*****************************************************************************
 // É}ÉNÉçíËã`

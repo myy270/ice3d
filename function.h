@@ -103,28 +103,34 @@ enum SCENE
 	SCENE_TITLE,			// タイトル画面
 	SCENE_GAME,				// ゲーム画面
 	SCENE_RESULT,			// リザルト画面
-	SCENE_MAX				// デフォルト値(なにもない状態、SetScene()を使わないとダメ)
+	SCENE_MAX
 };
 
 enum OBJECT
 {
 	OBJECT_PLAYER,
 	OBJECT_ENEMY,
-	OBJECT_MAX
+	OBJECT_MAX,
+
+	OBJECT_NULL				//	デフォルト値、オブジェクト無しの意味
 };
 
 enum CAMERA_MODE
 {
 	CAMERA_MODE_NEAR,
 	CAMERA_MODE_FAR,
+	CAMERA_MODE_CUTSCENE,
 	CAMERA_MODE_MAX
 };
 
+//一人モードと二人モード
 enum PLAY_MODE
 {
 	PLAY_MODE_SINGLE,		//一つのプレイヤー
 	PLAY_MODE_DOUBLE,		//二つのプレイヤー
-	PLAY_MODE_MAX
+	PLAY_MODE_MAX,
+
+	PLAY_MODE_NULL			//デフォルト値
 };
 
 enum STATE			//異常状態を記録
@@ -136,31 +142,21 @@ enum STATE			//異常状態を記録
 
 enum ITEMTYPE
 {
-	ITEMTYPE_COIN,			// コイン	//他のアイテムを持っていない時のデフォルト値
+	ITEMTYPE_COIN,			// コイン
 	ITEMTYPE_ICEBLOCK,		// 凍結アイテム(アイスブロック)
+	ITEMTYPE_MAX,
 
-	ITEMTYPE_MAX
+	ITEMTYPE_NULL			// デフォルト値、アイテム無しの意味
 };
 
 enum MAPPINGTYPE
 {
-	MAPPINGTYPE_ONE,			// テクスチャーを一枚に描画する
-	MAPPINGTYPE_ALL,			// テクスチャーを重複に描画する
+	MAPPINGTYPE_ONE,		// テクスチャーを一枚に描画する
+	MAPPINGTYPE_ALL			// テクスチャーを重複に描画する
 
 };
 
-struct EFFECT
-{
-	D3DXVECTOR3 pos;		// 位置
-	D3DXVECTOR3 rot;		// 回転
-	D3DXVECTOR3 move;		// 移動量
-	D3DXCOLOR col;			// 色
-	float fSizeX;			// 幅
-	float fSizeY;			// 高さ
-	int nTimer;				// タイマー
-	float nDecAlpha;		// アルファ値の減衰値
-	bool bUse;				// 使用しているかどうか
-};
+
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
@@ -282,6 +278,20 @@ struct SHADOW
 {
 	float size;				// 影の矩形の辺の長さ
 	D3DXVECTOR3 pos;		// 位置
+	bool bUse;				// 使用しているかどうか
+};
+
+//エフェクト
+struct EFFECT
+{
+	D3DXVECTOR3 pos;		// 位置
+	D3DXVECTOR3 rot;		// 回転
+	D3DXVECTOR3 move;		// 移動量
+	D3DXCOLOR col;			// 色
+	float fSizeX;			// 幅
+	float fSizeY;			// 高さ
+	int nTimer;				// タイマー
+	float nDecAlpha;		// アルファ値の減衰値
 	bool bUse;				// 使用しているかどうか
 };
 

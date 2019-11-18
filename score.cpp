@@ -6,7 +6,7 @@
 //=============================================================================
 #include "score.h"
 #include "camera.h"
-
+#include "title.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -69,7 +69,7 @@ HRESULT InitScore(void)
 	g_score = 0;
 	g_score2 = 0;
 
-	g_winner = OBJECT_MAX;
+	g_winner = OBJECT_NULL;		//デフォルト値
 
 	// 左スコアの　頂点情報の作成
 	MakeVertexNumFrame(pDevice, g_pD3DVtxBuffScore, NUM_PLACE,
@@ -173,22 +173,26 @@ void ChangeScore(OBJECT obj,int value)
 //=============================================================================
 void CompareScore()
 {
-	if (g_score >= g_score2)
-	{//プレイヤー勝つ場合
-		g_winner = OBJECT_PLAYER;		
-	}
-	else
-	{//プレイヤー負ける場合
-		g_winner = OBJECT_ENEMY;
-	}
+	if (g_winner == OBJECT_NULL)
+	{
+		if (g_score >= g_score2)
+		{//プレイヤー勝つ場合
+			g_winner = OBJECT_PLAYER;
+		}
+		else
+		{//プレイヤー負ける場合
+			g_winner = OBJECT_ENEMY;
+		}
 
-	if ((GetPlayMode() == PLAY_MODE_SINGLE) && (g_winner == OBJECT_ENEMY))
-	{
-		//AIが勝つ場合、ズームしない
-	}
-	else
-	{
-		WinScene();		//1pか2pが勝つ場合、ズームする
+		if ((GetPlayMode() == PLAY_MODE_SINGLE) && (g_winner == OBJECT_ENEMY))
+		{
+			//AIが勝つ場合、カットシーンしない
+		}
+		else
+		{	
+			SetCameraMode(CAMERA_MODE_CUTSCENE);	//1pか2pが勝つ場合、カットシーンする
+		}
+
 	}
 }
 

@@ -17,6 +17,7 @@
 #include "player.h"
 #include "enemy.h"
 #include "sound.h"
+#include "title.h"
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
@@ -992,7 +993,7 @@ HRESULT Character::Init(OBJECT object)
 	// 影を設定 ※体(part[0])を基準に
 	nIdxShadow = SetShadow(part[0].srt.pos, fRadius * 2.0f);	//BUG影の大きさは変わらない
 
-	holdItem = ITEMTYPE_COIN;
+	holdItem = ITEMTYPE_NULL;
 	state = NORMAL;
 	frozenTime = 0;
 
@@ -1025,17 +1026,10 @@ void Character::AIControl()
 #ifdef _DEBUG
 		//開発者機能
 		if (GetKeyboardTrigger(DIK_ADD))		//テンキーのプラス+
-		{//AIモードの切替　即ち、シングルモードとダブルモードの切替
+		{//AIモードの切替
 			useAI = !useAI;									//AIモードの切替
 
 			upAI = downAI = leftAI = rightAI = false;		//リセット
-
-			SetPlayMode((PLAY_MODE)!GetPlayMode());			//シングルモードとダブルモードの切替
-
-			if (GetPlayMode() == PLAY_MODE_DOUBLE)
-			{
-				SetCameraMode(CAMERA_MODE_FAR);				//カメラモードの調整
-			}
 		}
 #endif
 	}
@@ -1193,7 +1187,8 @@ void Character::Movement()
 	}
 
 	// カメラの向き取得
-	rotCamera = GetRotCamera();
+	rotCamera = GetRotCamera();						//そのため、UpdatePlayer()はUpdateCamera()の後に置く
+
 	if (objectType == OBJECT_ENEMY)
 	{
 		rotCamera = D3DXVECTOR3(0.0f, 0.0f, 0.0f);	//エネミーの向きはカメラの回転と無関係である
@@ -1545,40 +1540,46 @@ void Character::ItemCollision()
 	// アイテムを取得
 	pItem = GetItem();
 
-	for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, pItem++)
-	{
-		if (pItem->use == true)
+	if (!IsTimeEnd())
+	{//時間が終わっていない限り、アイテムを取得できる
+		for (int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++, pItem++)
 		{
-			float fLength;		//自身とアイテムの距離
+			if (pItem->use == true)
+			{
+				float fLength;		//自身とアイテムの距離
 
-			//バウンディングサークルBC //体(part[0])を基準に
-			fLength = (part[0].srt.pos.x - pItem->srt.pos.x) * (part[0].srt.pos.x - pItem->srt.pos.x)
-				+ (part[0].srt.pos.y - pItem->srt.pos.y) * (part[0].srt.pos.y - pItem->srt.pos.y)
-				+ (part[0].srt.pos.z - pItem->srt.pos.z) * (part[0].srt.pos.z - pItem->srt.pos.z);
+				//バウンディングサークルBC //体(part[0])を基準に
+				fLength = (part[0].srt.pos.x - pItem->srt.pos.x) * (part[0].srt.pos.x - pItem->srt.pos.x)
+					+ (part[0].srt.pos.y - pItem->srt.pos.y) * (part[0].srt.pos.y - pItem->srt.pos.y)
+					+ (part[0].srt.pos.z - pItem->srt.pos.z) * (part[0].srt.pos.z - pItem->srt.pos.z);
 
-			if (fLength < (fRadius + pItem->fRadius) * (fRadius + pItem->fRadius))
-			{//取得できる範囲内であれば
-				if ((holdItem == ITEMTYPE_ICEBLOCK) && (pItem->nType == ITEMTYPE_ICEBLOCK))
-				{//アイスブロックを持っている場合、他のアイスブロックは取得できない
+				if (fLength < (fRadius + pItem->fRadius) * (fRadius + pItem->fRadius))
+				{//取得できる範囲内であれば
+					if ((holdItem == ITEMTYPE_ICEBLOCK) && (pItem->nType == ITEMTYPE_ICEBLOCK))
+					{//アイスブロックを持っている場合、他のアイスブロックは取得できない
 
-				}
-				else
-				{
-					if (pItem->nType == ITEMTYPE_ICEBLOCK)
-					{
-						holdItem = ITEMTYPE_ICEBLOCK;
 					}
-					else if (pItem->nType == ITEMTYPE_COIN)
+					else
 					{
-						// スコア加算
-						ChangeScore(objectType, 100);
+						if (pItem->nType == ITEMTYPE_ICEBLOCK)
+						{
+							holdItem = ITEMTYPE_ICEBLOCK;
+						}
+						else if (pItem->nType == ITEMTYPE_COIN)
+						{
+							// スコア加算
+							ChangeScore(objectType, 100);
 
-						// コインを拾う効果音
-						//PlaySound(SOUND_LABEL_SE_COIN);
+							// コインを拾う効果音
+							//PlaySound(SOUND_LABEL_SE_COIN);
+						}
+
+						// アイテム消去
+						DeleteItem(nCntItem);
+
+						break;		//1フレームに、１個しか取得できない
 					}
-
-					// アイテム消去
-					DeleteItem(nCntItem);
+					
 				}
 			}
 		}
@@ -1628,7 +1629,7 @@ void Character::Freeze(Character* target)
 	{
 		target->state = FROZEN;			//相手を凍結状態にさせる
 		target->frozenTime = 180;		//3秒間
-		holdItem = ITEMTYPE_COIN;		//自分の凍結アイテムが消耗される
+		holdItem = ITEMTYPE_NULL;		//自分の凍結アイテムが消耗される
 	}
 }
 
