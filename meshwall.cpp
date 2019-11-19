@@ -85,6 +85,20 @@ HRESULT InitMeshWall()
 	MakeMeshWall(D3DXVECTOR3(640.0f, 0.0f, 0.0f), D3DXVECTOR3(-D3DX_PI * 0.50f, D3DX_PI * 0.50f, 0.0f),
 									16, 4, 80.0f, 80.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), MAPPINGTYPE_ALL);
 
+	//ñkï«ÇÃîwñ 
+	MakeMeshWall(D3DXVECTOR3(0.0f, 0.0f, -640.0f), D3DXVECTOR3(-D3DX_PI * 0.50f, 0.0f, 0.0f),
+		16, 4, 80.0f, 80.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), MAPPINGTYPE_ALL);
+	//ìÏï«ÇÃîwñ 
+	MakeMeshWall(D3DXVECTOR3(0.0f, 0.0f, 640.0f), D3DXVECTOR3(D3DX_PI * 0.50f, 0.0f, 0.0f),
+		16, 4, 80.0f, 80.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), MAPPINGTYPE_ALL);
+	//êºï«ÇÃîwñ 
+	MakeMeshWall(D3DXVECTOR3(640.0f, 0.0f, 0.0f), D3DXVECTOR3(-D3DX_PI * 0.50f, -D3DX_PI * 0.50f, 0.0f),
+		16, 4, 80.0f, 80.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), MAPPINGTYPE_ALL);
+	//ìåï«ÇÃîwñ 
+	MakeMeshWall(D3DXVECTOR3(-640.0f, 0.0f, 0.0f), D3DXVECTOR3(-D3DX_PI * 0.50f, D3DX_PI * 0.50f, 0.0f),
+		16, 4, 80.0f, 80.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.25f), MAPPINGTYPE_ALL);
+
+
 	//ñkï«ÇÃâÆç™
 	MakeMeshWall(D3DXVECTOR3(0.0f, 160.0f, 1280.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 									48, 16, 80.0f, 80.0f, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), MAPPINGTYPE_ALL);

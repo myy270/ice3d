@@ -88,6 +88,7 @@ void UninitGame(void)
 	// プレイヤーの終了処理
 	UninitPlayer();
 
+	// エネミーの終了処理
 	UninitEnemy();
 
 	// エフェトの終了処理
@@ -103,7 +104,7 @@ void UninitGame(void)
 	UninitItem();
 
 	// BGM停止
-	StopSound(SOUND_LABEL_BGM000);
+	//StopSound(SOUND_LABEL_BGM000);
 }
 
 //=============================================================================

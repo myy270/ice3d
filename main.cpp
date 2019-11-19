@@ -102,15 +102,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 //=============================================================================
 HRESULT Init(HINSTANCE hInstance, int nCmdShow)
 {
-	// ウィンドウを作成
+	// ウィンドウの初期化
 	HWND hWnd = InitWindow(hInstance, nCmdShow);
 
-	// DX初期化処理
+	// DXの初期化
 	if (FAILED(InitDX(hWnd, true)))
 	{
 		return E_FAIL;
 	}
 
+	// FPS機能の初期化
 	InitFPS();
 
 	// 入力処理の初期化
@@ -141,15 +142,20 @@ HRESULT Init(HINSTANCE hInstance, int nCmdShow)
 //=============================================================================
 void Uninit(void)
 {
-	UnitFPS();
-
+	// ウィンドウの終了処理 
 	UninitWindow();
 
+	// DXの終了処理
 	UninitDX();
 
-	UninitTitle();
-	UninitGame();
-	UninitResult();
+	// FPS機能の終了処理
+	UnitFPS();
+
+	// 入力処理の終了処理
+	UninitInput();
+
+	// デバッグ表示処理の終了処理
+	UninitDebugProc();
 
 	// フェードの終了処理
 	UninitFade();
@@ -157,11 +163,14 @@ void Uninit(void)
 	// サウンドの終了処理
 	UninitSound();
 
-	// 入力処理の終了処理
-	UninitInput();
+	// タイトル画面の終了処理
+	UninitTitle();
 
-	// デバッグ表示処理の終了処理
-	UninitDebugProc();
+	// ゲーム画面の終了処理
+	UninitGame();
+
+	// リザルト画面の終了処理
+	UninitResult();
 
 }
 
