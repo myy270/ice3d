@@ -151,18 +151,6 @@ void Uninit(void)
 	// FPS機能の終了処理
 	UnitFPS();
 
-	// 入力処理の終了処理
-	UninitInput();
-
-	// デバッグ表示処理の終了処理
-	UninitDebugProc();
-
-	// フェードの終了処理
-	UninitFade();
-
-	// サウンドの終了処理
-	UninitSound();
-
 	// タイトル画面の終了処理
 	UninitTitle();
 
@@ -171,6 +159,18 @@ void Uninit(void)
 
 	// リザルト画面の終了処理
 	UninitResult();
+	
+	// フェードの終了処理
+	UninitFade();
+
+	// サウンドの終了処理
+	UninitSound();
+
+	// 入力処理の終了処理
+	UninitInput();
+
+	// デバッグ表示処理の終了処理
+	UninitDebugProc();
 
 }
 
@@ -206,6 +206,10 @@ void Update(void)
 
 	// フェード処理の更新
 	UpdateFade();
+
+	// サウンドの更新
+	UpdateSound();
+
 }
 
 //=============================================================================
@@ -268,6 +272,15 @@ void Pause(bool& b)
 			(IsButtonTrigger(0, BUTTON_SHARE) && IsButtonPress(0, BUTTON_OPTIONS)))
 		{
 			b = !b;
+
+			if (b)
+			{//ポーズする時、すべての音楽を一時停止
+				StopSoundALL(true);
+			}
+			else
+			{
+				PlaySoundAll();
+			}
 		}
 	}
 

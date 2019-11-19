@@ -66,7 +66,7 @@ HRESULT InitGame(void)
 	InitItem();
 
 	// BGM再生 ちゃんとloopするように
-	//PlaySound(SOUND_LABEL_BGM000, XAUDIO2_LOOP_INFINITE);
+	PlaySound(SOUND_LABEL_BGM000, true, false);
 
 	return S_OK;
 }
@@ -103,8 +103,8 @@ void UninitGame(void)
 	// アイテムの終了処理
 	UninitItem();
 
-	// BGM停止
-	//StopSound(SOUND_LABEL_BGM000);
+	// ゲーム画面のすべての音楽を停止
+	StopSoundALL(false);
 }
 
 //=============================================================================
@@ -138,7 +138,6 @@ void UpdateGame(void)
 
 	// アイテム処理の更新
 	UpdateItem();
-
 
 }
 

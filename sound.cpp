@@ -5,14 +5,16 @@
 //
 //=============================================================================
 #include "sound.h"
-
+#include "debugproc.h"
+#include "input.h"
 //*****************************************************************************
 // パラメータ構造体定義
 //*****************************************************************************
 typedef struct
 {
-	char pFilename[256];	// ファイル名
-	bool bLoop;			// ループするかどうか
+	const char *pFilename;	// ファイル名
+	bool isSoloTempStop;	// 単独で一時停止されたことあるかどうか
+
 } PARAM;
 
 //*****************************************************************************
@@ -30,14 +32,14 @@ IXAudio2SourceVoice *g_apSourceVoice[SOUND_LABEL_MAX] = {};	// ソースボイス
 BYTE *g_apDataAudio[SOUND_LABEL_MAX] = {};					// オーディオデータ
 DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 
+XAUDIO2_VOICE_STATE g_xa2state;
+
 // 各音素材のパラメータ
 PARAM g_aParam[SOUND_LABEL_MAX] =
 {
-	{"data/BGM/bgm_maoudamashii_cyber01.wav", true},		// BGM0
-	{"data/BGM/bgm001.wav", true},		// BGM1
-	{"data/SE/shot000.wav", false},			// 弾発射音
-	{"data/SE/explosion000.wav", false},	// 爆発音
-	{"data/SE/coin000.wav", false},			// コイン音
+	{"data/BGM/bgm000.wav", false},	
+	{"data/SE/coin000.wav", false},	
+	{"data/SE/test.wav", false},
 };
 
 //=============================================================================
@@ -77,11 +79,11 @@ HRESULT InitSound(HWND hWnd)
 		// COMライブラリの終了処理
 		CoUninitialize();
 
-		return E_FAIL;
+return E_FAIL;
 	}
 
 	// サウンドデータの初期化
-	for(int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
+	for (int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
 	{
 		HANDLE hFile;
 		DWORD dwChunkSize = 0;
@@ -96,45 +98,45 @@ HRESULT InitSound(HWND hWnd)
 
 		// サウンドデータファイルの生成
 		hFile = CreateFile(g_aParam[nCntSound].pFilename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-		if(hFile == INVALID_HANDLE_VALUE)
+		if (hFile == INVALID_HANDLE_VALUE)
 		{
 			MessageBox(hWnd, "サウンドデータファイルの生成に失敗！(1)", "警告！", MB_ICONWARNING);
 			return HRESULT_FROM_WIN32(GetLastError());
 		}
-		if(SetFilePointer(hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+		if (SetFilePointer(hFile, 0, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
 		{// ファイルポインタを先頭に移動
 			MessageBox(hWnd, "サウンドデータファイルの生成に失敗！(2)", "警告！", MB_ICONWARNING);
 			return HRESULT_FROM_WIN32(GetLastError());
 		}
-	
+
 		// WAVEファイルのチェック
 		hr = CheckChunk(hFile, 'FFIR', &dwChunkSize, &dwChunkPosition);
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "WAVEファイルのチェックに失敗！(1)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
 		}
 		hr = ReadChunkData(hFile, &dwFiletype, sizeof(DWORD), dwChunkPosition);
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "WAVEファイルのチェックに失敗！(2)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
 		}
-		if(dwFiletype != 'EVAW')
+		if (dwFiletype != 'EVAW')
 		{
 			MessageBox(hWnd, "WAVEファイルのチェックに失敗！(3)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
 		}
-	
+
 		// フォーマットチェック
 		hr = CheckChunk(hFile, ' tmf', &dwChunkSize, &dwChunkPosition);
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "フォーマットチェックに失敗！(1)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
 		}
 		hr = ReadChunkData(hFile, &wfx, dwChunkSize, dwChunkPosition);
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "フォーマットチェックに失敗！(2)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
@@ -142,22 +144,22 @@ HRESULT InitSound(HWND hWnd)
 
 		// オーディオデータ読み込み
 		hr = CheckChunk(hFile, 'atad', &g_aSizeAudio[nCntSound], &dwChunkPosition);
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "オーディオデータ読み込みに失敗！(1)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
 		}
 		g_apDataAudio[nCntSound] = (BYTE*)malloc(g_aSizeAudio[nCntSound]);
 		hr = ReadChunkData(hFile, g_apDataAudio[nCntSound], g_aSizeAudio[nCntSound], dwChunkPosition);
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "オーディオデータ読み込みに失敗！(2)", "警告！", MB_ICONWARNING);
 			return S_FALSE;
 		}
-	
+
 		// ソースボイスの生成
 		hr = g_pXAudio2->CreateSourceVoice(&g_apSourceVoice[nCntSound], &(wfx.Format));
-		if(FAILED(hr))
+		if (FAILED(hr))
 		{
 			MessageBox(hWnd, "ソースボイスの生成に失敗！", "警告！", MB_ICONWARNING);
 			return S_FALSE;
@@ -166,14 +168,31 @@ HRESULT InitSound(HWND hWnd)
 		memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
 		buffer.AudioBytes = g_aSizeAudio[nCntSound];
 		buffer.pAudioData = g_apDataAudio[nCntSound];
-		buffer.Flags      = XAUDIO2_END_OF_STREAM;
-		buffer.LoopCount  = 0;
+		buffer.Flags = XAUDIO2_END_OF_STREAM;
+		buffer.LoopCount = 0;
 
-		// オーディオバッファの登録
-		g_apSourceVoice[nCntSound]->SubmitSourceBuffer(&buffer);
 	}
 
 	return S_OK;
+}
+
+//=============================================================================
+// 更新処理
+//=============================================================================
+void UpdateSound()
+{
+	//g_apSourceVoice[SOUND_LABEL_SE_TEST]->GetState(&g_xa2state);
+	//PrintDebugProc("BuffersQueued[SOUND_LABEL_SE_TEST]:%d \n\n\n", g_xa2state.BuffersQueued);
+
+	////テスト
+	//if (GetKeyboardTrigger(DIK_Z))
+	//{
+	//	PlaySound(SOUND_LABEL_SE_TEST, true, false);
+	//}
+	//if (GetKeyboardTrigger(DIK_X))
+	//{
+	//	StopSound(SOUND_LABEL_SE_TEST, false);
+	//}
 }
 
 //=============================================================================
@@ -215,72 +234,134 @@ void UninitSound(void)
 }
 
 //=============================================================================
-// セグメント再生(停止)
+// 音楽を再生
+// isLoop:true ループする。		false ループしない　
+// isEncore:true 再生している音を再生しようとする場合、最初から再生。　	false 再生（一時停止のところからの再生もできる）
 //=============================================================================
-HRESULT PlaySound(SOUND_LABEL label, int LoopCount)
+HRESULT PlaySound(SOUND_LABEL label, bool isLoop ,bool isEncore)
 {
-	XAUDIO2_VOICE_STATE xa2state;
 	XAUDIO2_BUFFER buffer;
 
 	memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
 	buffer.AudioBytes = g_aSizeAudio[label];
 	buffer.pAudioData = g_apDataAudio[label];
 	buffer.Flags      = XAUDIO2_END_OF_STREAM;
-	buffer.LoopCount  = LoopCount;
-
-	// 状態取得
-	g_apSourceVoice[label]->GetState(&xa2state);
-	if(xa2state.BuffersQueued != 0)
-	{// 再生中
-		// 一時停止
-		g_apSourceVoice[label]->Stop(0);
-
-		// オーディオバッファの削除
-		g_apSourceVoice[label]->FlushSourceBuffers();
+	if (isLoop)
+	{
+		buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+	}
+	else
+	{
+		buffer.LoopCount = XAUDIO2_NO_LOOP_REGION;
 	}
 
-	// オーディオバッファの登録
-	g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);
+	// 状態取得
+	g_apSourceVoice[label]->GetState(&g_xa2state);
+
+	if (isEncore)
+	{
+		if (g_xa2state.BuffersQueued != 0)						//BuffersQueuedは再生中の音を含むバッファ中の音の数
+		{//バッファに音ある場合
+			g_apSourceVoice[label]->Stop(0);					// 一時停止
+
+			// オーディオバッファの削除
+			//再生中の音は影響受けなくて、削除されなくて今回の再生終わるまで、再生し続ける。
+			//一時停止の音は影響受けて、削除されて停止になる。バッファ中のまだ再生してない待ち音は全部削除される（たぶん、一時停止の音は実質上待ち音になった）
+			g_apSourceVoice[label]->FlushSourceBuffers();		//実質上、ほぼg_xa2state.BuffersQueued = 0	
+															
+		}													
+	}
+
+	if (isEncore || (g_xa2state.BuffersQueued == 0))
+	{//最初から再生する場合、あるいは、この音まだ登録していない場合
+		// オーディオバッファの登録
+		g_apSourceVoice[label]->SubmitSourceBuffer(&buffer);	//実質上、BuffersQueued++		BuffersQueuedの最大限は64
+
+	}
 
 	// 再生
-	g_apSourceVoice[label]->Start(0);
+	g_apSourceVoice[label]->Start(0);							//BuffersQueued > 0の時、音を再生。音が終わったら、 BuffersQueued--。BuffersQueuedが0になるまで、ずっとバックグラウンドで再生し続ける
+
+	g_aParam[label].isSoloTempStop = false;
+
 
 	return S_OK;
 }
 
 //=============================================================================
-// セグメント停止
+// 一括一時停止された音楽を再生
+// 一括一時停止後に、ペアで使う
 //=============================================================================
-void StopSound(SOUND_LABEL label)
+HRESULT PlaySoundAll()
 {
-	XAUDIO2_VOICE_STATE xa2state;
+	for (int i = 0; i < SOUND_LABEL_MAX; i++)
+	{
+		// 状態取得
+		g_apSourceVoice[i]->GetState(&g_xa2state);
 
-	// 状態取得
-	g_apSourceVoice[label]->GetState(&xa2state);
-	if(xa2state.BuffersQueued != 0)
-	{// 再生中
-		// 一時停止
-		g_apSourceVoice[label]->Stop(0);
+		if (g_xa2state.BuffersQueued != 0)
+		{//一括停止の時、再生してる音か一時停止される音か
+			if (g_aParam[i].isSoloTempStop == false)
+			{//再生してる音なら
+				// 再生
+				g_apSourceVoice[i]->Start(0);
+			}
+		}
 
-		// オーディオバッファの削除
-		g_apSourceVoice[label]->FlushSourceBuffers();
 	}
+
+	return S_OK;
 }
 
 //=============================================================================
-// セグメント停止
+// 音楽を停止
+// tempStop:true 一時停止　　false 停止
 //=============================================================================
-void StopSound(void)
+void StopSound(SOUND_LABEL label, bool isTempStop)
 {
-	// 一時停止
-	for(int nCntSound = 0; nCntSound < SOUND_LABEL_MAX; nCntSound++)
-	{
-		if(g_apSourceVoice[nCntSound])
+	// 状態取得
+	g_apSourceVoice[label]->GetState(&g_xa2state);
+
+	if(g_xa2state.BuffersQueued != 0)								
+	{// 再生中		
+		g_apSourceVoice[label]->Stop(0);						// 一時停止
+
+		g_aParam[label].isSoloTempStop = true;
+
+		if(!isTempStop)
 		{
-			// 一時停止
-			g_apSourceVoice[nCntSound]->Stop(0);
+			// オーディオバッファの削除
+			g_apSourceVoice[label]->FlushSourceBuffers();		//一時停止の上に、これを使うと、停止になる
+
 		}
 	}
+
+}
+
+//=============================================================================
+// すべての音楽を一括停止
+// tempStop:true 一時停止　　false 停止
+//=============================================================================
+void StopSoundALL(bool isTempStop)
+{
+	for (int i = 0;i < SOUND_LABEL_MAX; i++)
+	{
+		// 状態取得
+		g_apSourceVoice[i]->GetState(&g_xa2state);
+
+		if (g_xa2state.BuffersQueued != 0)
+		{		
+			g_apSourceVoice[i]->Stop(0);						// 一時停止
+
+			if (!isTempStop)
+			{
+				// オーディオバッファの削除
+				g_apSourceVoice[i]->FlushSourceBuffers();		//一時停止の上に、これを使うと、停止になる
+
+			}
+		}
+	}
+
 }
 
 //=============================================================================

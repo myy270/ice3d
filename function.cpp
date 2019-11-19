@@ -1571,7 +1571,7 @@ void Character::ItemCollision()
 							ChangeScore(objectType, 100);
 
 							// コインを拾う効果音
-							//PlaySound(SOUND_LABEL_SE_COIN);
+							PlaySound(SOUND_LABEL_SE_COIN, false, true);
 						}
 
 						// アイテム消去

@@ -25,9 +25,9 @@ LPD3DXFONT	g_pD3DXFont = NULL;			// フォントへのポインタ
 char		g_aStrDebug[1024] = {"\0"};	// デバッグ情報
 
 #ifdef _DEBUG
-bool		g_bDispDebug = 1;	// デバッグ表示ON/OFF
+bool		g_bDispDebug = 1;			// デバッグ表示ON/OFF
 #else
-bool		g_bDispDebug = 0;	// デバッグ表示ON/OFF
+bool		g_bDispDebug = 0;			// デバッグ表示ON/OFF
 #endif
 
 //=============================================================================
@@ -92,15 +92,6 @@ void DrawDebugProc(void)
 //=============================================================================
 void PrintDebugProc(const char *fmt,...)
 {
-#if 0
-	long *pParam;
-	static char aBuf[256];
-
-	pParam = (long*)&fmt;
-	sprintf(aBuf, fmt, pParam[1], pParam[2], pParam[3], pParam[4],
-									pParam[5], pParam[6], pParam[7], pParam[8],
-									pParam[9], pParam[10], pParam[11], pParam[12]);
-#else
 	va_list list;			// 可変引数を処理する為に使用する変数
 	char *pCur;
 	char aBuf[256]={"\0"};
@@ -158,6 +149,6 @@ void PrintDebugProc(const char *fmt,...)
 	{
 		strcat(g_aStrDebug, aBuf);
 	}
-#endif
+
 }
 
