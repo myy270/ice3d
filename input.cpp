@@ -1,15 +1,15 @@
 ﻿/*******************************************************************************
-* タイトル:
+* タイトル:		入力処理[input.cpp]
 * プログラム名:
 * 作成者:		GP11A341 33 麦英泳
 * 作成日:		2018/08/17
 *******************************************************************************/
-
 #include "input.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+
 #define	NUM_KEY_MAX			(256)
 
 #define	NUM_BUTTON_MAX		(32)
@@ -28,7 +28,7 @@ HRESULT InitializeMouse(HWND hWnd);			// マウスの初期化
 void UninitMouse();							// マウスの終了処理
 HRESULT UpdateMouse();						// マウスの更新処理
 
-HRESULT InitializePad(HWND hWnd);			// パッド初期化
+HRESULT InitializePad(HWND hWnd);			// ゲームパッド初期化
 void UpdatePad(void);
 void UninitPad(void);
 
@@ -37,30 +37,30 @@ void UninitPad(void);
 //*****************************************************************************
 
 //キーボード
-LPDIRECTINPUT8			g_pDInput = NULL;									// IDirectInput8インターフェースへのポインタ
-LPDIRECTINPUTDEVICE8	g_pDIDevKeyboard = NULL;							// IDirectInputDevice8インターフェースへのポインタ(キーボード)
-BYTE					g_keyState[NUM_KEY_MAX];							// キーボードの状態を受け取るワーク
-BYTE					g_keyStateTrigger[NUM_KEY_MAX];						// キーボードの状態を受け取るワーク
-BYTE					g_keyStateRepeat[NUM_KEY_MAX];						// キーボードの状態を受け取るワーク
-BYTE					g_keyStateRelease[NUM_KEY_MAX];						// キーボードの状態を受け取るワーク
-int						g_keyStateRepeatCnt[NUM_KEY_MAX];					// キーボードのリピートカウンタ
+LPDIRECTINPUT8					g_pDInput = NULL;								// IDirectInput8インターフェースへのポインタ
+LPDIRECTINPUTDEVICE8			g_pDIDevKeyboard = NULL;						// IDirectInputDevice8インターフェースへのポインタ(キーボード)
+BYTE							g_keyState[NUM_KEY_MAX];						// キーボードの状態を受け取るワーク
+BYTE							g_keyStateTrigger[NUM_KEY_MAX];					// キーボードの状態を受け取るワーク
+BYTE							g_keyStateRepeat[NUM_KEY_MAX];					// キーボードの状態を受け取るワーク
+BYTE							g_keyStateRelease[NUM_KEY_MAX];					// キーボードの状態を受け取るワーク
+int								g_keyStateRepeatCnt[NUM_KEY_MAX];				// キーボードのリピートカウンタ
 
 //マウス
-static LPDIRECTINPUTDEVICE8 pMouse = NULL;									// mouse
+static LPDIRECTINPUTDEVICE8		g_pMouse = NULL;								// マウスデバイス
 
-static DIMOUSESTATE2   mouseState;											// マウスのダイレクトな状態
-static DIMOUSESTATE2   mouseTrigger;										// 押された瞬間だけON
+static DIMOUSESTATE2			g_mouseState;									// マウスのダイレクトな状態
+static DIMOUSESTATE2			g_mouseTrigger;									// 押された瞬間だけON
 
 //ゲームパッド
-static LPDIRECTINPUTDEVICE8	pGamePad[GAMEPADMAX] = {NULL,NULL,NULL,NULL};	// パッドデバイス
+static LPDIRECTINPUTDEVICE8		pGamePad[GAMEPADMAX] = {NULL,NULL,NULL,NULL};	// ゲームパッドデバイス
 
-static DWORD	padState[GAMEPADMAX];										// パッド情報（複数対応）
-static DWORD	padTrigger[GAMEPADMAX];
-static DWORD	padRelease[GAMEPADMAX];
-static int		padCount = 0;												// 検出したパッドの数
+static DWORD					g_padState[GAMEPADMAX];							// ゲームパッド情報（複数対応）
+static DWORD					g_padTrigger[GAMEPADMAX];
+static DWORD					g_padRelease[GAMEPADMAX];
+static int						g_padCount = 0;									// 検出したゲームパッドの数
 
-DWORD			padRepeat[GAMEPADMAX];
-int				padRepeatCnt[GAMEPADMAX][NUM_BUTTON_MAX];
+DWORD							g_padRepeat[GAMEPADMAX];
+int								g_padRepeatCnt[GAMEPADMAX][NUM_BUTTON_MAX];
 
 
 //=============================================================================
@@ -83,7 +83,7 @@ HRESULT InitInput(HINSTANCE hInst, HWND hWnd)
  	// マウスの初期化
 	InitializeMouse(hWnd);
 	
-	// パッドの初期化
+	// ゲームパッドの初期化
 	InitializePad(hWnd);
 
 	return S_OK;
@@ -100,7 +100,7 @@ void UninitInput(void)
 	// マウスの終了処理
 	UninitMouse();
 
-	// パッドの終了処理
+	// ゲームパッドの終了処理
 	UninitPad();
 
 	SAFE_RELEASE(g_pDInput);
@@ -118,12 +118,13 @@ void UpdateInput(void)
 	// マウスの更新
 	UpdateMouse();
 	
-	// パッドの更新
+	// ゲームパッドの更新
 	UpdatePad();
 
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//キーボード
 
 //=============================================================================
 // キーボードの初期化
@@ -148,7 +149,7 @@ HRESULT InitKeyboard(HWND hWnd)
 		return hr;
 	}
 
-	// 協調モードを設定（フォアグラウンド＆非排他モード）	//ウィンドウがフォーカスされていないとき、操作できるかどうかの設定
+	// 協調モードを設定（フォアグラウンド＆非排他モード）	//これを消すと、ウィンドウがフォーカスされていない時も操作できる
 #ifndef _DEBUG
 	hr = g_pDIDevKeyboard->SetCooperativeLevel(hWnd, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 	if(FAILED(hr))
@@ -249,6 +250,7 @@ bool GetKeyboardRelease(int key)
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//マウス
 
 //=============================================================================
 // マウスの初期化
@@ -257,21 +259,21 @@ HRESULT InitializeMouse(HWND hWnd)
 {
 	HRESULT result;
 	// デバイス作成
-	result = g_pDInput->CreateDevice(GUID_SysMouse,&pMouse,NULL);
-	if(FAILED(result) || pMouse==NULL)
+	result = g_pDInput->CreateDevice(GUID_SysMouse,&g_pMouse,NULL);
+	if(FAILED(result) || g_pMouse==NULL)
 	{
 		MessageBox(hWnd,"No mouse","Warning",MB_OK | MB_ICONWARNING);
 		return result;
 	}
 	// データフォーマット設定
-	result = pMouse->SetDataFormat(&c_dfDIMouse2);
+	result = g_pMouse->SetDataFormat(&c_dfDIMouse2);
 	if(FAILED(result))
 	{
 		MessageBox(hWnd,"Can't setup mouse","Warning",MB_OK | MB_ICONWARNING);
 		return result;
 	}
 	// 他のアプリと協調モードに設定			//ウィンドウがフォーカスされていないとき、操作できるかどうかの設定
-	result = pMouse->SetCooperativeLevel(hWnd, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
+	result = g_pMouse->SetCooperativeLevel(hWnd, (DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
 	if(FAILED(result))
 	{
 		MessageBox(hWnd,"Mouse mode error","Warning",MB_OK | MB_ICONWARNING);
@@ -287,7 +289,7 @@ HRESULT InitializeMouse(HWND hWnd)
 	prop.diph.dwHow = DIPH_DEVICE;
 	prop.dwData = DIPROPAXISMODE_REL;		// マウスの移動値　相対値
 
-	result = pMouse->SetProperty(DIPROP_AXISMODE,&prop.diph);
+	result = g_pMouse->SetProperty(DIPROP_AXISMODE,&prop.diph);
 	if(FAILED(result))
 	{
 		MessageBox(hWnd,"Mouse property error","Warning",MB_OK | MB_ICONWARNING);
@@ -295,7 +297,7 @@ HRESULT InitializeMouse(HWND hWnd)
 	}
 	
 	// アクセス権を得る
-	pMouse->Acquire();
+	g_pMouse->Acquire();
 	return result;
 }
 
@@ -304,11 +306,11 @@ HRESULT InitializeMouse(HWND hWnd)
 //=============================================================================
 void UninitMouse()
 {
-	if(pMouse)
+	if(g_pMouse)
 	{
-		pMouse->Unacquire();
-		pMouse->Release();
-		pMouse = NULL;
+		g_pMouse->Unacquire();
+		g_pMouse->Release();
+		g_pMouse = NULL;
 	}
 
 }
@@ -320,25 +322,25 @@ HRESULT UpdateMouse()
 {
 	HRESULT result;
 	// 前回の値保存
-	DIMOUSESTATE2 lastMouseState = mouseState;
+	DIMOUSESTATE2 lastMouseState = g_mouseState;
 	// データ取得
-	result = pMouse->GetDeviceState(sizeof(mouseState),&mouseState);
+	result = g_pMouse->GetDeviceState(sizeof(g_mouseState),&g_mouseState);
 	if(SUCCEEDED(result))
 	{
-		mouseTrigger.lX = mouseState.lX;
-		mouseTrigger.lY = mouseState.lY;
-		mouseTrigger.lZ = mouseState.lZ;
+		g_mouseTrigger.lX = g_mouseState.lX;
+		g_mouseTrigger.lY = g_mouseState.lY;
+		g_mouseTrigger.lZ = g_mouseState.lZ;
 		// マウスのボタン状態
 		for(int i=0;i<8;i++)
 		{
-			mouseTrigger.rgbButtons[i] = ((lastMouseState.rgbButtons[i] ^
-				mouseState.rgbButtons[i]) & mouseState.rgbButtons[i]);
+			g_mouseTrigger.rgbButtons[i] = ((lastMouseState.rgbButtons[i] ^
+				g_mouseState.rgbButtons[i]) & g_mouseState.rgbButtons[i]);
 		}
 	}
 	else	// 取得失敗
 	{
 		// アクセス権を得てみる
-		result = pMouse->Acquire();
+		result = g_pMouse->Acquire();
 	}
 	return result;
 	
@@ -349,32 +351,32 @@ HRESULT UpdateMouse()
 //=============================================================================
 BOOL IsMouseLeftPress(void)
 {
-	return (BOOL)(mouseState.rgbButtons[0] & 0x80);	// 押されたときに立つビットを検査
+	return (BOOL)(g_mouseState.rgbButtons[0] & 0x80);	// 押されたときに立つビットを検査
 }
 
 BOOL IsMouseLeftTrigger(void)
 {
-	return (BOOL)(mouseTrigger.rgbButtons[0] & 0x80);
+	return (BOOL)(g_mouseTrigger.rgbButtons[0] & 0x80);
 }
 
 BOOL IsMouseRightPress(void)
 {
-	return (BOOL)(mouseState.rgbButtons[1] & 0x80);
+	return (BOOL)(g_mouseState.rgbButtons[1] & 0x80);
 }
 
 BOOL IsMouseRightTrigger(void)
 {
-	return (BOOL)(mouseTrigger.rgbButtons[1] & 0x80);
+	return (BOOL)(g_mouseTrigger.rgbButtons[1] & 0x80);
 }
 
 BOOL IsMouseCenterPress(void)
 {
-	return (BOOL)(mouseState.rgbButtons[2] & 0x80);
+	return (BOOL)(g_mouseState.rgbButtons[2] & 0x80);
 }
 
 BOOL IsMouseCenterTrigger(void)
 {
-	return (BOOL)(mouseTrigger.rgbButtons[2] & 0x80);
+	return (BOOL)(g_mouseTrigger.rgbButtons[2] & 0x80);
 }
 
 //=============================================================================
@@ -382,20 +384,21 @@ BOOL IsMouseCenterTrigger(void)
 //=============================================================================
 long GetMouseX(void)
 {
-	return mouseState.lX;
+	return g_mouseState.lX;
 }
 
 long GetMouseY(void)
 {
-	return mouseState.lY;
+	return g_mouseState.lY;
 }
 
 long GetMouseZ(void)
 {
-	return mouseState.lZ;
+	return g_mouseState.lZ;
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//ゲームパッド
 
 //=============================================================================
 // コールバック関数
@@ -404,7 +407,7 @@ BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID )
 {
 	HRESULT result;
 
-	result = g_pDInput->CreateDevice(lpddi->guidInstance, &pGamePad[padCount++], NULL);
+	result = g_pDInput->CreateDevice(lpddi->guidInstance, &pGamePad[g_padCount++], NULL);
 	return DIENUM_CONTINUE;	// 次のデバイスを列挙
 
 }
@@ -412,17 +415,17 @@ BOOL CALLBACK SearchGamePadCallback(LPDIDEVICEINSTANCE lpddi, LPVOID )
 //=============================================================================
 // ゲームパッドの初期化
 //=============================================================================
-HRESULT InitializePad(HWND hWnd)			// パッド初期化
+HRESULT InitializePad(HWND hWnd)			// ゲームパッド初期化
 {
 	HRESULT		result;
 	int			i;
 
-	padCount = 0;
-	// ジョイパッドを探す
+	g_padCount = 0;
+	// ゲームパッドを探す
 	g_pDInput->EnumDevices(DI8DEVCLASS_GAMECTRL, (LPDIENUMDEVICESCALLBACK)SearchGamePadCallback, NULL, DIEDFL_ATTACHEDONLY);
-	// セットしたコールバック関数が、パッドを発見した数だけ呼ばれる。
+	// セットしたコールバック関数が、ゲームパッドを発見した数だけ呼ばれる。
 
-	for ( i=0 ; i<padCount ; i++ ) 
+	for ( i=0 ; i<g_padCount ; i++ ) 
 	{
 		// ジョイスティック用のデータ・フォーマットを設定
 		result = pGamePad[i]->SetDataFormat(&c_dfDIJoystick);
@@ -451,7 +454,8 @@ HRESULT InitializePad(HWND hWnd)			// パッド初期化
 //=============================================================================
 void UninitPad(void)
 {
-	for (int i=0 ; i<GAMEPADMAX ; i++) {
+	for (int i=0 ; i<GAMEPADMAX ; i++) 
+	{
 		if ( pGamePad[i] )
 		{
 			pGamePad[i]->Unacquire();
@@ -471,21 +475,23 @@ void UpdatePad(void)
 	DIJOYSTATE2		dijs;
 	int				i;
 
-	for ( i=0 ; i<padCount ; i++ ) 
+	for ( i=0 ; i<g_padCount ; i++ ) 
 	{
 		DWORD lastPadState;
-		lastPadState = padState[i];
-		padState[i] = 0x00000000l;	// 初期化
+		lastPadState = g_padState[i];
+		g_padState[i] = 0x00000000l;	// 初期化
 
 		result = pGamePad[i]->Poll();	// ジョイスティックにポールをかける
-		if ( FAILED(result) ) {
+		if ( FAILED(result) ) 
+		{
 			result = pGamePad[i]->Acquire();
 			while ( result == DIERR_INPUTLOST )
 				result = pGamePad[i]->Acquire();
 		}
 
 		result = pGamePad[i]->GetDeviceState(sizeof(DIJOYSTATE), &dijs);	// デバイス状態を読み取る
-		if ( result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED ) {
+		if ( result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED ) 
+		{
 			result = pGamePad[i]->Acquire();
 			while ( result == DIERR_INPUTLOST )
 				result = pGamePad[i]->Acquire();
@@ -495,73 +501,73 @@ void UpdatePad(void)
 
 		//* left stick 
 		//* y-axis (forward)
-		if ( dijs.lY < 32767 - LSTICK_OFFSET)					padState[i] |= BUTTON_LSTICK_UP;
+		if ( dijs.lY < 32767 - LSTICK_OFFSET)					g_padState[i] |= BUTTON_LSTICK_UP;
 		//* y-axis (backward)
-		if ( dijs.lY > 32767 + LSTICK_OFFSET)					padState[i] |= BUTTON_LSTICK_DOWN;
+		if ( dijs.lY > 32767 + LSTICK_OFFSET)					g_padState[i] |= BUTTON_LSTICK_DOWN;
 		//* x-axis (left)
-		if ( dijs.lX < 32767 - LSTICK_OFFSET)					padState[i] |= BUTTON_LSTICK_LEFT;
+		if ( dijs.lX < 32767 - LSTICK_OFFSET)					g_padState[i] |= BUTTON_LSTICK_LEFT;
 		//* x-axis (right)
-		if ( dijs.lX > 32767 + LSTICK_OFFSET)					padState[i] |= BUTTON_LSTICK_RIGHT;
+		if ( dijs.lX > 32767 + LSTICK_OFFSET)					g_padState[i] |= BUTTON_LSTICK_RIGHT;
 
 		//* right stick
-		if ( dijs.lRz < 32767 - RSTICK_OFFSET)					padState[i] |= BUTTON_RSTICK_UP;
+		if ( dijs.lRz < 32767 - RSTICK_OFFSET)					g_padState[i] |= BUTTON_RSTICK_UP;
 		//* 													  
-		if ( dijs.lRz > 32767 + RSTICK_OFFSET)					padState[i] |= BUTTON_RSTICK_DOWN;
+		if ( dijs.lRz > 32767 + RSTICK_OFFSET)					g_padState[i] |= BUTTON_RSTICK_DOWN;
 		//* 													  
-		if ( dijs.lZ  < 32767 - RSTICK_OFFSET)					padState[i] |= BUTTON_RSTICK_LEFT;
+		if ( dijs.lZ  < 32767 - RSTICK_OFFSET)					g_padState[i] |= BUTTON_RSTICK_LEFT;
 		//* 													  
-		if ( dijs.lZ  > 32767 + RSTICK_OFFSET)					padState[i] |= BUTTON_RSTICK_RIGHT;
+		if ( dijs.lZ  > 32767 + RSTICK_OFFSET)					g_padState[i] |= BUTTON_RSTICK_RIGHT;
 
 		//* 十字方向キー
-		if ((dijs.rgdwPOV[0] == 0) || (dijs.rgdwPOV[0] == 4500) || (dijs.rgdwPOV[0] == 31500))			padState[i] |= BUTTON_UP;
+		if ((dijs.rgdwPOV[0] == 0) || (dijs.rgdwPOV[0] == 4500) || (dijs.rgdwPOV[0] == 31500))			g_padState[i] |= BUTTON_UP;
 		//* 													  
-		if ((dijs.rgdwPOV[0] == 13500) || (dijs.rgdwPOV[0] == 18000) || (dijs.rgdwPOV[0] == 22500))		padState[i] |= BUTTON_DOWN;
+		if ((dijs.rgdwPOV[0] == 13500) || (dijs.rgdwPOV[0] == 18000) || (dijs.rgdwPOV[0] == 22500))		g_padState[i] |= BUTTON_DOWN;
 		//* 													  
-		if ((dijs.rgdwPOV[0] == 22500) || (dijs.rgdwPOV[0] == 27000) || (dijs.rgdwPOV[0] == 31500))		padState[i] |= BUTTON_LEFT;
+		if ((dijs.rgdwPOV[0] == 22500) || (dijs.rgdwPOV[0] == 27000) || (dijs.rgdwPOV[0] == 31500))		g_padState[i] |= BUTTON_LEFT;
 		//* 													  
-		if ((dijs.rgdwPOV[0] == 4500) || (dijs.rgdwPOV[0] == 9000) || (dijs.rgdwPOV[0] == 13500))		padState[i] |= BUTTON_RIGHT;
+		if ((dijs.rgdwPOV[0] == 4500) || (dijs.rgdwPOV[0] == 9000) || (dijs.rgdwPOV[0] == 13500))		g_padState[i] |= BUTTON_RIGHT;
 
 
-		if ( dijs.rgbButtons[0] & 0x80 )	padState[i] |= BUTTON_SQUARE;
-		if ( dijs.rgbButtons[1] & 0x80 )	padState[i] |= BUTTON_CROSS;
-		if ( dijs.rgbButtons[2] & 0x80 )	padState[i] |= BUTTON_CIRCLE;
-		if ( dijs.rgbButtons[3] & 0x80 )	padState[i] |= BUTTON_TRIANGLE;
-		if ( dijs.rgbButtons[4] & 0x80 )	padState[i] |= BUTTON_L1;
-		if ( dijs.rgbButtons[5] & 0x80 )	padState[i] |= BUTTON_R1;
-		if ( dijs.rgbButtons[6] & 0x80 )	padState[i] |= BUTTON_L2;
-		if ( dijs.rgbButtons[7] & 0x80 )	padState[i] |= BUTTON_R2;
-		if ( dijs.rgbButtons[8] & 0x80 )	padState[i] |= BUTTON_SHARE;
-		if ( dijs.rgbButtons[9] & 0x80 )	padState[i] |= BUTTON_OPTIONS;
-		if ( dijs.rgbButtons[10] & 0x80)	padState[i] |= BUTTON_L3;
-		if ( dijs.rgbButtons[11] & 0x80)	padState[i] |= BUTTON_R3;
-		if ( dijs.rgbButtons[12] & 0x80)	padState[i] |= BUTTON_PS;
-		if ( dijs.rgbButtons[13] & 0x80)	padState[i] |= BUTTON_TOUCHPAD;
+		if ( dijs.rgbButtons[0] & 0x80 )	g_padState[i] |= BUTTON_SQUARE;
+		if ( dijs.rgbButtons[1] & 0x80 )	g_padState[i] |= BUTTON_CROSS;
+		if ( dijs.rgbButtons[2] & 0x80 )	g_padState[i] |= BUTTON_CIRCLE;
+		if ( dijs.rgbButtons[3] & 0x80 )	g_padState[i] |= BUTTON_TRIANGLE;
+		if ( dijs.rgbButtons[4] & 0x80 )	g_padState[i] |= BUTTON_L1;
+		if ( dijs.rgbButtons[5] & 0x80 )	g_padState[i] |= BUTTON_R1;
+		if ( dijs.rgbButtons[6] & 0x80 )	g_padState[i] |= BUTTON_L2;
+		if ( dijs.rgbButtons[7] & 0x80 )	g_padState[i] |= BUTTON_R2;
+		if ( dijs.rgbButtons[8] & 0x80 )	g_padState[i] |= BUTTON_SHARE;
+		if ( dijs.rgbButtons[9] & 0x80 )	g_padState[i] |= BUTTON_OPTIONS;
+		if ( dijs.rgbButtons[10] & 0x80)	g_padState[i] |= BUTTON_L3;
+		if ( dijs.rgbButtons[11] & 0x80)	g_padState[i] |= BUTTON_R3;
+		if ( dijs.rgbButtons[12] & 0x80)	g_padState[i] |= BUTTON_PS;
+		if ( dijs.rgbButtons[13] & 0x80)	g_padState[i] |= BUTTON_TOUCHPAD;
 
 		// Trigger設定
-		padTrigger[i] = ((lastPadState ^ padState[i])	// 前回と違っていて
-						& padState[i]);					// しかも今ONのやつ
+		g_padTrigger[i] = ((lastPadState ^ g_padState[i])	// 前回と違っていて
+						& g_padState[i]);					// しかも今ONのやつ
 
 		// Release設定
-		padRelease[i] = (lastPadState ^ padState[i]) & ~padState[i];
+		g_padRelease[i] = (lastPadState ^ g_padState[i]) & ~g_padState[i];
 		
 		//Repeat設定
-		padRepeat[i] = padTrigger[i];
+		g_padRepeat[i] = g_padTrigger[i];
 
 		for (int cnt = 0; cnt < NUM_BUTTON_MAX; cnt++)
 		{
-			DWORD buff = padState[i] & (DWORD)(1 * powf(2.0f, (float)cnt));
+			DWORD buff = g_padState[i] & (DWORD)(1 * powf(2.0f, (float)cnt));
 		
 			if (buff)
 			{
-				padRepeatCnt[i][cnt]++;
-				if (padRepeatCnt[i][cnt] >= REPEAT_TIME)
+				g_padRepeatCnt[i][cnt]++;
+				if (g_padRepeatCnt[i][cnt] >= REPEAT_TIME)
 				{
-					padRepeat[i] = padRepeat[i] | buff;
+					g_padRepeat[i] = g_padRepeat[i] | buff;
 				}
 			}
 			else
 			{
-				padRepeatCnt[i][cnt] = 0;
+				g_padRepeatCnt[i][cnt] = 0;
 				
 			}
 		}
@@ -575,23 +581,20 @@ void UpdatePad(void)
 //=============================================================================
 BOOL IsButtonPress(int padNo,DWORD button)
 {
-	return (button & padState[padNo]);
+	return (button & g_padState[padNo]);
 }
 
 BOOL IsButtonTrigger(int padNo,DWORD button)
 {
-	return (button & padTrigger[padNo]);
+	return (button & g_padTrigger[padNo]);
 }
 
 BOOL IsButtonRelease(int padNo, DWORD button)
 {
-	return (button & padRelease[padNo]);
+	return (button & g_padRelease[padNo]);
 }
 
 BOOL IsButtonRepeat(int padNo, DWORD button)
 {
-	return (button & padRepeat[padNo]);
+	return (button & g_padRepeat[padNo]);
 }
-
-
-

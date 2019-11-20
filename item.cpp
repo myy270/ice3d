@@ -1,6 +1,6 @@
 //=============================================================================
 //
-// ƒRƒCƒ“‚ÆƒAƒCƒXƒuƒƒbƒN‚Ìˆ—A“€Œ‹ƒAƒCƒeƒ€UI‚Ìˆ— [item.cpp]	
+// ƒAƒCƒeƒ€(ƒRƒCƒ“‚ÆƒAƒCƒXƒuƒƒbƒN)‚Ìˆ—A“€Œ‹ƒAƒCƒeƒ€UI‚Ìˆ— [item.cpp]	
 // Author : ”ž‰p‰j
 //
 //=============================================================================
@@ -30,7 +30,6 @@
 #define	VALUE_ROTATE_ITEM		(D3DX_PI * 0.025f)							// ‰ñ“]—Ê	4.5“x‘Š“–
 
 #define	HEIGHT_FROMLAND_ITEM	(15.0f)										// ƒAƒCƒeƒ€‚Ì‘Ø‹ó‚‚³
-#define	NUM_COIN				(99)										// ƒRƒCƒ“‚Ì”
 
 //*****************************************************************************
 // ƒvƒƒgƒ^ƒCƒvéŒ¾
@@ -46,7 +45,7 @@ LPD3DXMESH			g_pMeshItem[ITEMTYPE_MAX];				// ID3DXMeshƒCƒ“ƒ^[ƒtƒFƒCƒX‚Ö‚Ìƒ|ƒCƒ
 LPD3DXBUFFER		g_pD3DXMatBuffItem[ITEMTYPE_MAX];		// ƒƒbƒVƒ…‚Ìƒ}ƒeƒŠƒAƒ‹î•ñ‚ðŠi”[
 DWORD				g_aNumMatItem[ITEMTYPE_MAX];			// ƒ}ƒeƒŠƒAƒ‹î•ñ‚Ì‘”
 
-ITEM				g_aItem[MAX_ITEM];			// ƒAƒCƒeƒ€ƒ[ƒN
+ITEM				g_aItem[MAX_ITEM];						// ƒAƒCƒeƒ€ƒ[ƒN
 
 bool g_isDropItem;		//ƒAƒCƒeƒ€—Ž‰º‚·‚é‚©
 
@@ -54,8 +53,8 @@ bool g_isReadyToDrop;	//—Ž‰º‚·‚éƒAƒCƒeƒ€‚Í‚à‚¤¶¬‚µ‚½‚©
 
 int g_dropItemIndex;	//—Ž‰º‚·‚éƒAƒCƒeƒ€‚ÌƒCƒ“ƒfƒNƒX
 
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemUI = NULL;		// ¶‚ÌƒAƒCƒeƒ€UI‚Ì’¸“_ƒoƒbƒtƒ@ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemUI2 = NULL;	// ‰E‚ÌƒAƒCƒeƒ€UI‚Ì’¸“_ƒoƒbƒtƒ@ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemUI = NULL;			// ¶‚ÌƒAƒCƒeƒ€UI‚Ì’¸“_ƒoƒbƒtƒ@ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemUI2 = NULL;		// ‰E‚ÌƒAƒCƒeƒ€UI‚Ì’¸“_ƒoƒbƒtƒ@ƒCƒ“ƒ^[ƒtƒF[ƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
 
 //ƒAƒCƒeƒ€‚ÌXƒtƒ@ƒCƒ‹‚ÌƒpƒX
 const char *c_aFileNameItem[ITEMTYPE_MAX] =
@@ -117,7 +116,12 @@ HRESULT InitItem(void)
 		fPosY = HEIGHT_FROMLAND_ITEM;
 		fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;
 
-		SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), ITEMTYPE_COIN, true);
+		int result = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), ITEMTYPE_COIN, true);
+
+		if (result == -1)
+		{//Œ©‚Â‚©‚ç‚È‚¢Žž
+			break;
+		}
 	}
 
 	return S_OK;
@@ -222,7 +226,7 @@ void DrawItem(void)
 //=============================================================================
 int SetItem(D3DXVECTOR3 pos, ITEMTYPE nType, bool shadowUsable)
 {
-	int itemIndex = -1;		//ƒGƒ‰[ƒR[ƒh
+	int itemIndex = -1;		//Œ©‚Â‚©‚ç‚È‚¢Žž‚Ì’l
 
 	for(int nCntItem = 0; nCntItem < MAX_ITEM; nCntItem++)
 	{
@@ -281,9 +285,9 @@ void DropItem()
 		if (!g_isReadyToDrop)
 		{
 			float fPosX, fPosY, fPosZ;
-			fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
-			fPosY = DROP_HIGHT;								//—Ž‰º‚Ì‚‚³
-			fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;//-600.0f~600.0f
+			fPosX = (float)(rand() % 12000) / 10.0f - 600.0f;	//-600.0f~600.0f
+			fPosY = DROP_HIGHT;									//—Ž‰º‚Ì‚‚³
+			fPosZ = (float)(rand() % 12000) / 10.0f - 600.0f;	//-600.0f~600.0f
 
 			g_dropItemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), ITEMTYPE_ICEBLOCK, false);
 

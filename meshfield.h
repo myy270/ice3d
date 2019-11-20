@@ -15,7 +15,6 @@
 
 HRESULT InitMeshField();
 void UninitMeshField(void);
-void UpdateMeshField(void);
 void DrawMeshField(void);
 
 #endif

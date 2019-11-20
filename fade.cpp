@@ -6,7 +6,6 @@
 //=============================================================================
 #include "fade.h"
 #include "scene.h"
-#include "timer.h"
 #include "score.h"
 
 //*****************************************************************************
@@ -23,10 +22,10 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTextureFade = NULL;	// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffFade = NULL;	// 頂点バッファインターフェースへのポインタ
-FADETYPE				g_fade;						// フェードの状態
-D3DXCOLOR				g_colorFade;				// フェードの幕の色
+LPDIRECT3DTEXTURE9			g_pD3DTextureFade = NULL;	// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffFade = NULL;	// 頂点バッファインターフェースへのポインタ
+FADETYPE					g_fade;						// フェードの状態
+D3DXCOLOR					g_colorFade;				// フェードの幕の色
 
 
 //=============================================================================
@@ -127,4 +126,3 @@ FADETYPE GetFade(void)
 {
 	return g_fade;
 }
-

@@ -16,14 +16,13 @@
 #define	TEXTURE_PRESS_START		"data/TEXTURE/PRESS_START.png"			// タイトル画面の「PRESS START」ロゴ
 #define	TEXTURE_MENU_1P2P		"data/TEXTURE/MENU_1P2P.png"			// 1p2p選択メニュー
 
-
 #define	TITLE_LOGO_WIDTH		FIT_WIDTH(640 * 0.7f)					// タイトルロゴの幅
-#define	TITLE_LOGO_HEIGHT		FIT_HEIGHT(640 * 0.7f)				// タイトルロゴの高さ
+#define	TITLE_LOGO_HEIGHT		FIT_HEIGHT(640 * 0.7f)					// タイトルロゴの高さ
 #define	TITLE_LOGO_POS_X		TEXTURE_CENTER_X(TITLE_LOGO_WIDTH)		// タイトルロゴの左上頂点のX座標
 #define	TITLE_LOGO_POS_Y		(SCREEN_HEIGHT * 0.05f)					// タイトルロゴの左上頂点のY座標
 
-#define	PRESS_START_WIDTH		FIT_WIDTH(289 * 1.3f) 				// 「PRESS START」ロゴの幅
-#define	PRESS_START_HEIGHT		FIT_HEIGHT(145 * 1.3f) 				// 「PRESS START」ロゴの高さ
+#define	PRESS_START_WIDTH		FIT_WIDTH(289 * 1.3f) 					// 「PRESS START」ロゴの幅
+#define	PRESS_START_HEIGHT		FIT_HEIGHT(145 * 1.3f) 					// 「PRESS START」ロゴの高さ
 #define	PRESS_START_POS_X		TEXTURE_CENTER_X(PRESS_START_WIDTH)		// 「PRESS START」ロゴの左上頂点のX座標
 #define	PRESS_START_POS_Y		(SCREEN_HEIGHT * 0.7f)					// 「PRESS START」ロゴの左上頂点のY座標
 

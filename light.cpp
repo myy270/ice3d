@@ -13,6 +13,7 @@
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 void SetDirectionalLight(LPDIRECT3DDEVICE9 pDevice, D3DLIGHT9& light, int idx, D3DCOLORVALUE color, D3DXVECTOR3 vec);
 
 //*****************************************************************************
@@ -54,7 +55,7 @@ void SetDirectionalLight(LPDIRECT3DDEVICE9 pDevice,D3DLIGHT9& light, int idx, D3
 	light.Diffuse = color;
 
 	// 方向の設定
-	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &vec);//ベクトルを正規化
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &vec);	//ベクトルを正規化
 
 	// ライトをレンダリングパイプラインに設定
 	pDevice->SetLight(idx, &light);

@@ -10,9 +10,9 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_EFFECT			"data/TEXTURE/effect000.jpg"	// 読み込むテクスチャファイル名
+#define	TEXTURE_EFFECT		"data/TEXTURE/particle.jpg"		// 読み込むテクスチャファイル名
 
-#define	MAX_EFFECT				(4096)							// エフェクト最大数
+#define	MAX_EFFECT			(256)							// エフェクト最大数
 
 //*****************************************************************************
 // 構造体定義
@@ -26,10 +26,10 @@
 // グローバル変数
 //*****************************************************************************
 
-LPDIRECT3DTEXTURE9		g_pD3DTextureEffect = NULL;		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffEffect = NULL;		// 頂点バッファインターフェースへのポインタ
+LPDIRECT3DTEXTURE9			g_pD3DTextureEffect = NULL;		// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffEffect = NULL;		// 頂点バッファインターフェースへのポインタ
 
-EFFECT					g_aEffect[MAX_EFFECT];			// エフェクトワーク
+EFFECT						g_aEffect[MAX_EFFECT];			// エフェクトワーク
 
 //=============================================================================
 // 初期化処理
@@ -41,7 +41,6 @@ HRESULT InitEffect(void)
 	// 頂点情報の作成
 	//ここのサイズ、色の情報入れなくてもいい、どうせ後、上書きされる
 	MakeVertex(pDevice, FVF_VERTEX_3D, g_pD3DVtxBuffEffect, D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f,D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f), MAX_EFFECT);
-
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
@@ -97,6 +96,7 @@ void UpdateEffect(void)
 			}
 		}
 	}
+
 }
 
 //=============================================================================

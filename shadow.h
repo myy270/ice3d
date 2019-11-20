@@ -8,9 +8,11 @@
 #define _SHADOW_H_
 
 #include "function.h"
+
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitShadow(void);
 void UninitShadow(void);
 void UpdateShadow(int nIdxShadow, D3DXVECTOR3 pos, float farFromLand);

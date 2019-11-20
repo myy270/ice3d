@@ -10,7 +10,6 @@
 // マクロ定義
 //*****************************************************************************
 
-
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -21,8 +20,9 @@
 LPDIRECT3D9 g_pD3D = NULL;						// Direct3Dオブジェクト
 LPDIRECT3DDEVICE9	g_pD3DDevice = NULL;		// Deviceオブジェクト(描画に必要)
 
-
-
+//=============================================================================
+// 初期化処理
+//=============================================================================
 HRESULT InitDX(HWND hWnd, BOOL bWindow)
 {		
 	g_pD3D = Direct3DCreate9(D3D_SDK_VERSION);	// Direct3Dオブジェクトの作成
@@ -95,18 +95,18 @@ HRESULT InitDX(HWND hWnd, BOOL bWindow)
 	}
 
 	// レンダリングステートパラメータの設定
-	g_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);				// 裏面をカリング
-	g_pD3DDevice->SetRenderState(D3DRS_ZENABLE, TRUE);						// Zバッファを使用
-	g_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);				// αブレンドを行う
-	g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);		// αソースカラーの指定
-	g_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// αデスティネーションカラーの指定
-	g_pD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);				//頂点法線の自動正規化を有効にするには TRUE
+	g_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);					// 裏面をカリング
+	g_pD3DDevice->SetRenderState(D3DRS_ZENABLE, TRUE);							// Zバッファを使用
+	g_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);					// αブレンドを行う
+	g_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);			// αソースカラーの指定
+	g_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);		// αデスティネーションカラーの指定
+	g_pD3DDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);					//頂点法線の自動正規化を有効にするには TRUE
 
 	// サンプラーステートパラメータの設定
-	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);	// テクスチャアドレッシング方法(U値)を設定
-	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);	// テクスチャアドレッシング方法(V値)を設定
-	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);	// テクスチャ縮小フィルタモードを設定
-	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);	// テクスチャ拡大フィルタモードを設定
+	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);		// テクスチャアドレッシング方法(U値)を設定
+	g_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);		// テクスチャアドレッシング方法(V値)を設定
+	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);		// テクスチャ縮小フィルタモードを設定
+	g_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);		// テクスチャ拡大フィルタモードを設定
 
 	// テクスチャステージステートパラメータの設定
 	g_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);		// アルファブレンディング処理
@@ -116,12 +116,14 @@ HRESULT InitDX(HWND hWnd, BOOL bWindow)
 	return S_OK;
 }
 
+//=============================================================================
+// 終了処理
+//=============================================================================
 void UninitDX(void)
 {
 	SAFE_RELEASE(g_pD3D);
 	SAFE_RELEASE(g_pD3DDevice);
 }
-
 
 //=============================================================================
 // デバイスの取得

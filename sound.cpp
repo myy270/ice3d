@@ -4,38 +4,33 @@
 // Author : 麦英泳
 //
 //=============================================================================
+#include <xaudio2.h>			// DXサウンド関連のライブラリー
+
 #include "sound.h"
 #include "debugproc.h"
 #include "input.h"
-//*****************************************************************************
-// パラメータ構造体定義
-//*****************************************************************************
-typedef struct
-{
-	const char *pFilename;	// ファイル名
-	bool isSoloTempStop;	// 単独で一時停止されたことあるかどうか
-
-} PARAM;
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT CheckChunk(HANDLE hFile, DWORD format, DWORD *pChunkSize, DWORD *pChunkDataPosition);
 HRESULT ReadChunkData(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, DWORD dwBufferoffset);
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-IXAudio2 *g_pXAudio2 = NULL;								// XAudio2オブジェクトへのインターフェイス
-IXAudio2MasteringVoice *g_pMasteringVoice = NULL;			// マスターボイス
-IXAudio2SourceVoice *g_apSourceVoice[SOUND_LABEL_MAX] = {};	// ソースボイス
-BYTE *g_apDataAudio[SOUND_LABEL_MAX] = {};					// オーディオデータ
-DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 
-XAUDIO2_VOICE_STATE g_xa2state;
+IXAudio2				*g_pXAudio2 = NULL;							// XAudio2オブジェクトへのインターフェイス
+IXAudio2MasteringVoice	*g_pMasteringVoice = NULL;					// マスターボイス
+IXAudio2SourceVoice		*g_apSourceVoice[SOUND_LABEL_MAX] = {};		// ソースボイス
+BYTE					*g_apDataAudio[SOUND_LABEL_MAX] = {};		// オーディオデータ
+DWORD					g_aSizeAudio[SOUND_LABEL_MAX] = {};			// オーディオデータサイズ
 
-// 各音素材のパラメータ
-PARAM g_aParam[SOUND_LABEL_MAX] =
+XAUDIO2_VOICE_STATE		g_xa2state;
+
+// 各音素材のパラメータ		enum SOUND_LABEL と合わせて並ぶ
+SOUND_PARAM g_aParam[SOUND_LABEL_MAX] =
 {
 	{"data/BGM/bgm000.wav", false},	
 	{"data/SE/coin000.wav", false},	
@@ -181,10 +176,11 @@ return E_FAIL;
 //=============================================================================
 void UpdateSound()
 {
+	////テスト
 	//g_apSourceVoice[SOUND_LABEL_SE_TEST]->GetState(&g_xa2state);
 	//PrintDebugProc("BuffersQueued[SOUND_LABEL_SE_TEST]:%d \n\n\n", g_xa2state.BuffersQueued);
 
-	////テスト
+
 	//if (GetKeyboardTrigger(DIK_Z))
 	//{
 	//	PlaySound(SOUND_LABEL_SE_TEST, true, false);

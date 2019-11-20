@@ -7,6 +7,8 @@
 #ifndef _DX_H_
 #define _DX_H_
 
+#include <d3dx9.h>						// DX関連のライブラリー
+
 #include "function.h"
 
 //*****************************************************************************
@@ -14,12 +16,9 @@
 //*****************************************************************************
 
 HRESULT InitDX(HWND hWnd, BOOL bWindow);
-
 void UninitDX(void);
 
 LPDIRECT3DDEVICE9 GetDevice(void);
-
-
 
 #endif
 

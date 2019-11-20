@@ -9,11 +9,11 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_SHADOW		"data/TEXTURE/shadow000.jpg"	// 読み込むテクスチャファイル名
+#define	TEXTURE_SHADOW				"data/TEXTURE/particle.jpg"		// 読み込むテクスチャファイル名
 
-#define	MAX_SHADOW			(MAX_ITEM + 2)					// 影最大数 (アイテム最大数 + プレイヤーとエネミーの数)
+#define	MAX_SHADOW					(MAX_ITEM + 2)					// 影最大数 (アイテム最大数 + プレイヤーとエネミーの数)
 
-#define	HEIGHT_FROMLAND_SHADOW			(0.1f)				// 影の滞空高さ
+#define	HEIGHT_FROMLAND_SHADOW		(0.1f)							// 影の滞空高さ
 
 //*****************************************************************************
 // 構造体定義
@@ -26,10 +26,11 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTextureShadow = NULL;		// テクスチャへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffShadow = NULL;		// 頂点バッファインターフェースへのポインタ
+LPDIRECT3DTEXTURE9			g_pD3DTextureShadow = NULL;				// テクスチャへのポインタ
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffShadow = NULL;				// 頂点バッファインターフェースへのポインタ
 
-SHADOW					g_aShadow[MAX_SHADOW];			// 影ワーク
+SHADOW						g_aShadow[MAX_SHADOW];					// 影ワーク
+
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -42,9 +43,9 @@ HRESULT InitShadow(void)
 																			D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f), MAX_SHADOW);
 
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
-								TEXTURE_SHADOW,				// ファイルの名前
-								&g_pD3DTextureShadow);		// 読み込むメモリー
+	D3DXCreateTextureFromFile(pDevice,								// デバイスへのポインタ
+								TEXTURE_SHADOW,						// ファイルの名前
+								&g_pD3DTextureShadow);				// 読み込むメモリー
 
 	//デフォルト値をセット
 	for(int nCntShadow = 0; nCntShadow < MAX_SHADOW; nCntShadow++)
@@ -113,7 +114,7 @@ void DrawShadow(void)
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
 			
-	D3DXMATRIX mtxTranslate, g_mtxWorldShadow;				// ワールドマトリックス
+	D3DXMATRIX mtxTranslate, g_mtxWorldShadow;
 
 	// 減算合成
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);		// 結果 = 転送先(DEST) - 転送元(SRC)
@@ -187,3 +188,4 @@ void DeleteShadow(int nIdxShadow)
 		g_aShadow[nIdxShadow].bUse = false;
 	}
 }
+

@@ -15,7 +15,6 @@
 
 HRESULT InitMeshWall();
 void UninitMeshWall(void);
-void UpdateMeshWall(void);
 void DrawMeshWall(void);
 
 #endif

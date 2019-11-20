@@ -6,20 +6,23 @@
 //=============================================================================
 #include "fps.h"
 #include "debugproc.h"
+
 //*****************************************************************************
 // グローバル変数:
 //*****************************************************************************
 #ifdef _DEBUG
 //FPS表示関連
-int		g_nFPS;			// 1秒のフレーム数（FPS）
-int		g_nFrameCount;	// フレーム数カウンター
-DWORD	dwFPSLastTime;	// 前回FPSを計算するときの時間
+int		g_nFPS;				// 1秒のフレーム数（FPS）
+int		g_nFrameCount;		// フレーム数カウンター
+DWORD	g_dwFPSLastTime;	// 前回FPSを計算するときの時間
 #endif
 
-DWORD	dwExecLastTime;	// 前回処理を行うときの時間
-DWORD	dwCurrentTime;	// 現在の時間
+DWORD	g_dwExecLastTime;	// 前回処理を行うときの時間
+DWORD	g_dwCurrentTime;	// 現在の時間
 
-
+//=============================================================================
+// 初期化処理
+//=============================================================================
 void InitFPS(void)
 {
 	timeBeginPeriod(1);				// タイマーの最小精度を1ミリ秒にする
@@ -28,33 +31,43 @@ void InitFPS(void)
 	//FPS表示関連
 	g_nFPS = 0;
 	g_nFrameCount = 0;
-	dwFPSLastTime = timeGetTime();
+	g_dwFPSLastTime = timeGetTime();
 #endif
 
-	dwExecLastTime = timeGetTime();
+	g_dwExecLastTime = timeGetTime();
 	
-
 }
 
+//=============================================================================
+// 終了処理
+//=============================================================================
+void UnitFPS(void)
+{
+	timeEndPeriod(1);				// タイマーの最小精度を戻す
+}
+
+//=============================================================================
+// 更新処理
+//=============================================================================
 bool UpdateFPS(void)
 {
-	dwCurrentTime = timeGetTime();
+	g_dwCurrentTime = timeGetTime();
 
 #ifdef _DEBUG
 	//FPS表示関連
-	if ((dwCurrentTime - dwFPSLastTime) >= 500)								// 0.5秒ごとに、FPSを更新する
+	if ((g_dwCurrentTime - g_dwFPSLastTime) >= 500)								// 0.5秒ごとに、FPSを更新する
 	{
-		g_nFPS = g_nFrameCount * 1000 / (dwCurrentTime - dwFPSLastTime);	//1秒のフレーム数（FPS）に換算する
+		g_nFPS = g_nFrameCount * 1000 / (g_dwCurrentTime - g_dwFPSLastTime);	//1秒のフレーム数（FPS）に換算する
 		g_nFrameCount = 0;
-		dwFPSLastTime = dwCurrentTime;
+		g_dwFPSLastTime = g_dwCurrentTime;
 		
 	}
 #endif
 
 	//FPSロック機能
-	if ((dwCurrentTime - dwExecLastTime) >= (1000 / FPS))					//1秒（1000ミリ秒）のいくつか分の間隔で処理を行う
+	if ((g_dwCurrentTime - g_dwExecLastTime) >= (1000 / FPS))					//1秒（1000ミリ秒）のいくつか分の間隔で処理を行う
 	{
-		dwExecLastTime = dwCurrentTime;
+		g_dwExecLastTime = g_dwCurrentTime;
 		
 #ifdef _DEBUG
 		//FPS表示関連
@@ -69,7 +82,9 @@ bool UpdateFPS(void)
 	}
 }
 
-
+//=============================================================================
+// FPSを表示
+//=============================================================================
 void ShowFPS(void)
 {
 #ifdef _DEBUG
@@ -78,11 +93,5 @@ void ShowFPS(void)
 #endif
 }
 
-
-
-void UnitFPS(void)
-{
-	timeEndPeriod(1);				// タイマーの最小精度を戻す
-}
 
 

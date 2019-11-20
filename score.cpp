@@ -7,10 +7,11 @@
 #include "score.h"
 #include "camera.h"
 #include "title.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_NUM			"data/TEXTURE/number000.png"										// 読み込むテクスチャファイル名
+#define	TEXTURE_NUM			"data/TEXTURE/numberList.png"										// 読み込むテクスチャファイル名
 #define	TEXTURE_FRAME		"data/TEXTURE/frame_score.png"										// 読み込むテクスチャファイル名
 
 #define	NUM_WIDTH			FIT_WIDTH(35)														// スコアの単体の数字の幅
@@ -48,15 +49,15 @@
 //*****************************************************************************
 // グローバル変数宣言
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTextureScore[2] = {};		// [0]:数字のテクスチャ―　[1]:枠のテクスチャ―
+LPDIRECT3DTEXTURE9			g_pD3DTextureScore[2] = {};		// [0]:数字のテクスチャ―　[1]:枠のテクスチャ―
 
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffScore = NULL;		// 左スコアの頂点バッファインターフェースへのポインタ
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffScore2 = NULL;		// 右スコアの頂点バッファインターフェースへのポインタ 
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffScore = NULL;		// 左スコアの頂点バッファインターフェースへのポインタ
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffScore2 = NULL;		// 右スコアの頂点バッファインターフェースへのポインタ 
 
-int						g_score;						// 左のスコア
-int						g_score2;						// 右のスコア
+int							g_score;						// 左のスコア
+int							g_score2;						// 右のスコア
 
-OBJECT g_winner;										// 勝者
+OBJECT						g_winner;						// 勝者
 
 //=============================================================================
 // 初期化処理
@@ -69,7 +70,7 @@ HRESULT InitScore(void)
 	g_score = 0;
 	g_score2 = 0;
 
-	g_winner = OBJECT_NULL;		//デフォルト値
+	g_winner = OBJECT_NULL;	
 
 	// 左スコアの　頂点情報の作成
 	MakeVertexNumFrame(pDevice, g_pD3DVtxBuffScore, NUM_PLACE,
@@ -84,14 +85,13 @@ HRESULT InitScore(void)
 		D3DCOLOR_RGBA(255, 170, 192, 255));	//ピンク
 		
 
-
 	// テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
-								TEXTURE_NUM,			// ファイルの名前
+	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
+								TEXTURE_NUM,				// ファイルの名前
 								&g_pD3DTextureScore[0]);	// 読み込むメモリー
 
-	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
-								TEXTURE_FRAME,			// ファイルの名前
+	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
+								TEXTURE_FRAME,				// ファイルの名前
 								&g_pD3DTextureScore[1]);	// 読み込むメモリー
 
 	return S_OK;

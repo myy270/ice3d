@@ -8,21 +8,11 @@
 #define _SOUND_H_
 
 #include "function.h"
-#include <xaudio2.h>					// DXサウンド関連のライブラリー
-
-// サウンドファイル
-typedef enum
-{
-	SOUND_LABEL_BGM000,			// BGM
-	SOUND_LABEL_SE_COIN,		// コインとの衝突音
-	SOUND_LABEL_SE_TEST,
-	SOUND_LABEL_MAX,
-
-} SOUND_LABEL;
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitSound(HWND hWnd);
 void UpdateSound();
 void UninitSound(void);

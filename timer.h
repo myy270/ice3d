@@ -13,7 +13,7 @@
 // プロトタイプ宣言
 //*****************************************************************************
 
-HRESULT InitTimer(int second = 999);
+HRESULT InitTimer(int second = 50);
 void UninitTimer(void);
 void UpdateTimer(void);
 void DrawTimer(void);

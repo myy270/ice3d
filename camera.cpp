@@ -37,6 +37,7 @@
 void SwitchCameraMode();
 void CameraChase();
 void Chase(D3DXVECTOR3 target);
+
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
@@ -46,7 +47,7 @@ D3DXVECTOR3		g_cameraUp;					// カメラの上方向
 
 D3DXVECTOR3		g_rotCamera;				// カメラの回転		.yだけ使う
 float			g_fLengthIntervalCamera;	// カメラの視点と注視点のXOZ面の距離
-float			 g_fChaseHeight;			// 追跡時の視点の高さ
+float			g_fChaseHeight;				// 追跡時の視点の高さ
 
 D3DXMATRIX		g_mtxView;					// ビューマトリックス
 D3DXMATRIX		g_mtxProjection;			// プロジェクションマトリックス
@@ -80,7 +81,7 @@ HRESULT InitCamera(void)
 }
 
 //=============================================================================
-// カメラの更新処理　UpdateCamera()がUpdatePlayer()の前にある
+// カメラの更新処理　UpdateCamera()はUpdatePlayer()の前に置く
 //=============================================================================
 void UpdateCamera(void)
 {	
@@ -144,7 +145,7 @@ void UpdateCamera(void)
 
 //=============================================================================
 // カメラの設定処理
-// 後に置く必要ある処理を含む
+// UpdatePlayer()の後に置く
 //=============================================================================
 void SetCamera(void)
 {

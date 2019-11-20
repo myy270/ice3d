@@ -13,11 +13,9 @@
 // プロトタイプ宣言
 //*****************************************************************************
 
-//ウィンドウを作る
 HWND InitWindow(HINSTANCE hInstance, int nCmdShow);
 
 void UninitWindow(void);
-
 
 #endif
 

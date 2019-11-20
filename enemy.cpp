@@ -5,7 +5,6 @@
 //
 //=============================================================================
 #include "enemy.h"
-#include "shadow.h"
 #include "debugproc.h"
 
 //*****************************************************************************
@@ -49,10 +48,10 @@ void UpdateEnemy(void)
 {
 	g_enemy.UpdateCharacter();
 
-	//PrintDebugProc("AIのup ：%d \n", g_up);
-	//PrintDebugProc("AIのdown ：%d \n", g_down);
-	//PrintDebugProc("AIのleft ：%d \n", g_left);
-	//PrintDebugProc("AIのright ：%d \n", g_right);
+	//PrintDebugProc("AIのup ：%d \n", g_enemy.upAI);
+	//PrintDebugProc("AIのdown ：%d \n", g_enemy.downAI);
+	//PrintDebugProc("AIのleft ：%d \n", g_enemy.leftAI);
+	//PrintDebugProc("AIのright ：%d \n", g_enemy.rightAI);
 
 }									  
 

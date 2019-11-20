@@ -1,5 +1,5 @@
 /*******************************************************************************
-* タイトル:
+* タイトル:		入力処理[input.h]
 * プログラム名:
 * 作成者:		GP11A341 33 麦英泳
 * 作成日:		2018/08/17
@@ -19,9 +19,9 @@
 // プログラム分けするときに使う
 #define	USE_KEYBOARD						// 宣言するとキーボードで操作可能になる
 #define	USE_MOUSE							// 宣言するとマウスで操作可能になる
-#define	USE_PAD								// 宣言するとパッドで操作可能になる
+#define	USE_PAD								// 宣言するとゲームパッド操作可能になる
 
-//ゲームパッドのボタン
+// ゲームパッドのボタン
 #define BUTTON_UP							0x00000001l	//0000 0001
 #define BUTTON_DOWN							0x00000002l	//0000 0010
 #define BUTTON_LEFT							0x00000004l	//0000 0100
@@ -55,11 +55,12 @@
 #define LSTICK_OFFSET						(4100)	    //left stick の精度を調整する
 #define RSTICK_OFFSET						(4100)	    //right stick の精度を調整する
 
-#define GAMEPADMAX							(4)			// 同時に接続するジョイパッドの最大数をセット
+#define GAMEPADMAX							(4)			// 同時に接続するゲームパッドの最大数をセット
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitInput(HINSTANCE hInst, HWND hWnd);
 void UninitInput(void);
 void UpdateInput(void);
@@ -71,15 +72,15 @@ bool GetKeyboardRepeat(int nKey);
 bool GetKeyboardRelease(int nKey);
 
 //マウス
-BOOL IsMouseLeftPress(void);							// 左クリックした状態
-BOOL IsMouseLeftTrigger(void);							// 左クリックした瞬間
-BOOL IsMouseRightPress(void);							// 右クリックした状態
-BOOL IsMouseRightTrigger(void);							// 右クリックした瞬間
-BOOL IsMouseCenterPress(void);							// 中クリックした状態
-BOOL IsMouseCenterTrigger(void);						// 中クリックした瞬間
-long GetMouseX(void);									// マウスがX方向に動いた相対値
-long GetMouseY(void);									// マウスがY方向に動いた相対値
-long GetMouseZ(void);									// マウスホイールが動いた相対値
+BOOL IsMouseLeftPress(void);			// 左クリックした状態
+BOOL IsMouseLeftTrigger(void);			// 左クリックした瞬間
+BOOL IsMouseRightPress(void);			// 右クリックした状態
+BOOL IsMouseRightTrigger(void);			// 右クリックした瞬間
+BOOL IsMouseCenterPress(void);			// 中クリックした状態
+BOOL IsMouseCenterTrigger(void);		// 中クリックした瞬間
+long GetMouseX(void);					// マウスがX方向に動いた相対値
+long GetMouseY(void);					// マウスがY方向に動いた相対値
+long GetMouseZ(void);					// マウスホイールが動いた相対値
 
 //ゲームパッド
 BOOL IsButtonPress(int padNo,DWORD button);

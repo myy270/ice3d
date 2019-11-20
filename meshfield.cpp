@@ -9,7 +9,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_FILENAME	"data/TEXTURE/ice.bmp"											// 読み込むテクスチャファイル名
+#define	TEXTURE_FILENAME	"data/TEXTURE/iceField.bmp"										// 読み込むテクスチャファイル名
 
 #define	POS_FIELD			(D3DXVECTOR3(0.0f, 0.0f, 0.0f))									// メッシュフィールドの中心座標
 #define	ROT_FIELD			(D3DXVECTOR3(0.0f, 0.0f, 0.0f))									// メッシュフィールドの回転量
@@ -29,6 +29,9 @@ LPDIRECT3DTEXTURE9			g_pD3DTextureField;			// テクスチャ読み込む場所
 LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffField;			// 頂点バッファインターフェースへのポインタ
 LPDIRECT3DINDEXBUFFER9		g_pD3DIdxBuffField;			// インデックスバッファインターフェースへのポインタ
 
+//=============================================================================
+// 初期化処理
+//=============================================================================
 HRESULT InitMeshField()
 {
 	LPDIRECT3DDEVICE9 pDevice = GetDevice();
@@ -47,6 +50,7 @@ HRESULT InitMeshField()
 
 	return S_OK;
 }
+
 //=============================================================================
 // 終了処理
 //=============================================================================
@@ -55,13 +59,6 @@ void UninitMeshField(void)
 	SAFE_RELEASE(g_pD3DTextureField);
 	SAFE_RELEASE(g_pD3DVtxBuffField);
 	SAFE_RELEASE(g_pD3DIdxBuffField);
-}
-
-//=============================================================================
-// 更新処理
-//=============================================================================
-void UpdateMeshField(void)
-{
 }
 
 //=============================================================================

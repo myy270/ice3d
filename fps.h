@@ -14,8 +14,8 @@
 //*****************************************************************************
 
 void InitFPS(void);
-bool UpdateFPS(void);
 void UnitFPS(void);
+bool UpdateFPS(void);
 
 void ShowFPS(void);
 

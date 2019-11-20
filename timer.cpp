@@ -11,7 +11,7 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_NUM				"data/TEXTURE/number000.png"									// タイマーの数字
+#define	TEXTURE_NUM				"data/TEXTURE/numberList.png"									// タイマーの数字
 #define	TEXTURE_FRAME			"data/TEXTURE/frame_timer.png"									// タイマーの枠
 
 #define	NUM_WIDTH				FIT_WIDTH(35)													// タイマーの単体の数字の幅
@@ -41,12 +41,13 @@
 //*****************************************************************************
 // グローバル変数宣言
 //*****************************************************************************
-LPDIRECT3DTEXTURE9		g_pD3DTextureTimer[2] = {NULL, NULL};		// [0]:タイマーの数字のテクスチャ―　[1]:タイマーの枠のテクスチャ―
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffTimer = NULL;					// 頂点バッファインターフェースへのポインタ
+LPDIRECT3DTEXTURE9			g_pD3DTextureTimer[2] = {NULL, NULL};		// [0]:タイマーの数字のテクスチャ―　[1]:タイマーの枠のテクスチャ―
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffTimer = NULL;					// 頂点バッファインターフェースへのポインタ
 				
-int						g_nTimerCount;								// タイマーのカウント		単位はフレーム
-bool					g_bEnableTimer;								// タイマー動作ON/OFF
-bool					g_bTimeEnd;								// 時間が終わったかどうか
+int							g_nTimerCount;								// タイマーのカウント		単位はフレーム
+bool						g_bEnableTimer;								// タイマー動作ON/OFF
+bool						g_bTimeEnd;									// 時間が終わったかどうか
+
 //=============================================================================
 // 初期化処理
 // second:タイマーの初期設定時間	単位は秒

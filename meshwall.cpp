@@ -9,8 +9,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	MAX_MESHWALL		(128)							// 壁の総数
-#define	TEXTURE_FILENAME	"data/TEXTURE/ice2.png"			// 読み込むテクスチャファイル名
+#define	MAX_MESHWALL		(128)								// 壁の総数
+#define	TEXTURE_FILENAME	"data/TEXTURE/iceWall.png"			// 読み込むテクスチャファイル名
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -20,30 +20,12 @@ HRESULT MakeMeshWall(D3DXVECTOR3 pos, D3DXVECTOR3 rot,
 						int numBlockH, int numBlockV, float sizeBlockH, float sizeBlockV, D3DXCOLOR col, MAPPINGTYPE type);
 
 //*****************************************************************************
-// 構造体定義
-//*****************************************************************************
-
-struct MESH_WALL
-{
-	LPDIRECT3DVERTEXBUFFER9 pD3DVtxBuff;		// 頂点バッファインターフェースへのポインタ
-	LPDIRECT3DINDEXBUFFER9	pD3DIdxBuff;		// インデックスバッファインターフェースへのポインタ
-
-	D3DXVECTOR3 pos;							// ポリゴン表示位置の中心座標
-	D3DXVECTOR3 rot;							// ポリゴンの回転量
-
-	int numVertex;								// 総頂点数	
-	int numVertexIndex;							// 総インデックス数
-	int numPolygon;								// 総ポリゴン数
-
-};
-
-//*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DTEXTURE9	g_pD3DTextureMeshWall = NULL;		// テクスチャ読み込む場所
+LPDIRECT3DTEXTURE9	g_pD3DTextureMeshWall = NULL;			// テクスチャ読み込む場所
 
-MESH_WALL			g_aMeshWall[MAX_MESHWALL];			// メッシュ壁ワーク
-int					g_nNumMeshWall;						// メッシュ壁の数
+MESH_WALL			g_aMeshWall[MAX_MESHWALL];				// メッシュ壁ワーク
+int					g_nNumMeshWall;							// メッシュ壁の数
 
 //=============================================================================
 // 初期化処理
@@ -54,9 +36,9 @@ HRESULT InitMeshWall()
 
 	g_nNumMeshWall = 0;
 
-	D3DXCreateTextureFromFile(pDevice,					// デバイスへのポインタ
-							TEXTURE_FILENAME,			// ファイルの名前
-							&g_pD3DTextureMeshWall);	// 読み込むメモリー
+	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
+							TEXTURE_FILENAME,				// ファイルの名前
+							&g_pD3DTextureMeshWall);		// 読み込むメモリー
  
 	// 壁の初期化	※順番要注意、作る順番 ＝ 描画順番
 	//北壁の地面
@@ -169,13 +151,6 @@ void UninitMeshWall(void)
 
 	SAFE_RELEASE(g_pD3DTextureMeshWall);
 
-}
-
-//=============================================================================
-// 更新処理
-//=============================================================================
-void UpdateMeshWall(void)
-{
 }
 
 //=============================================================================

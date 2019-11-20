@@ -57,13 +57,14 @@ HRESULT InitGame(void)
 	InitEffect();
 
 	// タイマーの初期化
-	InitTimer();		//正常時の設定値は50
+	InitTimer(LIMIT_TIME);
 
 	// スコアの初期化
 	InitScore();
 
 	// アイテムの初期化
 	InitItem();
+
 
 	// BGM再生 ちゃんとloopするように
 	PlaySound(SOUND_LABEL_BGM000, true, false);
@@ -103,6 +104,7 @@ void UninitGame(void)
 	// アイテムの終了処理
 	UninitItem();
 
+
 	// ゲーム画面のすべての音楽を停止
 	StopSoundALL(false);
 }
@@ -114,12 +116,6 @@ void UpdateGame(void)
 {
 	// カメラ処理の更新
 	UpdateCamera();
-
-	// 地面処理の更新
-	UpdateMeshField();
-
-	// 壁処理の更新
-	UpdateMeshWall();
 
 	// プレイヤー処理の更新
 	UpdatePlayer();
@@ -148,6 +144,7 @@ void DrawGame(void)
 {
 	// カメラの設定
 	SetCamera();
+
 
 	// 地面の描画
 	DrawMeshField();

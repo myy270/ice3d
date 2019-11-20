@@ -13,15 +13,15 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	TEXTURE_RESULT_WIN		"data/TEXTURE/win_logo.png"			// 勝つ テクスチャファイル名
-#define	TEXTURE_RESULT_GAMEOVER	"data/TEXTURE/gameover_logo.png"	// 負ける テクスチャファイル名
+#define	TEXTURE_RESULT_WIN			"data/TEXTURE/win_logo.png"				// 勝つ テクスチャファイル名
+#define	TEXTURE_RESULT_GAMEOVER		"data/TEXTURE/gameover_logo.png"		// 負ける テクスチャファイル名
 
-#define	RESULT_LOGO_POS_X	(SCREEN_WIDTH * 0.19f)					// リザルトロゴの位置(X座標)
-#define	RESULT_LOGO_POS_Y	(SCREEN_HEIGHT * 0.65f)					// リザルトロゴの位置(Y座標)
-#define	RESULT_LOGO_WIDTH	FIT_WIDTH(800)							// リザルトロゴの幅
-#define	RESULT_LOGO_HEIGHT	FIT_HEIGHT(240)							// リザルトロゴの高さ
+#define	RESULT_LOGO_POS_X			(SCREEN_WIDTH * 0.19f)					// リザルトロゴの位置(X座標)
+#define	RESULT_LOGO_POS_Y			(SCREEN_HEIGHT * 0.65f)					// リザルトロゴの位置(Y座標)
+#define	RESULT_LOGO_WIDTH			FIT_WIDTH(800)							// リザルトロゴの幅
+#define	RESULT_LOGO_HEIGHT			FIT_HEIGHT(240)							// リザルトロゴの高さ
 
-#define	COUNT_APPERA_RESULT	(60)									// リザルトロゴ出現までの待ち時間	
+#define	COUNT_APPERA_RESULT			(60)									// リザルトロゴ出現までの待ち時間	
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -30,13 +30,13 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffResultLogo = NULL;		// 頂点バッファインターフェースへのポインタ
+LPDIRECT3DVERTEXBUFFER9		g_pD3DVtxBuffResultLogo = NULL;			// 頂点バッファインターフェースへのポインタ
 
-LPDIRECT3DTEXTURE9		g_pD3DTextureResultLogo = NULL;		// 勝つ テクスチャへのポインタ
-LPDIRECT3DTEXTURE9		g_pD3DTextureResultLogo2 = NULL;	// 負ける テクスチャへのポインタ
+LPDIRECT3DTEXTURE9			g_pD3DTextureResultLogo = NULL;			// 勝つ テクスチャへのポインタ
+LPDIRECT3DTEXTURE9			g_pD3DTextureResultLogo2 = NULL;		// 負ける テクスチャへのポインタ
 
-int						g_nCountAppearResult = 0;			// 出現までの待ち時間
-float					g_fAlphaResult = 0.0f;				// リザルトロゴのα値
+int							g_nCountAppearResult = 0;				// 出現までの待ち時間
+float						g_fAlphaResult = 0.0f;					// リザルトロゴのα値
 
 //=============================================================================
 // 初期化処理
