@@ -7,11 +7,12 @@
 #ifndef _RESULT_H_
 #define _RESULT_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitResult(void);
 void UninitResult(void);
 void UpdateResult(void);

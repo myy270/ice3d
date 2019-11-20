@@ -7,20 +7,21 @@
 #ifndef _SCORE_H_
 #define _SCORE_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitScore(void);
 void UninitScore(void);
 void UpdateScore(void);
 void DrawScore(void);
 
-void ChangeScore(int value);//敵の
-void ChangeScore2(int value);//プレイヤーの
+void ChangeScore(OBJECT obj, int value);
 
-void compScore(); //プレイヤー勝つ場合true 
+void CompareScore();
 
 OBJECT GetWinner();
+
 #endif

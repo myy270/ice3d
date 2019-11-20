@@ -7,11 +7,12 @@
 #ifndef _DEBUGPROC_H_
 #define _DEBUGPROC_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitDebugProc(void);
 void UninitDebugProc(void);
 void UpdateDebugProc(void);

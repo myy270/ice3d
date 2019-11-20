@@ -7,20 +7,20 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT InitTimer(void);
+
+HRESULT InitTimer(int second = 50);
 void UninitTimer(void);
 void UpdateTimer(void);
 void DrawTimer(void);
 
-void EnableTimer(bool bEnable);
-void ResetTimer(int nTime = 999);
-
+void SetEnableTimer(bool b);
+void SetTimer(int second);
 int GetTimer();
-bool GetTimeOut();
+bool IsTimeEnd();
 
 #endif

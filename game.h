@@ -7,11 +7,12 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitGame(void);
 void UninitGame(void);
 void UpdateGame(void);

@@ -7,15 +7,17 @@
 #ifndef _TITLE_H_
 #define _TITLE_H_
 
-#include "main.h"
+#include "function.h"
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
+
 HRESULT InitTitle(void);
 void UninitTitle(void);
 void UpdateTitle(void);
 void DrawTitle(void);
 
-int GetCursorIdx();
+PLAY_MODE GetPlayMode();
+
 #endif
