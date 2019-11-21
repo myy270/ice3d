@@ -289,7 +289,7 @@ HRESULT MakeVertexNumFrame(LPDIRECT3DDEVICE9 pDevice, LPDIRECT3DVERTEXBUFFER9& v
 	}
 
 	{//頂点バッファの中身を埋める		
-		for (int nCntPlace = 0; nCntPlace <= numPlace; nCntPlace++)		//nCntPlaceは数字の左から始める添え字
+		for (int nCntPlace = 0; nCntPlace < numPlace + 1; nCntPlace++)		//nCntPlaceは数字の左から始める添え字
 		{
 			if (nCntPlace < numPlace)
 			{//	スコアの数字
@@ -1562,13 +1562,17 @@ void Character::ItemCollision()
 						if (pItem->nType == ITEMTYPE_ICEBLOCK)
 						{
 							holdItem = ITEMTYPE_ICEBLOCK;
+
+							// 凍結アイテムを拾う効果音を再生
+							PlaySound(SOUND_LABEL_SE_GETICEBLOCK, false, true);
+						
 						}
 						else if (pItem->nType == ITEMTYPE_COIN)
 						{
 							// スコア加算
 							ChangeScore(objectType, 100);
 
-							// コインを拾う効果音
+							// コインを拾う効果音を再生
 							PlaySound(SOUND_LABEL_SE_COIN, false, true);
 						}
 
@@ -1628,6 +1632,8 @@ void Character::Freeze(Character* target)
 		target->state = FROZEN;			//相手を凍結状態にさせる
 		target->frozenTime = 180;		//3秒間
 		holdItem = ITEMTYPE_NULL;		//自分の凍結アイテムが消耗される
+
+		PlaySound(SOUND_LABEL_SE_USEICEBLOCK, false, true);		// 凍結アイテムを使う音を再生
 	}
 }
 

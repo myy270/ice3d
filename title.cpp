@@ -7,6 +7,7 @@
 #include "title.h"
 #include "input.h"
 #include "fade.h"
+#include "sound.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -125,6 +126,8 @@ HRESULT InitTitle(void)
 								&g_pD3DTextureMenu1P2P);	// 読み込むメモリー
 
 
+	PlaySound(SOUND_LABEL_SE_OPENING, false, true);			// オープニング音を再生
+
 	return S_OK;
 }
 
@@ -222,53 +225,59 @@ void DrawTitle(void)
 //=============================================================================
 void TitleEffect(void)
 {
-	//タイトルロゴのフェードイン と 「PRESS START」ロゴの点滅
-	if (g_fAlphaTitleLogo < 1.0f)
-	{//タイトルロゴがフェードインする間
-		g_fAlphaTitleLogo += DELTA_TITLE_LOGO_ALPHA;			//毎フレームにアルファ値を増加して、フェードインさせる
-		if (g_fAlphaTitleLogo >= 1.0f)
-		{
-			g_fAlphaTitleLogo = 1.0f;
-		}
-
-		SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
-	}
-	else
-	{//フェードイン完成した後
-		if (g_nCountAppearStart < COUNT_APPEAR_START)		//「COUNT_APPEAR_START」フレームを待つ
-		{
-			g_nCountAppearStart++;
-		}
-		else
-		{//待ち終わったら、「PRESS START」ロゴを点滅させる
-			g_nCountDispStart = (g_nCountDispStart + 1) % (INTERVAL_DISP_START + INTERVAL_UNDISP_START);			//点滅させるようにカウントする
-			if (g_nCountDispStart < INTERVAL_DISP_START)
-			{
-				g_bDispStart = true;			//カウントが「0」から「INTERVAL_DISP_START」までの間に点灯する
-			}
-			else
-			{
-				g_bDispStart = false;			//カウントが「INTERVAL_DISP_START」から「INTERVAL_UNDISP_START」までの間に消灯する
-			}
-
-		}
-	}
-
-	//タイトルロゴのフェードインのスキップ と 1p2p選択メニューに移す処理
-	if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))
-	{
+	if(!g_bDispMenu1P2P)
+	{//1p2p選択メニューにまだ入っていない場合
+		//タイトルロゴのフェードイン と 「PRESS START」ロゴの点滅
 		if (g_fAlphaTitleLogo < 1.0f)
-		{//タイトルロゴがフェードインしている時
-			g_fAlphaTitleLogo = 1.0f;						// フェードインを完成状態にさせる
+		{//タイトルロゴがフェードインする間
+			g_fAlphaTitleLogo += DELTA_TITLE_LOGO_ALPHA;			//毎フレームにアルファ値を増加して、フェードインさせる
+			if (g_fAlphaTitleLogo >= 1.0f)
+			{
+				g_fAlphaTitleLogo = 1.0f;
+			}
 
 			SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
-
-			g_nCountAppearStart = COUNT_APPEAR_START;	//「PRESS START」ロゴを点滅状態にさせる
 		}
 		else
-		{//タイトルロゴがフェードイン完成した時			
-			g_bDispMenu1P2P = true;						//1p2p選択メニューを表示する
+		{//フェードイン完成した後
+			if (g_nCountAppearStart < COUNT_APPEAR_START)		//「COUNT_APPEAR_START」フレームを待つ
+			{
+				g_nCountAppearStart++;
+			}
+			else
+			{//待ち終わったら、「PRESS START」ロゴを点滅させる
+				g_nCountDispStart = (g_nCountDispStart + 1) % (INTERVAL_DISP_START + INTERVAL_UNDISP_START);			//点滅させるようにカウントする
+				if (g_nCountDispStart < INTERVAL_DISP_START)
+				{
+					g_bDispStart = true;			//カウントが「0」から「INTERVAL_DISP_START」までの間に点灯する
+				}
+				else
+				{
+					g_bDispStart = false;			//カウントが「INTERVAL_DISP_START」から「INTERVAL_UNDISP_START」までの間に消灯する
+				}
+
+			}
 		}
+
+		//タイトルロゴのフェードインのスキップ と 1p2p選択メニューに移す処理
+		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))
+		{
+			if (g_fAlphaTitleLogo < 1.0f)
+			{//タイトルロゴがフェードインしている時
+				g_fAlphaTitleLogo = 1.0f;						// フェードインを完成状態にさせる
+
+				SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
+
+				g_nCountAppearStart = COUNT_APPEAR_START;		//「PRESS START」ロゴを点滅状態にさせる
+			}
+			else
+			{//タイトルロゴがフェードイン完成した時			
+				g_bDispMenu1P2P = true;									//1p2p選択メニューを表示する
+
+				PlaySound(SOUND_LABEL_SE_TITLESTART, false, true);		// タイトル画面にスタートボタンを押した音を再生
+			}
+		}
+
 	}
 
 }
@@ -291,10 +300,14 @@ void Menu1P2P(void)
 				{
 					g_nCursorIdx = INDEX_MAX_MENU_1P2P - 1;
 				}
+
+				PlaySound(SOUND_LABEL_SE_CURORMOVE, false, true);			//カーソル移動音を再生
 			}
 			else if (GetKeyboardRepeat(DIK_S) || IsButtonRepeat(0, BUTTON_DOWN) || IsButtonRepeat(0, BUTTON_LSTICK_DOWN))
 			{//カーソルを下移動
 				g_nCursorIdx = (g_nCursorIdx + 1) % INDEX_MAX_MENU_1P2P;
+
+				PlaySound(SOUND_LABEL_SE_CURORMOVE, false, true);			//カーソル移動音を再生
 			}
 
 			if (GetKeyboardTrigger(DIK_SPACE) || IsButtonTrigger(0, BUTTON_CIRCLE))
@@ -312,6 +325,8 @@ void Menu1P2P(void)
 
 				SetFade(FADE_OUT);
 				g_bChosedMenu1P2P = true;
+
+				PlaySound(SOUND_LABEL_SE_CURORYES, false, true);			//カーソル決定音を再生
 			}
 		}
 	}

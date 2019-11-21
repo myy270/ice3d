@@ -10,8 +10,13 @@
 // マクロ定義
 //*****************************************************************************
 
-#define CLASS_NAME		"AppClass"			// ウインドウのクラス名
-#define WINDOW_NAME		"ICE3D"				// ウインドウのキャプション名
+#define CLASS_NAME		"AppClass"					// ウインドウのクラス名
+
+#ifdef _DEBUG
+#define WINDOW_NAME		"ICE3D(debug)"				// ウインドウのキャプション名
+#else
+#define WINDOW_NAME		"ICE3D(release)"			// ウインドウのキャプション名
+#endif
 
 //*****************************************************************************
 // プロトタイプ宣言

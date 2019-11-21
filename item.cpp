@@ -10,6 +10,8 @@
 #include "player.h"
 #include "enemy.h"
 #include "timer.h"
+#include "sound.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -292,6 +294,9 @@ void DropItem()
 			g_dropItemIndex = SetItem(D3DXVECTOR3(fPosX, fPosY, fPosZ), ITEMTYPE_ICEBLOCK, false);
 
 			g_isReadyToDrop = true;
+
+			PlaySound(SOUND_LABEL_SE_ICEBLOCKDROP, false, false);		// 凍結アイテムが落下する音を再生
+
 		}
 
 		if (g_dropItemIndex != -1)
@@ -305,6 +310,7 @@ void DropItem()
 				g_isDropItem = false;
 				g_isReadyToDrop = false;
 			}
+
 		}
 		
 	}

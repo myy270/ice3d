@@ -24,9 +24,9 @@ LPD3DXFONT	g_pD3DXFont = NULL;			// フォントへのポインタ
 char		g_aStrDebug[1024] = {"\0"};	// デバッグ情報
 
 #ifdef _DEBUG
-bool		g_bDispDebug = 1;			// デバッグ表示ON/OFF
+bool		g_bDispDebug = BOOL_DEBUG_UI;			// デバッグ表示ON/OFF
 #else
-bool		g_bDispDebug = 0;			// デバッグ表示ON/OFF
+bool		g_bDispDebug = false;					// デバッグ表示ON/OFF
 #endif
 
 //=============================================================================

@@ -7,6 +7,7 @@
 #include "score.h"
 #include "camera.h"
 #include "title.h"
+#include "sound.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -185,15 +186,19 @@ void CompareScore()
 		}
 
 		if ((GetPlayMode() == PLAY_MODE_SINGLE) && (g_winner == OBJECT_ENEMY))
-		{
-			//AIが勝つ場合、カットシーンしない
+		{//AIが勝つ場合
+			StopSound(SOUND_LABEL_BGM000, false);				//BGMを停止
+			PlaySound(SOUND_LABEL_SE_GAMEOVER, false, true);	//ゲームオーバー音を再生
 		}
 		else
-		{	
-			SetCameraMode(CAMERA_MODE_CUTSCENE);	//1pか2pが勝つ場合、カットシーンする
-		}
+		{//プレイヤー(1pか2p)が勝つ場合
+			SetCameraMode(CAMERA_MODE_CUTSCENE);				//カットシーンする	
 
+			StopSound(SOUND_LABEL_BGM000, false);				//BGMを停止
+			PlaySound(SOUND_LABEL_SE_WIN, false, true);			//勝つ音を再生
+		}
 	}
+
 }
 
 //=============================================================================

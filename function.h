@@ -85,7 +85,9 @@
 
 #define AI_TYPE					(1)								// AIの種類			//リリース時の設定値は 1
 
-#define LIMIT_TIME				(50)							// 制限時間			//リリース時の設定値は 50
+#define LIMIT_TIME				(15)							// 制限時間			//リリース時の設定値は 50
+
+#define BOOL_DEBUG_UI			(false)							// デバッグ情報の表示かどうか
 
 //*****************************************************************************
 // 列挙型定義
@@ -160,15 +162,7 @@ enum MAPPINGTYPE
 
 };
 
-// g_aParam[SOUND_LABEL_MAX]のサウンドファイルのパスと合わせて並ぶ
-enum SOUND_LABEL
-{
-	SOUND_LABEL_BGM000,			// BGM
-	SOUND_LABEL_SE_COIN,		// コインとの衝突音
-	SOUND_LABEL_SE_TEST,		// テスト音
-	SOUND_LABEL_MAX,
 
-};
 
 //*****************************************************************************
 // 構造体定義

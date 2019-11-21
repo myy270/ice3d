@@ -271,13 +271,16 @@ void Pause(bool& b)
 			b = !b;
 
 			if (b)
-			{//ポーズする時、すべての音楽を一時停止
-				StopSoundALL(true);
+			{
+				StopSoundALL(true);									//ポーズする瞬間の、再生している音を一時停止
+
+				PlaySound(SOUND_LABEL_SE_PAUSE, false, true);		//ポーズの効果音を再生
 			}
 			else
 			{
-				PlaySoundAll();
+				PlaySoundAll();										//ポーズにより一時停止した音を再生
 			}
+		
 		}
 	}
 

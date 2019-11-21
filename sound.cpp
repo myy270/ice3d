@@ -34,7 +34,21 @@ SOUND_PARAM g_aParam[SOUND_LABEL_MAX] =
 {
 	{"data/BGM/bgm000.wav", false},	
 	{"data/SE/coin000.wav", false},	
-	{"data/SE/test.wav", false},
+	{"data/SE/pause.wav", false},
+	{"data/SE/pause.wav", false},
+	{"data/SE/cursor_move.wav", false},
+	{"data/SE/cursor_yes.wav", false},
+	{"data/SE/title_start.wav", false},
+	{"data/SE/time_end.wav", false},
+	{"data/SE/use_iceblock.wav", false},
+	{"data/SE/iceblock_drop.wav", false},
+	{"data/SE/get_iceblock.wav", false},
+	{"data/SE/opening.wav", false},
+	{"data/SE/time_warning.wav", false},
+	{"data/SE/win.wav", false},
+	{"data/SE/gameover.wav", false},
+
+	
 };
 
 //=============================================================================
@@ -181,10 +195,10 @@ void UpdateSound()
 	//PrintDebugProc("BuffersQueued[SOUND_LABEL_SE_TEST]:%d \n\n\n", g_xa2state.BuffersQueued);
 
 
-	//if (GetKeyboardTrigger(DIK_Z))
-	//{
-	//	PlaySound(SOUND_LABEL_SE_TEST, true, false);
-	//}
+	if (GetKeyboardTrigger(DIK_Z))
+	{
+		PlaySound(SOUND_LABEL_SE_TEST, false, true);
+	}
 	//if (GetKeyboardTrigger(DIK_X))
 	//{
 	//	StopSound(SOUND_LABEL_SE_TEST, false);

@@ -7,6 +7,7 @@
 #include "timer.h"
 #include "fade.h"
 #include "input.h"
+#include "sound.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -104,17 +105,28 @@ void UninitTimer(void)
 //=============================================================================
 void UpdateTimer(void)
 {
-
 #ifdef _DEBUG
-	if (GetKeyboardTrigger(DIK_SUBTRACT))		//テンキーのマイナス-
+	if (GetKeyboardTrigger(DIK_SUBTRACT))	//テンキーのマイナス-
 	{
-		g_nTimerCount = 5 * FPS;	//開発者機能、タイマーの時間を5秒にする
+		g_nTimerCount = 6 * FPS;			//開発者機能、タイマーの時間を6秒にする
 	}
 #endif
 
 	if(g_bEnableTimer)
 	{
 		g_nTimerCount--;			//毎フレームにカウントダウン
+	}
+
+	if (g_nTimerCount == 5 * FPS)
+	{
+		PlaySound(SOUND_LABEL_SE_TIMEWARNING, false, true);					// タイムウォーニング音を再生
+
+		for (int nCntPlace = 0; nCntPlace < NUM_PLACE + 1; nCntPlace++)
+		{
+			// 反射光の設定
+			SetVtxDataCor(g_pD3DVtxBuffTimer, FVF_VERTEX_2D, D3DCOLOR_RGBA(255, 0, 0, 255), nCntPlace);		// タイマーを赤色にする
+		}
+
 	}
 
 	if (g_nTimerCount < 0)
@@ -124,9 +136,11 @@ void UpdateTimer(void)
 
 	if ((g_nTimerCount <= 0) && (g_bTimeEnd == false))
 	{
-		g_bTimeEnd = true;	//時間が終わった
+		g_bTimeEnd = true;		//時間が終わった
 
-		SetFade(FADE_OUT);		//リザルト画面へフェード
+		SetFade(FADE_OUT);		//リザルト画面へフェードアウト
+
+		PlaySound(SOUND_LABEL_SE_TIMEEND, false, true);		// タイマー終わった音を再生
 	}
 
 	int count = g_nTimerCount + 59;			//残り0.5秒としても、画面上には1秒として表示するための役割
