@@ -259,22 +259,25 @@ void TitleEffect(void)
 			}
 		}
 
-		//タイトルロゴのフェードインのスキップ と 1p2p選択メニューに移す処理
-		if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))
+		if (GetFade() == FADE_NONE)
 		{
-			if (g_fAlphaTitleLogo < 1.0f)
-			{//タイトルロゴがフェードインしている時
-				g_fAlphaTitleLogo = 1.0f;						// フェードインを完成状態にさせる
+			//タイトルロゴのフェードインのスキップ と 1p2p選択メニューに移す処理
+			if (GetKeyboardTrigger(DIK_RETURN) || IsButtonTrigger(0, BUTTON_OPTIONS))
+			{
+				if (g_fAlphaTitleLogo < 1.0f)
+				{//タイトルロゴがフェードインしている時
+					g_fAlphaTitleLogo = 1.0f;						// フェードインを完成状態にさせる
 
-				SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
+					SetVtxDataCor(g_pD3DVtxBuffTitleLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 1.0f, 1.0f, g_fAlphaTitleLogo));	//アルファ値をセットする
 
-				g_nCountAppearStart = COUNT_APPEAR_START;		//「PRESS START」ロゴを点滅状態にさせる
-			}
-			else
-			{//タイトルロゴがフェードイン完成した時			
-				g_bDispMenu1P2P = true;									//1p2p選択メニューを表示する
+					g_nCountAppearStart = COUNT_APPEAR_START;		//「PRESS START」ロゴを点滅状態にさせる
+				}
+				else
+				{//タイトルロゴがフェードイン完成した時			
+					g_bDispMenu1P2P = true;									//1p2p選択メニューを表示する
 
-				PlaySound(SOUND_LABEL_SE_TITLESTART, false, true);		// タイトル画面にスタートボタンを押した音を再生
+					PlaySound(SOUND_LABEL_SE_TITLESTART, false, true);		// タイトル画面にスタートボタンを押した音を再生
+				}
 			}
 		}
 

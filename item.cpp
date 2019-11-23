@@ -15,6 +15,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
+#define	TEXTURE_UI_ICEBLOCK		"data/TEXTURE/ui_iceblock.png"				// アイスブロックのUI
+
 #define	ITEM_RADIUS				(10.0f)										// アイテムの半径	//影の大きさ、アイテムとの当たる距離 と関係ある
 
 #define	ITEMUI_WIDTH			FIT_WIDTH(65.0f)							// アイテムUIの幅
@@ -58,6 +60,8 @@ int g_dropItemIndex;	//落下するアイテムのインデクス
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemUI = NULL;			// 左のアイテムUIの頂点バッファインターフェースへのポインタ
 LPDIRECT3DVERTEXBUFFER9 g_pD3DVtxBuffItemUI2 = NULL;		// 右のアイテムUIの頂点バッファインターフェースへのポインタ
 
+LPDIRECT3DTEXTURE9		g_pD3DTextureUI = NULL;				// テクスチャへのポインタ
+
 //アイテムのXファイルのパス
 const char *c_aFileNameItem[ITEMTYPE_MAX] =
 {
@@ -78,7 +82,7 @@ HRESULT InitItem(void)
 	SetVtxDataCor(g_pD3DVtxBuffItemUI, FVF_VERTEX_2D, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));		//シアン色にする
 
 	MakeVertex(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI2, D3DXVECTOR3(ITEMUI_POS_X2, ITEMUI_POS_Y, 0.0f), ITEMUI_WIDTH, ITEMUI_HEIGHT);
-	SetVtxDataCor(g_pD3DVtxBuffItemUI2, FVF_VERTEX_2D, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));	//シアン色にする
+	SetVtxDataCor(g_pD3DVtxBuffItemUI2, FVF_VERTEX_2D, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));		//シアン色にする
 
 	// Xファイルの読み込み
 	for(int nCntItemType = 0; nCntItemType < ITEMTYPE_MAX; nCntItemType++)
@@ -126,6 +130,11 @@ HRESULT InitItem(void)
 		}
 	}
 
+	// テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
+								TEXTURE_UI_ICEBLOCK,		// ファイルの名前
+								&g_pD3DTextureUI);			// 読み込むメモリー
+
 	return S_OK;
 }
 
@@ -143,6 +152,8 @@ void UninitItem(void)
 
 	SAFE_RELEASE(g_pD3DVtxBuffItemUI);
 	SAFE_RELEASE(g_pD3DVtxBuffItemUI2);
+	SAFE_RELEASE(g_pD3DTextureUI);
+	
 }
 
 //=============================================================================
@@ -209,18 +220,26 @@ void DrawItem(void)
 		}
 	}
 
+	// αテストを有効に
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 10);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
 	//凍結アイテムUIの描画	
 	//左の方
 	if (GetPlayer()->holdItem == ITEMTYPE_ICEBLOCK)
 	{
-		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI, NULL);
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI, g_pD3DTextureUI);
 	}
 	//右の方
 	if (GetEnemy()->holdItem == ITEMTYPE_ICEBLOCK)
 	{
-		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI2, NULL);
+		DrawPolygon(pDevice, FVF_VERTEX_2D, g_pD3DVtxBuffItemUI2, g_pD3DTextureUI);
 	}
-			
+		
+	// αテストを無効に
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
 }
 
 //=============================================================================

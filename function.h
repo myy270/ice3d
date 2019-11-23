@@ -56,7 +56,7 @@
 
 #define	FPS						(60)							// ロックされたFPS
 
-#define	FIRST_SCENE				(SCENE_TITLE)					// 最初の画面		//リリース時の設定値は SCENE_TITLE
+#define	FIRST_SCENE				(SCENE_TITLE)					// プログラム起動時の最初の画面		//リリース時の設定値は SCENE_TITLE
 
 #define	BODY_PLAYER				"data/MODEL/bearBody.x"			// 読み込むモデル名
 #define	HEAD_PLAYER				"data/MODEL/bearHead.x"			// 読み込むモデル名
@@ -85,7 +85,7 @@
 
 #define AI_TYPE					(1)								// AIの種類			//リリース時の設定値は 1
 
-#define LIMIT_TIME				(15)							// 制限時間			//リリース時の設定値は 50
+#define LIMIT_TIME				(999)							// 制限時間			//リリース時の設定値は 50
 
 #define BOOL_DEBUG_UI			(false)							// デバッグ情報の表示かどうか
 

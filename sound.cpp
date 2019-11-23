@@ -34,7 +34,7 @@ SOUND_PARAM g_aParam[SOUND_LABEL_MAX] =
 {
 	{"data/BGM/bgm000.wav", false},	
 	{"data/SE/coin000.wav", false},	
-	{"data/SE/pause.wav", false},
+	{"data/SE/draw.wav", false},
 	{"data/SE/pause.wav", false},
 	{"data/SE/cursor_move.wav", false},
 	{"data/SE/cursor_yes.wav", false},
@@ -47,6 +47,8 @@ SOUND_PARAM g_aParam[SOUND_LABEL_MAX] =
 	{"data/SE/time_warning.wav", false},
 	{"data/SE/win.wav", false},
 	{"data/SE/gameover.wav", false},
+	{"data/SE/retire.wav", false},
+	{"data/SE/draw.wav", false}
 
 	
 };

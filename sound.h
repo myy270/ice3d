@@ -13,7 +13,7 @@
 // 列挙型定義
 //*****************************************************************************
 
-// g_aParam[SOUND_LABEL_MAX]のサウンドファイルのパスと合わせて並ぶ
+// g_aParam[SOUND_LABEL_MAX]のパスと対応して並ぶ
 enum SOUND_LABEL
 {
 	SOUND_LABEL_BGM000,				// BGM
@@ -29,9 +29,10 @@ enum SOUND_LABEL
 	SOUND_LABEL_SE_GETICEBLOCK,		// 凍結アイテムを拾う効果音
 	SOUND_LABEL_SE_OPENING,			// オープニング音
 	SOUND_LABEL_SE_TIMEWARNING,		// タイムウォーニング音
-	SOUND_LABEL_SE_WIN,				// 勝つ音
+	SOUND_LABEL_SE_WIN,				// 勝利音
 	SOUND_LABEL_SE_GAMEOVER,		// ゲームオーバー音
-
+	SOUND_LABEL_SE_RETIRE,			// タイトル画面に戻る音 
+	SOUND_LABEL_SE_DRAW,			// 引き分けの音 
 
 	SOUND_LABEL_MAX,
 

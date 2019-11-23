@@ -1602,7 +1602,7 @@ void Character::UseIceblock()
 	{
 		key = DIK_SPACE;
 		padNo = 0;
-		target = GetEnemy();		//å„Ç≈çÏÇÈ
+		target = GetEnemy();
 	}
 	else
 	{

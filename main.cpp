@@ -190,7 +190,7 @@ void Update(void)
 		UpdateTitle();
 		break;
 
-	case SCENE_GAME:			// ゲーム画面の更新
+	case SCENE_GAME:		// ゲーム画面の更新
 		UpdateGame();
 		break;
 
@@ -295,7 +295,8 @@ void Retire(void)
 		(IsButtonPress(0, BUTTON_L3) && IsButtonTrigger(0, BUTTON_R3)) ||
 		(IsButtonTrigger(0, BUTTON_L3) && IsButtonPress(0, BUTTON_R3)))
 	{		
-		SetScene(SCENE_TITLE);
+		SetFade(FADE_IN);			//フェードアウト最後のSetSceneを防止
+		SetScene(SCENE_TITLE);	
 	}
 
 }

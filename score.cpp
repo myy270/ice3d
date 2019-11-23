@@ -176,26 +176,34 @@ void CompareScore()
 {
 	if (g_winner == OBJECT_NULL)
 	{
-		if (g_score >= g_score2)
-		{//プレイヤー勝つ場合
+		if (g_score > g_score2)
+		{//プレイヤー1 勝つ場合
 			g_winner = OBJECT_PLAYER;
 		}
-		else
-		{//プレイヤー負ける場合
+		else if(g_score < g_score2)
+		{//プレイヤー1 負ける場合
 			g_winner = OBJECT_ENEMY;
 		}
+		else
+		{//引き分け
+			g_winner = OBJECT_NULL;
+		}
+
+		StopSound(SOUND_LABEL_BGM000, false);					//BGMを停止
 
 		if ((GetPlayMode() == PLAY_MODE_SINGLE) && (g_winner == OBJECT_ENEMY))
 		{//AIが勝つ場合
-			StopSound(SOUND_LABEL_BGM000, false);				//BGMを停止
 			PlaySound(SOUND_LABEL_SE_GAMEOVER, false, true);	//ゲームオーバー音を再生
+		}
+		else if (g_winner == OBJECT_NULL)
+		{//引き分けの場合
+			PlaySound(SOUND_LABEL_SE_DRAW, false, true);		//引き分けの音を再生
 		}
 		else
 		{//プレイヤー(1pか2p)が勝つ場合
 			SetCameraMode(CAMERA_MODE_CUTSCENE);				//カットシーンする	
 
-			StopSound(SOUND_LABEL_BGM000, false);				//BGMを停止
-			PlaySound(SOUND_LABEL_SE_WIN, false, true);			//勝つ音を再生
+			PlaySound(SOUND_LABEL_SE_WIN, false, true);			//勝利音を再生
 		}
 	}
 
