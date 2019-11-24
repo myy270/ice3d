@@ -147,6 +147,7 @@ void DrawResult(void)
 	{
 		if (GetWinner() == OBJECT_PLAYER)
 		{
+			SetVtxDataCor(g_pD3DVtxBuffResultLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 0.7f, 0.0f, g_fAlphaResult));	//オレンジ
 			texture = g_pD3DTextureResultLogo[0];
 		}
 		else if (GetWinner() == OBJECT_ENEMY)
@@ -162,10 +163,12 @@ void DrawResult(void)
 	{
 		if ((GetWinner() == OBJECT_PLAYER))
 		{
+			SetVtxDataCor(g_pD3DVtxBuffResultLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 0.7f, 0.0f, g_fAlphaResult));	//オレンジ
 			texture = g_pD3DTextureResultLogo[0];
 		}
 		else if (GetWinner() == OBJECT_ENEMY)
 		{
+			SetVtxDataCor(g_pD3DVtxBuffResultLogo, FVF_VERTEX_2D, D3DXCOLOR(1.0f, 0.67f, 0.75f, g_fAlphaResult));//ピンク
 			texture = g_pD3DTextureResultLogo[0];
 		}
 		else

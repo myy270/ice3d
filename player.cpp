@@ -48,9 +48,9 @@ void UpdatePlayer(void)
 {
 	g_player.UpdateCharacter();
 
-	PrintDebugProc("目的向き：%f \n\n", g_player.rotDest.y);
-	PrintDebugProc("現在の向き：%f \n\n", g_player.part[0].srt.rot.y);
-	PrintDebugProc("移動量：%f %f %f \n\n", g_player.move.x, g_player.move.y, g_player.move.z);
+	//PrintDebugProc("目的向き：%f \n\n", g_player.rotDest.y);
+	//PrintDebugProc("現在の向き：%f \n\n", g_player.part[0].srt.rot.y);
+	//PrintDebugProc("移動量：%f %f %f \n\n", g_player.move.x, g_player.move.y, g_player.move.z);
 
 }									  
 

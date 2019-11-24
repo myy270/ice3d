@@ -181,22 +181,22 @@ void SetCamera(void)
 
 
 	//デバッグ用出力情報
-	PrintDebugProc("[camera pos：(%f : %f : %f)]\n", g_cameraPos.x,
-		g_cameraPos.y,
-		g_cameraPos.z);
-	PrintDebugProc("[camera at：(%f : %f : %f)]\n", g_cameraAt.x,
-		g_cameraAt.y,
-		g_cameraAt.z);
+	//PrintDebugProc("[camera pos：(%f : %f : %f)]\n", g_cameraPos.x,
+	//	g_cameraPos.y,
+	//	g_cameraPos.z);
+	//PrintDebugProc("[camera at：(%f : %f : %f)]\n", g_cameraAt.x,
+	//	g_cameraAt.y,
+	//	g_cameraAt.z);
 
-	PrintDebugProc("\n");
-	PrintDebugProc("[camera rot：(%f : %f : %f)]\n", g_rotCamera.x,
-		g_rotCamera.y,
-		g_rotCamera.z);
-	PrintDebugProc("\n");
-	PrintDebugProc("chaseHightP:%f\n", g_fChaseHeight);
-	PrintDebugProc("\n");
-	PrintDebugProc("LengthIntervalCamera:%f\n", g_fLengthIntervalCamera);
-	PrintDebugProc("\n");
+	//PrintDebugProc("\n");
+	//PrintDebugProc("[camera rot：(%f : %f : %f)]\n", g_rotCamera.x,
+	//	g_rotCamera.y,
+	//	g_rotCamera.z);
+	//PrintDebugProc("\n");
+	//PrintDebugProc("chaseHightP:%f\n", g_fChaseHeight);
+	//PrintDebugProc("\n");
+	//PrintDebugProc("LengthIntervalCamera:%f\n", g_fLengthIntervalCamera);
+	//PrintDebugProc("\n");
 
 }
 

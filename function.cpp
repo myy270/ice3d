@@ -1145,7 +1145,7 @@ int Character::AI(int type)
 		leftAI = rightAI = upAI = downAI = 0;//止まる
 	}
 
-	PrintDebugProc("AI(type %d)の一番近いアイテムの番号 ：%d \n\n", type, tagetNo);
+	//PrintDebugProc("AI(type %d)の一番近いアイテムの番号 ：%d \n\n", type, tagetNo);
 
 	return tagetNo;
 

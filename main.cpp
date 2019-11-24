@@ -218,7 +218,7 @@ void Draw(void)
 	LPDIRECT3DDEVICE9 g_pD3DDevice = GetDevice();
 
 	// バックバッファ＆Ｚバッファのクリア
-	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(255, 255, 255, 255), 1.0f, 0);
+	g_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(97, 123, 182, 255), 1.0f, 0);		//フィールドの色と似ている色にする
 
 	// Direct3Dによる描画の開始
 	if(SUCCEEDED(g_pD3DDevice->BeginScene()))

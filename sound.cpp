@@ -197,10 +197,10 @@ void UpdateSound()
 	//PrintDebugProc("BuffersQueued[SOUND_LABEL_SE_TEST]:%d \n\n\n", g_xa2state.BuffersQueued);
 
 
-	if (GetKeyboardTrigger(DIK_Z))
-	{
-		PlaySound(SOUND_LABEL_SE_TEST, false, true);
-	}
+	//if (GetKeyboardTrigger(DIK_Z))
+	//{
+	//	PlaySound(SOUND_LABEL_SE_TEST, false, true);
+	//}
 	//if (GetKeyboardTrigger(DIK_X))
 	//{
 	//	StopSound(SOUND_LABEL_SE_TEST, false);

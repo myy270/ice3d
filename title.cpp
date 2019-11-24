@@ -116,6 +116,7 @@ HRESULT InitTitle(void)
 	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
 								TEXTURE_TITLE_LOGO,			// ファイルの名前
 								&g_pD3DTextureTitleLogo);	// 読み込むメモリー
+
 	// タイトル画面の「PRESS START」ロゴ
 	D3DXCreateTextureFromFile(pDevice,						// デバイスへのポインタ
 								TEXTURE_PRESS_START,		// ファイルの名前
